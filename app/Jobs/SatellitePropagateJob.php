@@ -2,9 +2,10 @@
 
 namespace App\Jobs;
 
-use App\Engines\Satellite\SatelliteEngine;
 use App\Models\Satellite;
 use App\Models\SatelliteTrack;
+use App\Engines\Satellite\SatelliteEngine;
+use App\Events\SatelliteUpdated;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
@@ -15,29 +16,23 @@ class SatellitePropagateJob implements ShouldQueue
 
     public function handle(SatelliteEngine $engine): void
     {
-        try {
-            Log::info('Starting Satellite Propagation...');
+        $satellites = Satellite::where('status', 'ACTIVE')->get();
 
-            $satellites = Satellite::where('status', 'ACTIVE')->get();
+        foreach ($satellites as $satellite) {
+            try {
+                $trackData = $engine->propagate($satellite);
 
-            foreach ($satellites as $satellite) {
-                if ($satellite->tle_line1 && $satellite->tle_line2) {
-                    $coords = $engine->propagate($satellite);
+                SatelliteTrack::create(array_merge([
+                    'satellite_id' => $satellite->id,
+                    'tracked_at' => now(),
+                ], $trackData));
 
-                    SatelliteTrack::create([
-                        'satellite_id' => $satellite->id,
-                        'latitude' => $coords['latitude'],
-                        'longitude' => $coords['longitude'],
-                        'altitude' => $coords['altitude'],
-                        'velocity' => $coords['velocity'],
-                        'captured_at' => now(),
-                    ]);
-                }
+                // Broadcast live update
+                event(new SatelliteUpdated($satellite, $trackData));
+
+            } catch (\Exception $e) {
+                Log::error("Failed to propagate satellite {$satellite->name}: " . $e->getMessage());
             }
-
-            Log::info('Satellite Propagation successful.');
-        } catch (\Exception $e) {
-            Log::error('Satellite Propagation failed: ' . $e->getMessage());
         }
     }
 }
