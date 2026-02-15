@@ -194,3 +194,37 @@ To https://github.com/creyt2012/vetinh.git
    1dc7637..ce501f2  main -> main
 Successfully pushed changes.
 Change detected. Syncing to GitHub...
+warning: adding embedded git repository: wiki_clone
+hint: You've added another git repository inside your current repository.
+hint: Clones of the outer repository will not contain the contents of
+hint: the embedded repository and will not know how to obtain it.
+hint: If you meant to add a submodule, use:
+hint: 
+hint: 	git submodule add <url> wiki_clone
+hint: 
+hint: If you added this path by mistake, you can remove it from the
+hint: index with:
+hint: 
+hint: 	git rm --cached wiki_clone
+hint: 
+hint: See "git help submodule" for more information.
+[main 2d64f68] Auto-sync: 2026-02-16 06:36:31
+ Committer: Nguyễn Thành Biên <creytdeveloper@xdigital-2.local>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly. Run the
+following command and follow the instructions in your editor to edit
+your configuration file:
+
+    git config --global --edit
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 2 files changed, 20 insertions(+)
+ create mode 160000 wiki_clone
+To https://github.com/creyt2012/vetinh.git
+   ce501f2..2d64f68  main -> main
+Successfully pushed changes.
+Change detected. Syncing to GitHub...
