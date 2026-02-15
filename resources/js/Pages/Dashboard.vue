@@ -34,20 +34,16 @@ onMounted(() => {
     if (window.Echo) {
         window.Echo.channel('weather.live')
             .listen('.weather.updated', (e) => {
-                metrics.value = {
-                    ...e.data,
-                    risk_score: e.risk.score,
-                    risk_level: e.risk.level
-                };
+                metrics.value = e.data;
             });
 
         window.Echo.channel('satellites.live')
             .listen('.satellite.updated', (e) => {
                 const index = satellites.value.findIndex(s => s.id === e.data.id);
                 if (index !== -1) {
-                    satellites.value[index] = { ...satellites.value[index], ...e.track };
+                    satellites.value[index] = { ...satellites.value[index], ...e.data };
                 } else {
-                    satellites.value.push({ ...e.data, ...e.track });
+                    satellites.value.push(e.data);
                 }
             });
     }
