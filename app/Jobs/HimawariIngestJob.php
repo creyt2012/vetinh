@@ -2,9 +2,11 @@
 
 namespace App\Jobs;
 
+use App\Models\WeatherMetric;
 use App\Engines\Weather\HimawariService;
 use App\Engines\Weather\HimawariProcessor;
-use App\Models\WeatherMetric;
+use App\Engines\Analytics\RiskEngine;
+use App\Events\WeatherMetricsUpdated;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
@@ -13,29 +15,40 @@ class HimawariIngestJob implements ShouldQueue
 {
     use Queueable;
 
-    public function handle(HimawariService $service, HimawariProcessor $processor): void
-    {
+    public function handle(
+        HimawariService $service,
+        HimawariProcessor $processor,
+        RiskEngine $riskEngine
+    ): void {
         try {
-            Log::info('Starting Himawari Ingestion pipeline...');
+            // 1. Fetch latest imagery
+            $imagePath = $service->downloadLatest();
 
-            $metadata = $service->fetchLatestMetadata();
-            // In a real scenario, we would loop through tiles and merge them.
-            // Here we simulate tile (0,0,0) as basic input.
-            $tilePath = $service->downloadTile($metadata['timestamp'], 0, 0, 0);
+            // 2. Process imagery (Crop VN, Get stats)
+            $stats = $processor->processImage($imagePath);
 
-            $coverage = $processor->calculateCloudCoverage($tilePath);
-
-            WeatherMetric::create([
-                'latitude' => 15.8, // Center of Vietnam approx
-                'longitude' => 108.3,
-                'cloud_coverage' => $coverage,
-                'timestamp' => now(),
-                'data_sources' => ['Himawari-9'],
+            // 3. Save Metrics
+            $metric = WeatherMetric::create([
+                'source' => 'Himawari-9',
+                'captured_at' => now(),
+                'cloud_coverage' => $stats['cloud_coverage'],
+                'rain_intensity' => $stats['rain_estimation'],
+                'metadata' => [
+                    'image_url' => $stats['image_url'],
+                    'provider' => 'JMA'
+                ]
             ]);
 
-            Log::info("Himawari Ingestion successful. Coverage: {$coverage}%");
+            // 4. Compute Risk & Broadcast
+            $previous = WeatherMetric::where('id', '!=', $metric->id)->latest('captured_at')->first();
+            $risk = $riskEngine->computeRiskScore($metric, $previous);
+
+            event(new WeatherMetricsUpdated($metric, $risk));
+
+            Log::info("Himawari ingestion complete. Risk Score: {$risk['score']}");
+
         } catch (\Exception $e) {
-            Log::error("Himawari Ingestion failed: " . $e->getMessage());
+            Log::error("Himawari Ingestion Failed: " . $e->getMessage());
         }
     }
 }
