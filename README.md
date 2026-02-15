@@ -19,7 +19,7 @@ Trải nghiệm giao diện 3D sống động, nơi bạn có thể thấy các 
 Mình không chỉ đưa ra những con số khô khan. StarWeather phân tích hàng loạt dữ liệu từ mật độ mây đến cường độ mưa để trả về một **Điểm Rủi Ro (Risk Score)** dễ hiểu. Bạn sẽ biết ngay tình trạng thời tiết tại khu vực của mình đang ở mức An toàn, Trung bình hay Nguy cấp.
 
 ### API Dành Cho Nhà Phát Triển
-Nếu bạn muốn xây dựng ứng dụng riêng? Hệ thống API của chúng tôi cực kỳ linh hoạt, được thiết kế theo chuẩn Enterprise, giúp bạn truy xuất dữ liệu vệ tinh và thời tiết chỉ với vài dòng code.
+Nếu bạn muốn xây dựng ứng dụng riêng? Hệ thống API của Mình cực kỳ linh hoạt, được thiết kế theo chuẩn Enterprise, giúp bạn truy xuất dữ liệu vệ tinh và thời tiết chỉ với vài dòng code.
 
 ---
 
@@ -50,7 +50,7 @@ npm run dev        # Giao diện Vue 3
 ---
 
 ## 🚀 Lộ trình sắp tới
-Chúng tôi đang làm việc không ngừng nghỉ để đưa thêm dữ liệu từ các **Radar thời tiết** và triển khai hệ thống **Cảnh báo sớm qua Email/Sms** trong các phiên bản tới.
+Mình đang làm việc không ngừng nghỉ để đưa thêm dữ liệu từ các **Radar thời tiết** và triển khai hệ thống **Cảnh báo sớm qua Email/Sms** trong các phiên bản tới.
 
 ---
 **Một sản phẩm đầy tâm huyết của Mình**  
