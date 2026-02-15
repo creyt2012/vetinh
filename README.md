@@ -1,66 +1,103 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# StarWeather - Nền tảng Trí tuệ Vệ tinh & Trái đất Thời gian thực
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+StarWeather là một nền tảng SaaS thương mại cấp Enterprise, cung cấp khả năng theo dõi vệ tinh thời gian thực và phân tích dữ liệu thời tiết thông minh. Hệ thống kết hợp dữ liệu từ các vệ tinh khí tượng (Himawari), dữ liệu Sentinel (Copernicus), và dữ liệu quỹ đạo NORAD để cung cấp các dự báo, cảnh bảo rủi ro và API cho nhà phát triển.
 
-## About Laravel
+## 🛰️ Tính năng cốt lõi
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### 1. Công cụ Vệ tinh Thời gian thực
+- Theo dõi vị trí vệ tinh (Starlink, ISS, Sentinel, Himawari,...) mỗi 3 giây.
+- Sử dụng thuật toán SGP4 để tính toán quỹ đạo chính xác.
+- Hiển thị độ cao, vận tốc và bán kính hiển thị trên bản đồ 3D.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 2. Trí tuệ Thời tiết & Ảnh Vệ tinh
+- Tự động lấy ảnh từ vệ tinh Himawari-9 mỗi 10 phút.
+- Xử lý ảnh để trích xuất độ phủ mây, mật độ mây và ước tính lượng mưa.
+- Phân đoạn mây và xác định các vùng đối lưu mạnh tại khu vực Việt Nam.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 3. Hệ thống Đánh giá Rủi ro (Risk Engine)
+- Tính toán điểm rủi ro thiên tai (0-100) dựa trên fusion dữ liệu đa nguồn.
+- Phân loại mức độ rủi ro: **LOW**, **MEDIUM**, **HIGH**, **CRITICAL**.
+- Phát hiện các bất thường về áp suất và sự phát triển bất thường của mây bão.
 
-## Learning Laravel
+### 4. Giao diện 3D Globe Cao cấp
+- Quả địa cầu 3D tương tác xây dựng bằng Three.js.
+- Lớp phủ mây thời gian thực và quỹ đạo vệ tinh sống động.
+- Bảng điều khiển (Dashboard) mang phong cách Glassmorphism, hiện đại và tối ưu trải nghiệm người dùng.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 5. API cho Nhà phát triển
+- Hệ thống API v1 hoàn chỉnh với xác thực API Key.
+- Giới hạn băng thông (Rate limiting) theo gói đăng ký (SaaS model).
+- Tài liệu tích hợp sẵn cho việc truy xuất dữ liệu thời tiết và vệ tinh.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## 🛠️ Công nghệ sử dụng
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- **Backend**: Laravel 11 (PHP 8.3)
+- **Frontend**: Vue 3, Vite, TailwindCSS
+- **3D Engine**: Three.js
+- **Real-time**: Laravel Reverb (WebSocket)
+- **Database**: MySQL 8.0 & Redis
+- **Queue/Worker**: Laravel Horizon
+- **Monitoring**: Laravel Pulse
 
-## Laravel Sponsors
+## 🚀 Hướng dẫn cài đặt địa phương (Local Setup)
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Dự án này được tối ưu hóa để chạy trực tiếp trên môi trường MacOS/Linux mà không cần Docker (theo yêu cầu của kiến trúc sư).
 
-### Premium Partners
+### 1. Yêu cầu hệ thống
+- PHP 8.3+
+- Composer
+- Node.js & NPM
+- MySQL 8.0+
+- Redis
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+### 2. Các bước cài đặt
 
-## Contributing
+```bash
+# Clone repository
+git clone https://github.com/creyt2012/vetinh.git
+cd vetinh
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+# Cài đặt PHP dependencies
+composer install
 
-## Code of Conduct
+# Cài đặt JS dependencies
+npm install
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# Cấu hình môi trường
+cp .env.example .env
+php artisan key:generate
 
-## Security Vulnerabilities
+# Cấu hình Database trong .env sau đó chạy migration và seeder
+php artisan migrate --seed
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 3. Chạy ứng dụng
 
-## License
+Mở 3 cửa sổ terminal riêng biệt:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- **Terminal 1 (Web Server)**: `php artisan serve`
+- **Terminal 2 (Vite Dev)**: `npm run dev`
+- **Terminal 3 (Worker & Scheduler)**:
+  ```bash
+  php artisan horizon
+  # và một terminal khác để chạy scheduler
+  php artisan schedule:work
+  ```
+
+## 🔄 Tự động hóa GitHub (Auto-push)
+
+Dự án tích hợp sẵn script `git-autopush.sh`. Script này sử dụng `fswatch` để theo dõi sự thay đổi của file và tự động commit/push lên GitHub ngay lập tức.
+
+Để khởi động:
+```bash
+nohup ./git-autopush.sh > git-autopush.log 2>&1 &
+```
+
+##  Lộ trình phát triển (Roadmap)
+- **Tháng 1-2**: Hoàn thiện nền tảng SaaS và Ingestion cơ bản (Đã hoàn thành).
+- **Tháng 3-4**: Tích hợp Radar thời tiết và dữ liệu trạm mặt đất.
+- **Tháng 5-6**: Triển khai mô hình Nowcasting (dự báo ngắn hạn 0-2h) và hệ thống Billing thương mại.
+
+---
+**Phát triển bởi creyt2012**  
+*Kiến trúc sư hệ thống vệ tinh & Kỹ sư Laravel Enterprise*
