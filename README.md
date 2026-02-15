@@ -53,5 +53,5 @@ npm run dev        # Giao diện Vue 3
 Chúng tôi đang làm việc không ngừng nghỉ để đưa thêm dữ liệu từ các **Radar thời tiết** và triển khai hệ thống **Cảnh báo sớm qua Email/Sms** trong các phiên bản tới.
 
 ---
-**Một sản phẩm đầy tâm huyết của creyt2012**  
+**Một sản phẩm đầy tâm huyết của Mình**  
 *Cảm ơn bạn đã đồng hành cùng StarWeather trên con đường chinh phục dữ liệu Trái đất!*
