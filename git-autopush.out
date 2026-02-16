@@ -562,3 +562,11 @@ nothing to commit, working tree clean
 To https://github.com/creyt2012/vetinh.git
  ! [remote rejected] main -> main (cannot lock ref 'refs/heads/main': is at 22673b1e4d25aacb4d855f56e3e4fe8f6e34b49b but expected ca2e35a1b63c1ba94989b9a67bb972121c7c8348)
 error: failed to push some refs to 'https://github.com/creyt2012/vetinh.git'
+On branch main
+Your branch is ahead of 'origin/main' by 1 commit.
+  (use "git push" to publish your local commits)
+
+nothing to commit, working tree clean
+To https://github.com/creyt2012/vetinh.git
+   22673b1..f5ffbac  main -> main
+error: could not lock config file .git/config: File exists
