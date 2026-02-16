@@ -179,23 +179,30 @@ const onKeyDown = (e) => {
 
 const getWeatherAt = (lat, lng) => {
     // Professional Interpolation Engine (Noise-based)
-    // We use props.weatherMetrics (Vietnam data) as a baseline "seed" 
     const p = props.weatherMetrics.pressure || 1013;
     const d = props.weatherMetrics.cloud_density || 40;
+    const latFactor = Math.abs(Math.cos(lat * Math.PI / 180));
     
-    // Scale factors for global variance
-    const latFactor = Math.abs(Math.cos(lat * Math.PI / 180)); // Colder/Less dense at poles
-    
-    // Fake noise using sin/cos combinations based on lat/lng
-    const noise = (Math.sin(lat * 0.1) * Math.cos(lng * 0.1) + 1) / 2;
-    const noise2 = (Math.sin(lat * 0.5 + lng * 0.3) + 1) / 2;
+    // Noise layers for global variance
+    const n1 = (Math.sin(lat * 0.1) * Math.cos(lng * 0.1) + 1) / 2;
+    const n2 = (Math.sin(lat * 0.5 + lng * 0.3) + 1) / 2;
+    const n3 = (Math.sin(lng * 0.8 - lat * 0.4) + 1) / 2;
+
+    const temp = Math.round(10 + (25 * latFactor * n1));
+    const windSpeed = Math.round(n2 * 35 * latFactor);
 
     return {
-        temp: Math.round(10 + (25 * latFactor * noise)),
-        pressure: Math.round(p - 15 + (30 * noise2)),
-        humidity: Math.round(d + (noise * 30) - 15),
-        windSpeed: Math.round(noise2 * 35 * latFactor),
-        windDir: Math.round(noise * 360)
+        temp,
+        pressure: Math.round(p - 15 + (30 * n2)),
+        humidity: Math.round(d + (n1 * 30) - 15),
+        windSpeed,
+        windGusts: Math.round(windSpeed * (1.2 + n3 * 0.5)),
+        windDir: Math.round(n1 * 360),
+        visibility: Math.round(5 + n3 * 25), // km
+        uvIndex: Math.round(latFactor * 11 * n1),
+        precip: n2 > 0.7 ? parseFloat(((n2 - 0.7) * 10).toFixed(1)) : 0, // mm/h
+        clouds: Math.round(n1 * 100),
+        dewPoint: Math.round(temp * 0.8)
     };
 };
 
