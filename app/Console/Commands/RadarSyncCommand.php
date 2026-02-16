@@ -11,20 +11,29 @@ class RadarSyncCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'app:radar-sync-command';
+    protected $signature = 'radar:sync';
+    protected $description = 'Sync latest global radar metadata from RainViewer';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Command description';
-
-    /**
-     * Execute the console command.
-     */
-    public function handle()
+    public function handle(\App\Engines\Weather\RainViewerService $rainViewer)
     {
-        //
+        $this->info("Fetching latest Radar metadata from RainViewer...");
+
+        $radarConfig = $rainViewer->getLatestRadar();
+
+        if (!empty($radarConfig)) {
+            // Store in Cache for 10 minutes (radar updates every 10 mins usually)
+            \Illuminate\Support\Facades\Cache::put('radar_config_latest', $radarConfig, now()->addMinutes(10));
+
+            $this->info("Radar sync successful. Latest timestamp: " . $radarConfig['timestamp']);
+
+            // Log for audit
+            \App\Models\ActivityLog::log(
+                null,
+                'RADAR_SYNC_SUCCESS',
+                "Synchronized global radar metadata for timestamp: " . $radarConfig['timestamp']
+            );
+        } else {
+            $this->error("Failed to sync Radar metadata.");
+        }
     }
 }
