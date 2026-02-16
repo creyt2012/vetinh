@@ -9,9 +9,10 @@ const props = defineProps({
 
 const form = useForm({
     channels: props.settings.channels || {
-        telegram: { enabled: false, chat_id: '' },
+        telegram: { enabled: false, chat_id: '', bot_token: '' },
         slack: { enabled: false, webhook_url: '' },
-        zalo: { enabled: false, phone_number: '' },
+        zalo: { enabled: false, oa_id: '', template_id: '' },
+        web_push: { enabled: false, endpoint: '' },
     },
     thresholds: props.settings.thresholds || {
         critical_risk_score: 80,
