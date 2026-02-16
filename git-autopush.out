@@ -1,3 +1,12 @@
 Starting StarWeather Ultra-Sync Watcher (V3 - Hardened)...
 Monitoring: /Users/creytdeveloper/Documents/vetinh
 error: could not lock config file .git/config: File exists
+On branch main
+Your branch is ahead of 'origin/main' by 1 commit.
+  (use "git push" to publish your local commits)
+
+nothing to commit, working tree clean
+To https://github.com/creyt2012/vetinh.git
+ ! [remote rejected] main -> main (cannot lock ref 'refs/heads/main': is at 4695d744a1e9c4a5e9a8e37be7907a13e01f7c33 but expected 9d076202eef3d1e1f97a82a3c840f37ac1b3350e)
+error: failed to push some refs to 'https://github.com/creyt2012/vetinh.git'
+error: could not lock config file .git/config: File exists
