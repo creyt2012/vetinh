@@ -47,8 +47,16 @@ class SatelliteSeeder extends Seeder
                 'norad_id' => '40697',
                 'tle_line1' => '1 40697U 15028A   24047.85966442  .00000140  00000-0  10487-3 0  9997',
                 'tle_line2' => '2 40697  98.5663 118.9950 0001141  85.7483 274.3858 14.30825381452140',
-                'type' => 'OBSERVATION',
+                'type' => 'SCIENTIFIC',
                 'status' => 'ACTIVE'
+            ],
+            [
+                'name' => 'DEBRIS (PEGASUS R/B)',
+                'norad_id' => '23106',
+                'tle_line1' => '1 23106U 94029B   24047.45678912  .00001234  00000-0  12345-3 0  9995',
+                'tle_line2' => '2 23106  81.2345 312.4567 0234567  12.3456 348.7654 14.56789123  1234',
+                'type' => 'SPACE_DEBRIS',
+                'status' => 'INACTIVE'
             ]
         ];
 
