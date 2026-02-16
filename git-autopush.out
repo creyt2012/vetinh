@@ -741,3 +741,20 @@ After doing this, you may fix the identity used for this commit with:
  3 files changed, 188 insertions(+), 39 deletions(-)
 To https://github.com/creyt2012/vetinh.git
    25ce060..f5aa930  main -> main
+[main d3e692f] Auto-sync: resources/js/Pages/Admin/AdminDashboard.vue (2026-02-17 02:25:42)
+ Committer: Nguyễn Thành Biên <creytdeveloper@xdigital-2.local>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly. Run the
+following command and follow the instructions in your editor to edit
+your configuration file:
+
+    git config --global --edit
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 3 files changed, 19 insertions(+), 7 deletions(-)
+To https://github.com/creyt2012/vetinh.git
+   f5aa930..d3e692f  main -> main
