@@ -5,9 +5,13 @@ import { ref, onMounted, computed } from 'vue';
 
 const metrics = ref({
     cloud_coverage: 0,
+    cloud_density: 0,
     rain_intensity: 0,
+    pressure: 0,
     risk_score: 0,
     risk_level: 'LOADING...',
+    confidence_score: 0,
+    provenance: null,
     captured_at: null,
     image_url: null
 });
@@ -59,7 +63,8 @@ const fetchLatestMetrics = async () => {
             metrics.value = {
                 ...json.data,
                 risk_score: json.data.risk.score,
-                risk_level: json.data.risk.level
+                risk_level: json.data.risk.level,
+                confidence_score: json.data.risk.confidence
             };
         }
     } catch (e) {
@@ -185,6 +190,34 @@ const fetchLiveSatellites = async () => {
                                     'text-red-500': metrics.risk_level === 'CRITICAL'
                                 }" class="text-2xl font-black font-outfit">{{ metrics.risk_score }}</p>
                             </div>
+                        </div>
+
+                        <!-- Enterprise Row 2 -->
+                        <div class="grid grid-cols-3 gap-2 pt-2 border-t border-white/5">
+                            <div class="space-y-0.5">
+                                <p class="text-[8px] text-white/20 uppercase font-bold">Pressure</p>
+                                <p class="text-xs font-bold text-white/80">{{ metrics.pressure }}<span class="text-[8px] ml-0.5 text-white/20">hPa</span></p>
+                            </div>
+                            <div class="space-y-0.5 text-center">
+                                <p class="text-[8px] text-white/20 uppercase font-bold">Density</p>
+                                <p class="text-xs font-bold text-white/80">{{ Math.round(metrics.cloud_density) }}%</p>
+                            </div>
+                            <div class="space-y-0.5 text-right">
+                                <p class="text-[8px] text-white/20 uppercase font-bold">Confidence</p>
+                                <p class="text-xs font-bold text-vibrant-blue">{{ metrics.confidence_score }}%</p>
+                            </div>
+                        </div>
+
+                        <!-- Provenance Footer -->
+                        <div v-if="metrics.provenance" class="flex items-center justify-between pt-2">
+                             <div class="flex items-center space-x-1">
+                                 <span class="text-[7px] text-white/20 uppercase">Sensor:</span>
+                                 <span class="text-[7px] font-black text-white/40 uppercase">{{ metrics.provenance.sensor }}</span>
+                             </div>
+                             <div class="flex items-center space-x-1">
+                                 <span class="text-[7px] text-white/20 uppercase">Source:</span>
+                                 <span class="text-[7px] font-black text-white/40 uppercase">{{ metrics.source }}</span>
+                             </div>
                         </div>
                     </div>
                     <!-- Subtle Glow in background -->
