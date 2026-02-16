@@ -3,9 +3,11 @@ import UserLayout from '@/Layouts/UserLayout.vue';
 import { Head } from '@inertiajs/vue3';
 import { onMounted, ref } from 'vue';
 import Globe from 'globe.gl';
+import axios from 'axios';
 
 const globeContainer = ref(null);
 const activeLayer = ref('clouds');
+const activeStorms = ref([]);
 
 const layers = [
     { id: 'clouds', name: 'CLOUD_DENSITY', color: 'vibrant-blue' },
@@ -13,24 +15,54 @@ const layers = [
     { id: 'wind', name: 'WIND_SPEED', color: 'yellow-500' },
 ];
 
-onMounted(() => {
+onMounted(async () => {
+    // Fetch storms
+    try {
+        const response = await axios.get('/api/weather/storms');
+        activeStorms.value = response.data;
+    } catch (e) {
+        console.error('Failed to fetch storm data', e);
+    }
+
+    const width = globeContainer.value.offsetWidth;
+    const height = globeContainer.value.offsetHeight;
+
     const world = Globe()
         (globeContainer.value)
-        .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
-        .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
+        .width(width)
+        .height(height)
+        .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-night.jpg')
+        .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
         .backgroundColor('#020205')
-        .showAtmosphere(true)
-        .atmosphereColor('#0088ff')
-        .atmosphereDaylightAlpha(0.1);
+        .ringsData(activeStorms.value)
+        .ringColor(() => '#ef4444')
+        .ringMaxRadius(5)
+        .ringPropagationSpeed(2)
+        .ringRepeatPeriod(1000)
+        .pointsData(activeStorms.value)
+        .pointColor(() => '#ef4444')
+        .pointAltitude(0.01)
+        .pointRadius(0.5)
+        .labelsData(activeStorms.value)
+        .labelLat(d => d.latitude)
+        .labelLng(d => d.longitude)
+        .labelText(d => d.name)
+        .labelSize(1.5)
+        .labelColor(() => '#ef4444')
+        .labelResolution(2);
 
-    // Initial view
-    world.pointOfView({ lat: 10, lng: 106, altitude: 2 });
+    world.controls().autoRotate = true;
+    world.controls().autoRotateSpeed = 0.5;
 
-    // Handle resize
-    window.addEventListener('resize', () => {
+    world.pointOfView({ lat: 10, lng: 106, altitude: 2.5 }, 2000);
+
+    const handleResize = () => {
+        if (!globeContainer.value) return;
         world.width(globeContainer.value.offsetWidth);
         world.height(globeContainer.value.offsetHeight);
-    });
+    };
+
+    window.addEventListener('resize', handleResize);
 });
 </script>
 

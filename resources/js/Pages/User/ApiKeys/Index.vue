@@ -1,6 +1,6 @@
 <script setup>
 import UserLayout from '@/Layouts/UserLayout.vue';
-import { Head } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 
 const props = defineProps({
     apiKeys: Array

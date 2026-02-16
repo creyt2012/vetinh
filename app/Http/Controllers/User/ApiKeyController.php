@@ -13,8 +13,13 @@ class ApiKeyController extends Controller
 {
     public function index(): Response
     {
+        $user = Auth::user();
+        $apiKeys = ($user && $user->tenant_id)
+            ? ApiKey::where('tenant_id', $user->tenant_id)->get()
+            : [];
+
         return Inertia::render('User/ApiKeys/Index', [
-            'apiKeys' => ApiKey::where('tenant_id', Auth::user()->tenant_id)->get()
+            'apiKeys' => $apiKeys
         ]);
     }
 }

@@ -3,20 +3,13 @@ import UserLayout from '@/Layouts/UserLayout.vue';
 import { Head, Link } from '@inertiajs/vue3';
 import { ref, onMounted } from 'vue';
 
-const riskScore = ref(34);
-const satellites = ref([
-    { name: 'VETINH-A1', status: 'active', orbit: 'LEO', battery: '94%' },
-    { name: 'VETINH-B2', status: 'stable', orbit: 'MEO', battery: '82%' },
-    { name: 'CLOUD-SCAN-X', status: 'ingesting', orbit: 'GEO', battery: '98%' },
-]);
-
-// Mock weather data
-const weatherData = ref({
-    temp: 28.4,
-    humidity: 62,
-    wind: 12.5,
-    pressure: 1012
+const props = defineProps({
+    metrics: Array,
+    satellites: Array,
+    storms: Array
 });
+
+const riskScore = ref(props.storms?.length > 0 ? 68 : 34);
 </script>
 
 <template>
@@ -48,9 +41,10 @@ const weatherData = ref({
                         <div class="text-center">
                             <div class="w-48 h-48 rounded-full border border-vibrant-blue/20 flex items-center justify-center relative">
                                 <div class="absolute inset-0 rounded-full border-t-2 border-vibrant-blue animate-spin duration-[3000ms]"></div>
+                                <div v-if="storms?.length > 0" class="absolute inset-0 animate-ping opacity-20 rounded-full bg-red-500"></div>
                                 <div class="text-center">
                                     <p class="text-[10px] font-black text-vibrant-blue uppercase tracking-widest">Global_Risk</p>
-                                    <h1 class="text-6xl font-black italic shadow-vibrant-blue/40 drop-shadow-[0_0_15px_rgba(0,136,255,0.5)]">{{ riskScore }}%</h1>
+                                    <h1 class="text-6xl font-black italic shadow-vibrant-blue/40 drop-shadow-[0_0_15px_rgba(0,136,255,0.5)]" :class="riskScore > 50 ? 'text-red-500' : ''">{{ riskScore }}%</h1>
                                 </div>
                             </div>
                         </div>
@@ -111,19 +105,15 @@ const weatherData = ref({
                                 <Link href="#" class="text-[8px] font-black underline opacity-40 hover:opacity-100 transition-opacity">VIEW_HISTORY</Link>
                             </div>
                             <div class="space-y-4">
-                                <div class="flex items-start space-x-4 p-3 border border-red-500/10 bg-red-500/5">
+                                <div v-for="storm in storms" :key="storm.id" class="flex items-start space-x-4 p-3 border border-red-500/10 bg-red-500/5">
                                     <div class="w-1 h-8 bg-red-500"></div>
                                     <div>
-                                        <p class="text-[10px] font-black text-red-500 uppercase">HEAVY_RAIN_DETECTED</p>
-                                        <p class="text-[9px] text-white/40 mt-0.5">District 7, HCM - Intensity: 42mm/h</p>
+                                        <p class="text-[10px] font-black text-red-500 uppercase">{{ storm.name }}_DETECTION</p>
+                                        <p class="text-[9px] text-white/40 mt-0.5">{{ storm.latitude }}, {{ storm.longitude }} - Wind: {{ storm.max_wind_speed }}km/h</p>
                                     </div>
                                 </div>
-                                <div class="flex items-start space-x-4 p-3 border border-yellow-500/10 bg-yellow-500/5 opacity-60">
-                                    <div class="w-1 h-8 bg-yellow-500"></div>
-                                    <div>
-                                        <p class="text-[10px] font-black text-yellow-500 uppercase">WIND_SPEED_INCREASE</p>
-                                        <p class="text-[9px] text-white/40 mt-0.5">Nha Trang - GUST_22KT</p>
-                                    </div>
+                                <div v-if="storms?.length === 0" class="p-6 text-center border border-white/5 opacity-20 uppercase text-[8px] tracking-widest font-black">
+                                    NO_CYCOGENESIS_DETECTED
                                 </div>
                             </div>
                         </div>

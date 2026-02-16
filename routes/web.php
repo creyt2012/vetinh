@@ -13,6 +13,11 @@ Route::get('/weather/map', function () {
 
 Route::get('/alerts', [\App\Http\Controllers\User\AlertController::class, 'index'])->name('alerts.index');
 Route::get('/api-portal', [\App\Http\Controllers\User\ApiKeyController::class, 'index'])->name('apikeys.index');
+Route::get('/api-docs', function () {
+    return Inertia::render('User/ApiDocs');
+})->name('user.api-docs');
+Route::get('/reports', [\App\Http\Controllers\User\ReportController::class, 'index'])->name('user.reports.index');
+Route::get('/reports/{file}/download', [\App\Http\Controllers\User\ReportController::class, 'download'])->name('user.reports.download');
 
 Route::get('/login', function () {
     return redirect()->route('home');
@@ -43,11 +48,15 @@ Route::prefix('admin')->group(function () {
     Route::get('/alerts/settings', [\App\Http\Controllers\Admin\AlertSettingsController::class, 'index'])->name('admin.alerts.settings');
     Route::post('/alerts/settings', [\App\Http\Controllers\Admin\AlertSettingsController::class, 'update'])->name('admin.alerts.update');
 
-    // Alert Rules (Condition Engine) (NEW)
+    // Audit Rules (Condition Engine) (NEW)
     Route::get('/alerts/rules', [\App\Http\Controllers\Admin\AlertRuleController::class, 'index'])->name('admin.alerts.rules');
     Route::post('/alerts/rules', [\App\Http\Controllers\Admin\AlertRuleController::class, 'store'])->name('admin.alerts.rules.store');
     Route::put('/alerts/rules/{rule}', [\App\Http\Controllers\Admin\AlertRuleController::class, 'update'])->name('admin.alerts.rules.update');
     Route::delete('/alerts/rules/{rule}', [\App\Http\Controllers\Admin\AlertRuleController::class, 'destroy'])->name('admin.alerts.rules.destroy');
+
+    // System Operations (Audit & Roles) (NEW)
+    Route::get('/system/audit-logs', [\App\Http\Controllers\Admin\AuditLogController::class, 'index'])->name('admin.system.audit');
+    Route::get('/system/roles', [\App\Http\Controllers\Admin\RoleManagementController::class, 'index'])->name('admin.system.roles');
 
     // Billing
     Route::get('/billing', [\App\Http\Controllers\Admin\BillingController::class, 'index'])->name('admin.billing');

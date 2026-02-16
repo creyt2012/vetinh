@@ -15,7 +15,8 @@ class UserDashboardController extends Controller
     {
         return Inertia::render('User/Dashboard', [
             'metrics' => WeatherMetric::latest()->limit(10)->get(),
-            'satellites' => Satellite::all()
+            'satellites' => Satellite::all(),
+            'storms' => \App\Models\Storm::where('status', 'active')->get()
         ]);
     }
 }

@@ -37,4 +37,9 @@ class Tenant extends Model
     {
         return $this->hasMany(ApiKey::class);
     }
+
+    public function activityLogs()
+    {
+        return $this->hasMany(ActivityLog::class);
+    }
 }
