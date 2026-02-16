@@ -3,8 +3,8 @@
 namespace App\Repositories;
 
 use App\Models\WeatherMetric;
-use App\Models\SatelliteTrack;
-use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class StateRepository
 {
@@ -15,18 +15,25 @@ class StateRepository
      */
     public function setLatestWeather(WeatherMetric $metric): void
     {
-        Redis::set(self::CACHE_PREFIX . 'weather_latest', $metric->toJson(), 'EX', 3600);
+        try {
+            Cache::put(self::CACHE_PREFIX . 'weather_latest', $metric->toArray(), now()->addHour());
+        } catch (\Exception $e) {
+            Log::warning("Cache failure in setLatestWeather: " . $e->getMessage());
+        }
     }
 
     /**
-     * Get the latest weather metrics from L1 cache or DB fallback.
+     * Get the latest weather metrics from cache or DB fallback.
      */
     public function getLatestWeather(): ?WeatherMetric
     {
-        $cached = Redis::get(self::CACHE_PREFIX . 'weather_latest');
-
-        if ($cached) {
-            return new WeatherMetric(json_decode($cached, true));
+        try {
+            $cached = Cache::get(self::CACHE_PREFIX . 'weather_latest');
+            if ($cached) {
+                return new WeatherMetric($cached);
+            }
+        } catch (\Exception $e) {
+            Log::warning("Cache failure in getLatestWeather: " . $e->getMessage());
         }
 
         return WeatherMetric::orderBy('captured_at', 'desc')->first();
@@ -37,15 +44,25 @@ class StateRepository
      */
     public function setSatelliteState(int $satelliteId, array $trackData): void
     {
-        Redis::hset(self::CACHE_PREFIX . 'satellites', (string) $satelliteId, json_encode($trackData));
+        try {
+            $states = Cache::get(self::CACHE_PREFIX . 'satellites', []);
+            $states[$satelliteId] = $trackData;
+            Cache::put(self::CACHE_PREFIX . 'satellites', $states, now()->addMinutes(10));
+        } catch (\Exception $e) {
+            Log::warning("Cache failure in setSatelliteState: " . $e->getMessage());
+        }
     }
 
     /**
-     * Get all satellite states from L1 cache.
+     * Get all satellite states from cache.
      */
     public function getSatelliteStates(): array
     {
-        $states = Redis::hgetall(self::CACHE_PREFIX . 'satellites');
-        return array_map(fn($s) => json_decode($s, true), $states);
+        try {
+            return Cache::get(self::CACHE_PREFIX . 'satellites', []);
+        } catch (\Exception $e) {
+            Log::warning("Cache failure in getSatelliteStates: " . $e->getMessage());
+            return [];
+        }
     }
 }
