@@ -18,7 +18,7 @@ const metrics = ref({
 
 const selectedLocation = ref(null); 
 const satellites = ref([]);
-const activeLayers = ref(['COMMUNICATION', 'NAVIGATION', 'STATION', 'SCIENTIFIC', 'WEATHER', 'SPACE_DEBRIS']);
+const activeLayers = ref(['COMMUNICATION', 'NAVIGATION', 'STATION', 'SCIENTIFIC', 'WEATHER', 'SPACE_DEBRIS', 'RISK_HEATMAP']);
 const now = ref(new Date());
 
 const filteredSatellites = computed(() => {
@@ -158,8 +158,15 @@ const handleSurfaceClick = async (data) => {
                                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21l-8.228-9.904A17.963 17.963 0 014 22m4-19l4 4m0 0l4-4m-4 4v12"/></svg>
                                 </div>
                                 <div>
-                                    <h2 class="text-sm font-black tracking-[0.2em] text-white uppercase italic">Location <span class="text-vibrant-blue">Intel</span></h2>
-                                    <p class="text-[9px] text-white/30 uppercase mt-0.5 font-mono">{{ selectedLocation.lat.toFixed(4) }}°N / {{ selectedLocation.lng.toFixed(4) }}°E</p>
+                                    <h2 class="text-sm font-black tracking-[0.2em] text-white uppercase italic">
+                                        <span v-if="selectedLocation.province">{{ selectedLocation.province }}</span>
+                                        <span v-else>Location</span>
+                                        <span class="text-vibrant-blue"> Intel</span>
+                                    </h2>
+                                    <p class="text-[9px] text-white/30 uppercase mt-0.5 font-mono">
+                                        <span v-if="selectedLocation.district" class="text-vibrant-blue/60">{{ selectedLocation.district }} / {{ selectedLocation.commune }} • </span>
+                                        {{ selectedLocation.lat.toFixed(4) }}°N / {{ selectedLocation.lng.toFixed(4) }}°E
+                                    </p>
                                 </div>
                             </div>
                             <button @click="selectedLocation = null" class="w-10 h-10 rounded-full bg-white/5 hover:bg-white/15 flex items-center justify-center transition-all duration-300">
@@ -252,13 +259,15 @@ const handleSurfaceClick = async (data) => {
 
                     <!-- Layers Toggles (The actual logic items) -->
                     <div class="flex items-center space-x-2 pr-3">
-                        <button v-for="layer in ['COMMUNICATION', 'NAVIGATION', 'STATION', 'SCIENTIFIC', 'WEATHER', 'SPACE_DEBRIS']" 
+                        <button v-for="layer in ['COMMUNICATION', 'NAVIGATION', 'STATION', 'SCIENTIFIC', 'WEATHER', 'SPACE_DEBRIS', 'RISK_HEATMAP']" 
                                 :key="layer" 
                                 class="h-14 px-5 rounded-2xl flex items-center space-x-4 transition-all duration-300 group/layer overflow-hidden"
-                                :class="[activeLayers.includes(layer) ? 'bg-vibrant-blue shadow-lg shadow-vibrant-blue/30' : 'bg-white/5 hover:bg-white/10 shadow-none']"
+                                :class="[activeLayers.includes(layer) ? (layer === 'RISK_HEATMAP' ? 'bg-red-600 shadow-lg shadow-red-600/30' : 'bg-vibrant-blue shadow-lg shadow-vibrant-blue/30') : 'bg-white/5 hover:bg-white/10 shadow-none']"
                                 @click="toggleLayer(layer)">
                             <span :class="[activeLayers.includes(layer) ? 'bg-white' : 'bg-white/20']" class="w-2 h-2 rounded-full transition-colors"></span>
-                            <span class="text-[10px] font-black uppercase tracking-[0.2em]" :class="[activeLayers.includes(layer) ? 'text-white' : 'text-white/40 group-hover/layer:text-white/80']">{{ layer.toLowerCase().replace('_', ' ') }}</span>
+                            <span class="text-[10px] font-black uppercase tracking-[0.2em]" :class="[activeLayers.includes(layer) ? 'text-white' : 'text-white/40 group-hover/layer:text-white/80']">
+                                {{ layer === 'RISK_HEATMAP' ? 'RISK MAP' : layer.toLowerCase().replace('_', ' ') }}
+                            </span>
                         </button>
                     </div>
                 </div>
