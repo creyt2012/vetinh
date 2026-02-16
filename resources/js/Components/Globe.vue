@@ -499,56 +499,62 @@ const animate = () => {
                 </div>
             </div>
 
-            <!-- Surface Tooltip (Weather Intelligence) -->
-            <div v-else-if="hoveredSurface" class="glass border border-white/10 px-4 py-4 rounded-xl shadow-2xl min-w-[180px] space-y-3">
-                <div class="flex items-center justify-between border-b border-white/5 pb-2">
+            <!-- Surface Tooltip (Premium Weather Pulse) -->
+            <div v-else-if="hoveredSurface" 
+                 class="backdrop-blur-2xl bg-black/60 border border-white/10 p-5 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] min-w-[220px] space-y-4 animate-in fade-in zoom-in duration-300">
+                
+                <div class="flex items-center justify-between">
                     <div class="flex flex-col">
-                        <span class="text-[10px] font-black text-white/90 uppercase tracking-widest leading-none">Scanning...</span>
-                        <span class="text-[7px] font-mono text-white/30 uppercase tracking-tighter">{{ hoveredSurface.lat.toFixed(2) }}°, {{ hoveredSurface.lng.toFixed(2) }}°</span>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-1.5 h-1.5 rounded-full bg-vibrant-blue shadow-[0_0_8px_#4f46e5] animate-pulse"></div>
+                            <span class="text-[10px] font-black text-white uppercase tracking-[0.2em] leading-none">Scanning Surface</span>
+                        </div>
+                        <span class="text-[8px] font-mono text-white/20 mt-1">{{ hoveredSurface.lat.toFixed(3) }}°N / {{ hoveredSurface.lng.toFixed(3) }}°E</span>
                     </div>
-                    <div class="w-8 h-8 rounded-lg bg-vibrant-blue/10 flex items-center justify-center">
-                        <svg class="w-4 h-4 text-vibrant-blue animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-white/5 to-transparent border border-white/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <svg class="w-5 h-5 text-vibrant-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                         </svg>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-0.5">
-                        <span class="text-[7px] text-white/40 uppercase font-bold">Temperature</span>
-                        <div class="flex items-baseline space-x-1">
-                            <span class="text-xs font-black text-white">{{ hoveredSurface.temp }}</span>
-                            <span class="text-[8px] text-white/20">°C</span>
+                        <span class="text-[8px] text-white/30 uppercase font-bold tracking-tighter">Temperature</span>
+                        <div class="flex items-baseline space-x-0.5">
+                            <span class="text-lg font-black text-white">{{ hoveredSurface.temp }}</span>
+                            <span class="text-[10px] font-bold text-white/20">°C</span>
                         </div>
                     </div>
                     <div class="space-y-0.5 text-right">
-                        <span class="text-[7px] text-white/40 uppercase font-bold">Wind / Gusts</span>
+                        <span class="text-[8px] text-white/30 uppercase font-bold tracking-tighter">Wind / Gusts</span>
                         <div class="flex items-baseline justify-end space-x-1">
-                            <span class="text-xs font-black text-vibrant-green">{{ hoveredSurface.windSpeed }}</span>
-                            <span class="text-[8px] text-white/30">/</span>
-                            <span class="text-[10px] font-bold text-vibrant-green/70">{{ hoveredSurface.windGusts }}</span>
-                            <span class="text-[8px] text-white/20">km/h</span>
+                            <span class="text-sm font-black text-vibrant-green">{{ hoveredSurface.windSpeed }}</span>
+                            <span class="text-[10px] font-bold text-vibrant-green/50">/</span>
+                            <span class="text-xs font-black text-vibrant-green/70">{{ hoveredSurface.windGusts }}</span>
                         </div>
                     </div>
                     <div class="space-y-0.5">
-                        <span class="text-[7px] text-white/40 uppercase font-bold">Pressure</span>
-                        <div class="flex items-baseline space-x-1">
-                            <span class="text-xs font-black text-white/80">{{ hoveredSurface.pressure }}</span>
-                            <span class="text-[8px] text-white/20">hPa</span>
+                        <span class="text-[8px] text-white/30 uppercase font-bold tracking-tighter">Air Pressure</span>
+                        <div class="flex items-baseline space-x-0.5">
+                            <span class="text-sm font-black text-white/80">{{ hoveredSurface.pressure }}</span>
+                            <span class="text-[9px] font-bold text-white/20">hPa</span>
                         </div>
                     </div>
                     <div class="space-y-0.5 text-right">
-                        <span class="text-[7px] text-white/40 uppercase font-bold">Rain/Snow</span>
-                        <div class="flex items-baseline justify-end space-x-1">
-                            <span class="text-xs font-black text-vibrant-blue">{{ hoveredSurface.precip }}</span>
-                            <span class="text-[8px] text-white/20">mm</span>
+                        <span class="text-[8px] text-white/30 uppercase font-bold tracking-tighter">Precipitation</span>
+                        <div class="flex items-baseline justify-end space-x-0.5">
+                            <span class="text-sm font-black text-vibrant-blue">{{ hoveredSurface.precip }}</span>
+                            <span class="text-[9px] font-bold text-white/20">mm</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="pt-2 border-t border-white/5 flex items-center justify-between text-[7px] font-black text-white/20 uppercase tracking-widest">
-                    <span>Click to Pin</span>
-                    <span class="animate-bounce">↓</span>
+                <div class="pt-3 border-t border-white/5 flex items-center justify-center space-x-2">
+                    <span class="text-[8px] font-black text-vibrant-blue uppercase tracking-[0.3em]">Click to Intel Pin</span>
+                    <div class="flex space-x-0.5">
+                        <div v-for="i in 3" :key="i" class="w-1 h-1 rounded-full bg-vibrant-blue/20 animate-bounce" :style="{ animationDelay: (i * 200) + 'ms' }"></div>
+                    </div>
                 </div>
             </div>
         </div>
