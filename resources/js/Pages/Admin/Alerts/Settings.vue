@@ -46,25 +46,47 @@ const saveSettings = () => {
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <!-- Telegram -->
-                        <div class="space-y-4 p-4 border border-white/5 rounded-xl bg-white/[0.02]">
-                            <div class="flex justify-between items-center">
-                                <span class="text-xs font-black uppercase italic">Telegram Bot</span>
+                        <div class="space-y-4 p-6 border border-white/5 rounded-xl bg-white/[0.02]">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-black uppercase italic text-vibrant-blue">Telegram_Bot</span>
                                 <input type="checkbox" v-model="form.channels.telegram.enabled" class="toggle toggle-primary" />
                             </div>
-                            <input v-model="form.channels.telegram.chat_id" 
-                                   placeholder="Chat ID or @channel"
-                                   class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2 text-xs font-mono" />
+                            <div class="space-y-3">
+                                <input v-model="form.channels.telegram.bot_token" placeholder="BOT_TOKEN" class="w-full bg-black/40 border border-white/10 px-4 py-2 text-[10px] font-mono" />
+                                <input v-model="form.channels.telegram.chat_id" placeholder="CHAT_ID" class="w-full bg-black/40 border border-white/10 px-4 py-2 text-[10px] font-mono" />
+                            </div>
+                        </div>
+
+                        <!-- Zalo -->
+                        <div class="space-y-4 p-6 border border-white/5 rounded-xl bg-white/[0.02]">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-black uppercase italic text-vibrant-blue">Zalo_OA_Service</span>
+                                <input type="checkbox" v-model="form.channels.zalo.enabled" class="toggle toggle-primary" />
+                            </div>
+                            <div class="space-y-3">
+                                <input v-model="form.channels.zalo.oa_id" placeholder="Zalo_OA_ID" class="w-full bg-black/40 border border-white/10 px-4 py-2 text-[10px] font-mono" />
+                                <input v-model="form.channels.zalo.template_id" placeholder="TEMPLATE_ID" class="w-full bg-black/40 border border-white/10 px-4 py-2 text-[10px] font-mono" />
+                            </div>
                         </div>
 
                         <!-- Slack -->
-                        <div class="space-y-4 p-4 border border-white/5 rounded-xl bg-white/[0.02]">
-                            <div class="flex justify-between items-center">
-                                <span class="text-xs font-black uppercase italic">Slack Webhook</span>
+                        <div class="space-y-4 p-6 border border-white/5 rounded-xl bg-white/[0.02]">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-black uppercase italic text-vibrant-blue">Slack_Integration</span>
                                 <input type="checkbox" v-model="form.channels.slack.enabled" class="toggle toggle-primary" />
                             </div>
-                            <input v-model="form.channels.slack.webhook_url" 
-                                   placeholder="https://hooks.slack.com/services/..."
-                                   class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2 text-xs font-mono" />
+                            <input v-model="form.channels.slack.webhook_url" placeholder="https://hooks.slack.com/services/..." class="w-full bg-black/40 border border-white/10 px-4 py-2 text-[10px] font-mono mt-3" />
+                        </div>
+
+                        <!-- Web Push -->
+                        <div class="space-y-4 p-6 border border-white/5 rounded-xl bg-white/[0.02]">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-black uppercase italic text-vibrant-blue">Browser_Web_Push</span>
+                                <input type="checkbox" v-model="form.channels.web_push.enabled" class="toggle toggle-primary" />
+                            </div>
+                            <div class="p-3 bg-white/5 border border-white/5 text-[9px] font-mono text-white/40 italic">
+                                SYSTEM_AUTO_VAPID_ACTIVE: Giao thức Web Push chuẩn VAPID sẽ tự động kích hoạt cho tất cả thiết bị đã đăng ký.
+                            </div>
                         </div>
                     </div>
                 </div>
