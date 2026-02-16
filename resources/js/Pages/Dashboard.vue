@@ -112,7 +112,7 @@ const fetchLiveSatellites = async () => {
             <div class="space-y-4">
                 <h3 class="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] mb-4">Satellite Layers</h3>
                 <div class="space-y-2">
-                    <button v-for="layer in ['COMMUNICATION', 'NAVIGATION', 'STATION', 'OBSERVATION', 'WEATHER']" 
+                    <button v-for="layer in ['COMMUNICATION', 'NAVIGATION', 'STATION', 'SCIENTIFIC', 'WEATHER', 'SPACE_DEBRIS']" 
                             :key="layer"
                             @click="toggleLayer(layer)"
                             class="w-full flex items-center justify-between p-3 rounded-xl transition-all duration-300 border"
@@ -120,14 +120,15 @@ const fetchLiveSatellites = async () => {
                         <div class="flex items-center space-x-3">
                             <span class="w-2 h-2 rounded-full" :class="{
                                 'bg-vibrant-blue': layer === 'COMMUNICATION',
-                                'bg-vibrant-orange': layer === 'NAVIGATION',
+                                'bg-vibrant-green': layer === 'NAVIGATION',
                                 'bg-white': layer === 'STATION',
-                                'bg-vibrant-purple': layer === 'OBSERVATION',
-                                'bg-vibrant-green': layer === 'WEATHER'
+                                'bg-vibrant-purple': layer === 'SCIENTIFIC',
+                                'bg-[#10b981]': layer === 'WEATHER',
+                                'bg-vibrant-orange': layer === 'SPACE_DEBRIS'
                             }"></span>
-                            <span class="text-[11px] font-bold tracking-tight text-white/80 uppercase">{{ layer.toLowerCase() }}</span>
+                            <span class="text-[11px] font-bold tracking-tight text-white/80 uppercase">{{ layer.toLowerCase().replace('_', ' ') }}</span>
                         </div>
-                        <span class="text-[10px] font-mono text-white/30">{{ satellites.filter(s => s.type === layer).length }}</span>
+                        <span class="text-[10px] font-mono text-white/30">{{ filteredSatellites.filter(s => s.type === layer).length }}</span>
                     </button>
                 </div>
             </div>
