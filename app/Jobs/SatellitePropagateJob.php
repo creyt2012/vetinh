@@ -33,6 +33,9 @@ class SatellitePropagateJob implements ShouldQueue
                     'id' => $satellite->id,
                     'name' => $satellite->name,
                     'type' => $satellite->type,
+                    'velocity' => $trackData['velocity'] ?? 0,
+                    'altitude' => $trackData['altitude'] ?? 0,
+                    'period' => $trackData['period'] ?? 0,
                 ], $trackData));
 
                 // 3. Broadcast live update
