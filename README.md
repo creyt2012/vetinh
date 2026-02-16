@@ -10,7 +10,7 @@ Cho dù bạn là một người đam mê thiên văn muốn theo dõi **ISS** h
 
 ---
 
-## ✨ Những điểm nổi bật
+##  Những điểm nổi bật
 
 ### Khám Phá Trái Đất Qua Quả Địa Cầu 3D
 Trải nghiệm giao diện 3D sống động, nơi bạn có thể thấy các vệ tinh đang bay lơ lửng trên đầu mình theo đúng quỹ đạo thực tế. Lớp phủ mây từ vệ tinh **Himawari-9** được cập nhật liên tục, cho bạn cái nhìn trực quan nhất về các cơn bão hoặc vùng mây đang hình thành.
