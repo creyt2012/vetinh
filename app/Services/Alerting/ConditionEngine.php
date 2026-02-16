@@ -7,15 +7,46 @@ use Illuminate\Support\Facades\Log;
 class ConditionEngine
 {
     /**
-     * Evaluate a set of rules against current and previous data states.
-     * 
-     * @param array $currentState ['temp' => 25, 'wind_speed' => 50, ...]
-     * @param array|null $previousState
-     * @param array $rules [['logic' => 'AND', 'conditions' => [...]]]
-     * @return array ['triggered' => bool, 'level' => string, 'reason' => string]
+     * Evaluate a metric against a collection of DB rules.
      */
+    public function evaluateModelRules(array $currentState, ?array $previousState, $rules): array
+    {
+        foreach ($rules as $rule) {
+            $triggered = false;
+
+            // Handle trend operators
+            if (in_array($rule->operator, ['trend_up', 'trend_down'])) {
+                if ($previousState && isset($previousState[$rule->parameter]) && isset($currentState[$rule->parameter])) {
+                    $diff = $currentState[$rule->parameter] - $previousState[$rule->parameter];
+                    if ($rule->operator === 'trend_up' && $diff > $rule->threshold)
+                        $triggered = true;
+                    if ($rule->operator === 'trend_down' && $diff < -$rule->threshold)
+                        $triggered = true;
+                }
+            } else {
+                // Absolute comparison
+                if (isset($currentState[$rule->parameter])) {
+                    $triggered = $this->compare($currentState[$rule->parameter], $rule->operator, $rule->threshold);
+                }
+            }
+
+            if ($triggered) {
+                return [
+                    'triggered' => true,
+                    'level' => $rule->severity,
+                    'reason' => $rule->name,
+                    'rule_id' => $rule->id,
+                    'channels' => $rule->channels
+                ];
+            }
+        }
+
+        return ['triggered' => false];
+    }
+
     public function evaluate(array $currentState, ?array $previousState, array $rules): array
     {
+        // Existing logic for nested rules (backward compatibility)
         foreach ($rules as $rule) {
             if ($this->evaluateRule($currentState, $previousState, $rule)) {
                 return [
