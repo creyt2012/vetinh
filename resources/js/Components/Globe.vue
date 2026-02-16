@@ -379,6 +379,7 @@ const onMouseDown = (event) => {
     const raycaster = new THREE.Raycaster();
     raycaster.setFromCamera(mouse, camera);
 
+    const intersects = raycaster.intersectObjects(Array.from(satelliteMarkers.values()));
     if (intersects.length > 0) {
         const marker = intersects[0].object;
         for (let [id, m] of satelliteMarkers) {
