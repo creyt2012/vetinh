@@ -146,7 +146,23 @@ const handleSurfaceClick = async (data) => {
             :weatherMetrics="metrics"
             :activeLayers="activeLayers"
             @surface-click="handleSurfaceClick"
+            @satellite-click="handleSatelliteClick"
         />
+
+        <!-- 2.1 SATELLITE TELEMETRY PANEL (Floating Left) -->
+        <div v-if="selectedSatellite" class="fixed left-12 top-40 w-[320px] z-50 animate-in slide-in-from-left duration-500">
+            <div class="relative group">
+                <!-- Close Button -->
+                <button @click="selectedSatellite = null" 
+                        class="absolute -top-3 -right-3 w-8 h-8 bg-black/60 border border-white/10 rounded-full flex items-center justify-center hover:bg-red-500/20 hover:border-red-500/50 transition-all z-[61] pointer-events-auto">
+                    <svg class="w-4 h-4 text-white/40 hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+                
+                <SatelliteTelemetryPanel :satellite="selectedSatellite" />
+            </div>
+        </div>
 
         <!-- 3. TOP TELEMETRY STRIP -->
         <header class="fixed top-12 left-16 right-16 z-50 flex justify-between items-start pointer-events-none">

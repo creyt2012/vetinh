@@ -83,3 +83,10 @@ Your branch is ahead of 'origin/main' by 1 commit.
 nothing to commit, working tree clean
 To https://github.com/creyt2012/vetinh.git
    11c23ea..fad7425  main -> main
+On branch main
+Your branch is ahead of 'origin/main' by 1 commit.
+  (use "git push" to publish your local commits)
+
+nothing to commit, working tree clean
+To https://github.com/creyt2012/vetinh.git
+   fad7425..c703a9a  main -> main
