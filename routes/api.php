@@ -23,4 +23,9 @@ Route::middleware(['auth.api_key', \App\Http\Middleware\CheckApiKeyLimits::class
     Route::get('/weather/ground-stations', [WeatherController::class, 'groundStations']);
     Route::get('/weather/history', [WeatherController::class, 'locationHistory']);
     Route::get('/weather/heatmap', [WeatherController::class, 'heatmap']);
+
+    // Mission Control
+    Route::get('/mission-control/files', [MissionControlController::class, 'index']);
+    Route::post('/mission-control/upload', [MissionControlController::class, 'store']);
+    Route::get('/mission-control/files/{missionFile}', [MissionControlController::class, 'show']);
 });
