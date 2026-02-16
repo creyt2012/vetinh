@@ -1,6 +1,7 @@
 <script setup>
 import { Head } from '@inertiajs/vue3';
 import Globe from '@/Components/Globe.vue';
+import SatelliteTelemetryPanel from '@/Components/SatelliteTelemetryPanel.vue';
 import { ref, onMounted, computed } from 'vue';
 
 const metrics = ref({
@@ -17,6 +18,7 @@ const metrics = ref({
 });
 
 const selectedLocation = ref(null); 
+const selectedSatellite = ref(null);
 const satellites = ref([]);
 const activeLayers = ref(['COMMUNICATION', 'NAVIGATION', 'STATION', 'SCIENTIFIC', 'WEATHER', 'SPACE_DEBRIS', 'RISK_HEATMAP']);
 const now = ref(new Date());
@@ -24,6 +26,11 @@ const now = ref(new Date());
 const filteredSatellites = computed(() => {
     return satellites.value.filter(s => activeLayers.value.includes(s.type));
 });
+
+const handleSatelliteClick = (satellite) => {
+    selectedSatellite.value = satellite;
+    // Auto-focus location if needed or just show panel
+};
 
 const toggleLayer = (layer) => {
     if (activeLayers.value.includes(layer)) {
