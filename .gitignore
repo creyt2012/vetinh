@@ -21,3 +21,7 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+# Auto-push logs
+git-autopush.log
+git-autopush.out
