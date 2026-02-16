@@ -343,3 +343,11 @@ To https://github.com/creyt2012/vetinh.git
  3 files changed, 11 insertions(+)
 To https://github.com/creyt2012/vetinh.git
    ac8f44b..9ee91e6  main -> main
+On branch main
+Your branch is ahead of 'origin/main' by 1 commit.
+  (use "git push" to publish your local commits)
+
+nothing to commit, working tree clean
+To https://github.com/creyt2012/vetinh.git
+ ! [remote rejected] main -> main (cannot lock ref 'refs/heads/main': is at 6eadb2ed6c0608ac92769b4ebd32ddf39120776b but expected 9ee91e601bbadc696d27df5a6a351cd33ff41e24)
+error: failed to push some refs to 'https://github.com/creyt2012/vetinh.git'

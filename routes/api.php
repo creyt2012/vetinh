@@ -11,6 +11,7 @@ Route::middleware(['auth.api_key', \App\Http\Middleware\CheckApiKeyLimits::class
     // Satellites
     Route::get('/satellites/live', [SatelliteController::class, 'index']);
     Route::get('/health', [\App\Http\Controllers\Api\V1\HealthController::class, 'check']);
+    Route::get('/plans', [\App\Http\Controllers\Api\V1\PaymentController::class, 'plans']);
 
     // Payments
     Route::post('/payments/checkout', [\App\Http\Controllers\Api\V1\PaymentController::class, 'checkout']);
