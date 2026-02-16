@@ -29,6 +29,10 @@ fswatch -o "$REPO_PATH" -l 0.1 -r \
         
         echo "[$TIMESTAMP] Change detected in $FIRST_FILE. Syncing..." >> "$LOG_FILE"
         
+        # Ensure identity is local for this repo
+        git config user.name "creyt2012"
+        git config user.email "mortarcloud@gmail.com"
+        
         git add .
         git commit -m "Auto-sync: $FIRST_FILE ($TIMESTAMP)"
         git push origin main
