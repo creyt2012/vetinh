@@ -49,7 +49,7 @@ npm run dev        # Giao diện Vue 3
 
 ---
 
-## 🚀 Lộ trình sắp tới
+##  Lộ trình sắp tới
 Mình đang làm việc không ngừng nghỉ để đưa thêm dữ liệu từ các **Radar thời tiết** và triển khai hệ thống **Cảnh báo sớm qua Email/Sms** trong các phiên bản tới.
 
 ---
