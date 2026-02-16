@@ -13,18 +13,31 @@ class WeatherMetric extends Model
         'latitude',
         'longitude',
         'cloud_coverage',
+        'cloud_density',
         'rain_intensity',
+        'pressure',
+        'cloud_growth_rate',
         'risk_score',
         'risk_level',
+        'confidence_score',
         'source',
         'captured_at',
         'data_sources',
+        'provenance',
     ];
 
     protected $casts = [
         'captured_at' => 'datetime',
         'data_sources' => 'array',
+        'provenance' => 'array',
         'latitude' => 'float',
         'longitude' => 'float',
+        'cloud_coverage' => 'float',
+        'cloud_density' => 'float',
+        'rain_intensity' => 'float',
+        'pressure' => 'float',
+        'cloud_growth_rate' => 'float',
+        'risk_score' => 'float',
+        'confidence_score' => 'float',
     ];
 }
