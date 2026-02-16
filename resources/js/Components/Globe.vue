@@ -20,11 +20,12 @@ const emit = defineEmits(['select']);
 
 // Color Map for Categories
 const CATEGORY_COLORS = {
-    'STATION': 0xffffff, // White (ISS)
-    'COMMUNICATION': 0x4f46e5, // Blue
-    'WEATHER': 0x10b981, // Green
-    'OBSERVATION': 0x8b5cf6, // Purple
-    'NAVIGATION': 0xf59e0b, // Orange
+    'COMMUNICATION': 0x0ea5e9, // Bright Blue (Cyan-ish)
+    'NAVIGATION': 0x22c55e,    // Bright Green
+    'SCIENTIFIC': 0xa855f7,    // Bright Purple
+    'SPACE_DEBRIS': 0xf97316,  // Strong Orange
+    'STATION': 0xffffff,       // White (ISS)
+    'WEATHER': 0x10b981,       // Green (Keep for backward compatibility or merge)
     'DEFAULT': 0xcccccc
 };
 
