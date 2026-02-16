@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useForm, Head } from '@inertiajs/vue3';
+import AdminLayout from '@/Layouts/AdminLayout.vue';
 
 const props = defineProps({
     satellites: Array
@@ -81,27 +82,20 @@ const route = window.route;
 </script>
 
 <template>
-    <Head title="Mission Control - Backend Administration" />
-    
-    <div class="min-h-screen bg-[#020205] text-white p-8 font-inter">
-        <!-- Header -->
-        <div class="max-w-7xl mx-auto flex justify-between items-end mb-12">
-            <div class="flex items-center space-x-6">
-                <div class="w-2 h-16 bg-vibrant-blue shadow-[0_0_20px_#0088ff]"></div>
-                <div>
-                    <p class="text-vibrant-blue font-black tracking-[0.4em] text-[10px] uppercase mb-2">Back-end Infrastructure</p>
-                    <h1 class="text-6xl font-black font-outfit uppercase tracking-tighter italic leading-none">MISSION CONTROL</h1>
-                </div>
+    <AdminLayout>
+        <template #header>SATELLITE_ASSET_INVENTORY</template>
+        <Head title="Mission Control - Backend Administration" />
+        
+        <div class="flex justify-between items-center mb-10">
+            <div>
+                <p class="text-vibrant-blue font-black tracking-[.2em] text-[10px] uppercase mb-1">Orbital_Fleet_Status</p>
+                <h3 class="text-3xl font-black font-outfit uppercase tracking-tighter italic">ACTIVE_ASSETS</h3>
             </div>
-            
-            <div class="flex items-center space-x-4">
-                <a href="/" class="px-8 py-4 border border-white/5 bg-white/[0.02] hover:bg-white/5 transition uppercase text-[10px] font-black tracking-[0.3em]">Return_to_Dashboard</a>
-                <button @click="showAddModal = true" class="px-8 py-4 bg-vibrant-blue text-black hover:bg-white transition uppercase text-[10px] font-black tracking-[0.3em] shadow-[0_0_30px_rgba(0,136,255,0.3)]">Deploy_New_Asset</button>
-            </div>
+            <button @click="showAddModal = true" class="px-8 py-4 bg-vibrant-blue text-black hover:bg-white transition uppercase text-[10px] font-black tracking-[0.3em] shadow-[0_0_30px_rgba(0,136,255,0.3)]">Deploy_New_Asset</button>
         </div>
 
         <!-- Inventory Grid -->
-        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div v-for="sat in satellites" :key="sat.id" 
                 class="group relative bg-[#08080C] border border-white/5 p-8 hover:border-vibrant-blue/50 transition-all duration-700 overflow-hidden shadow-2xl">
                 
@@ -283,7 +277,9 @@ const route = window.route;
             </div>
         </div>
 
-    </div>
+        </div>
+
+    </AdminLayout>
 </template>
 
 <style scoped>
