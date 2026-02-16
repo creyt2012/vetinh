@@ -11,36 +11,40 @@ use Illuminate\Http\Request;
 class WeatherController extends Controller
 {
     protected RiskEngine $riskEngine;
+    protected \App\Repositories\StateRepository $stateRepo;
 
-    public function __construct(RiskEngine $riskEngine)
+    public function __construct(RiskEngine $riskEngine, \App\Repositories\StateRepository $stateRepo)
     {
         $this->riskEngine = $riskEngine;
+        $this->stateRepo = $stateRepo;
     }
 
     /**
-     * Get latest weather metrics and risk assessment.
+     * Get latest weather metrics and risk assessment using L1 Cache.
      */
     public function latest(): JsonResponse
     {
-        $metric = WeatherMetric::latest('captured_at')->first();
+        $metric = $this->stateRepo->getLatestWeather();
 
         if (!$metric) {
             return response()->json(['status' => 'error', 'message' => 'No weather data available'], 404);
         }
 
-        $previous = WeatherMetric::where('captured_at', '<', $metric->captured_at)
-            ->latest('captured_at')
-            ->first();
-
-        $risk = $this->riskEngine->computeRiskScore($metric, $previous);
-
         return response()->json([
             'status' => 'success',
             'data' => [
                 'cloud_coverage' => $metric->cloud_coverage,
+                'cloud_density' => $metric->cloud_density,
                 'rain_intensity' => $metric->rain_intensity,
+                'pressure' => $metric->pressure,
                 'captured_at' => $metric->captured_at,
-                'risk' => $risk
+                'risk' => [
+                    'score' => $metric->risk_score,
+                    'level' => $metric->risk_level,
+                    'confidence' => $metric->confidence_score,
+                    'growth' => $metric->cloud_growth_rate
+                ],
+                'provenance' => $metric->provenance
             ]
         ]);
     }
