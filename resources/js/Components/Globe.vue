@@ -403,5 +403,20 @@ const animate = () => {
                 <div class="flex justify-between"><span>VEL:</span> <span>{{ Math.round(selectedSatellite.velocity) }}k/s</span></div>
             </div>
         </div>
+
+        <!-- Hover Tooltip -->
+        <div v-if="hoveredSatellite" 
+             class="fixed z-[100] pointer-events-none transition-all duration-75 ease-out"
+             :style="{ left: toolTipPos.x + 20 + 'px', top: toolTipPos.y + 'px' }">
+            <div class="glass border border-white/10 px-3 py-2 rounded-lg shadow-2xl flex flex-col space-y-1">
+                <div class="flex items-center space-x-2">
+                    <span :style="{ backgroundColor: 'rgba(' + hexToRgb(CATEGORY_COLORS[hoveredSatellite.type] || CATEGORY_COLORS.DEFAULT) + ', 1)' }" class="w-1.5 h-1.5 rounded-full"></span>
+                    <span class="text-[9px] font-black text-white/90 uppercase tracking-tighter">{{ hoveredSatellite.name }}</span>
+                </div>
+                <div class="text-[8px] font-mono text-white/40 uppercase">
+                    {{ hoveredSatellite.latitude.toFixed(2) }}°N / {{ hoveredSatellite.longitude.toFixed(2) }}°E
+                </div>
+            </div>
+        </div>
     </div>
 </template>
