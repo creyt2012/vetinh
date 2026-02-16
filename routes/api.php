@@ -20,6 +20,7 @@ Route::middleware(['auth.api_key', \App\Http\Middleware\CheckApiKeyLimits::class
     // Weather
     Route::get('/weather/latest', [WeatherController::class, 'latest']);
     Route::get('/weather/metrics', [WeatherController::class, 'metrics']);
+    Route::get('/weather/ground-stations', [WeatherController::class, 'groundStations']);
     Route::get('/weather/history', [WeatherController::class, 'locationHistory']);
     Route::get('/weather/heatmap', [WeatherController::class, 'heatmap']);
 });
