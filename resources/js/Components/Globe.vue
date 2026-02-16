@@ -272,7 +272,6 @@ const getWeatherAt = (lat, lng) => {
     };
 };
 
-const onMouseMove = (event) => {
     const rect = renderer.domElement.getBoundingClientRect();
     const mouse = new THREE.Vector2(
         ((event.clientX - rect.left) / rect.width) * 2 - 1,
@@ -307,9 +306,11 @@ const onMouseMove = (event) => {
             const hit = sphereIntersects[0];
             const point = hit.point.clone().normalize();
             
-            // Convert point to Lat/Lng
+            // Convert point to Lat/Lng (FIXED FORMULA)
             const lat = Math.asin(point.y) * (180 / Math.PI);
-            const lng = Math.atan2(point.z, -point.x) * (180 / Math.PI);
+            let lng = Math.atan2(point.z, -point.x) * (180 / Math.PI) - 180;
+            while (lng <= -180) lng += 360;
+            while (lng > 180) lng -= 360;
             
             const localWeather = getWeatherAt(lat, lng);
             
@@ -471,7 +472,10 @@ const onMouseDown = (event) => {
             const hit = sphereIntersects[0];
             const point = hit.point.clone().normalize();
             const lat = Math.asin(point.y) * (180 / Math.PI);
-            const lng = Math.atan2(point.z, -point.x) * (180 / Math.PI);
+            let lng = Math.atan2(point.z, -point.x) * (180 / Math.PI) - 180;
+            while (lng <= -180) lng += 360;
+            while (lng > 180) lng -= 360;
+            
             const weather = getWeatherAt(lat, lng);
             
             // Resolve Location Intel
