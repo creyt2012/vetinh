@@ -621,3 +621,21 @@ After doing this, you may fix the identity used for this commit with:
  create mode 100644 resources/js/Pages/Admin/ApiKeyManagement.vue
 To https://github.com/creyt2012/vetinh.git
    8cc1ce0..e9e86be  main -> main
+[main 9b8c959] Auto-sync: resources/js/Pages/Admin/UserManagement.vue (2026-02-17 02:05:52)
+ Committer: Nguyễn Thành Biên <creytdeveloper@xdigital-2.local>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly. Run the
+following command and follow the instructions in your editor to edit
+your configuration file:
+
+    git config --global --edit
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 3 files changed, 126 insertions(+)
+ create mode 100644 resources/js/Pages/Admin/UserManagement.vue
+To https://github.com/creyt2012/vetinh.git
+   e9e86be..9b8c959  main -> main

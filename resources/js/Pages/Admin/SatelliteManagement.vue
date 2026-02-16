@@ -277,8 +277,6 @@ const route = window.route;
             </div>
         </div>
 
-        </div>
-
     </AdminLayout>
 </template>
 
