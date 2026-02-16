@@ -12,8 +12,13 @@ class AlertController extends Controller
 {
     public function index(): Response
     {
+        $user = Auth::user();
+        $alerts = ($user && $user->tenant)
+            ? $user->tenant->activityLogs()->where('action', 'NOTIFICATION_SENT')->latest()->limit(50)->get()
+            : [];
+
         return Inertia::render('User/Alerts/Index', [
-            'alerts' => Auth::user()->tenant ? Auth::user()->tenant->activityLogs()->where('action', 'NOTIFICATION_SENT')->latest()->limit(50)->get() : []
+            'alerts' => $alerts
         ]);
     }
 }
