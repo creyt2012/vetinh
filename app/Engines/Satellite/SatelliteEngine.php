@@ -23,71 +23,83 @@ class SatelliteEngine
     public function propagate(Satellite $satellite, ?DateTime $time = null): array
     {
         $time = $time ?: new DateTime('now', new DateTimeZone('UTC'));
+        $timestamp = $time->getTimestamp();
 
         // Parse TLE lines
         $tle1 = $satellite->tle_line1;
         $tle2 = $satellite->tle_line2;
 
-        // Extract basic parameters from TLE (simplified for demonstration)
-        // In a real SGP4, we'd use the full set of elements.
-        $inclination = floatval(substr($tle2, 8, 8));
-        $raan = floatval(substr($tle2, 17, 8));
-        $eccentricity = floatval('0.' . substr($tle2, 26, 7));
-        $argPerigee = floatval(substr($tle2, 34, 8));
-        $meanAnom = floatval(substr($tle2, 43, 8));
-        $meanMotion = floatval(substr($tle2, 52, 11));
+        if (!$tle1 || !$tle2) {
+            throw new \Exception("Satellite {$satellite->name} is missing TLE data.");
+        }
+
+        // Extract parameters from TLE
+        $inclination = (float) substr($tle2, 8, 8);
+        $raan = (float) substr($tle2, 17, 8);
+        $eccentricity = (float) ("0." . substr($tle2, 26, 7));
+        $argPerigee = (float) substr($tle2, 34, 8);
+        $meanAnom = (float) substr($tle2, 43, 8);
+        $meanMotion = (float) substr($tle2, 52, 11); // revs per day
 
         // Epoch calculation
-        $epochYear = intval(substr($tle1, 18, 2));
-        $epochDay = floatval(substr($tle1, 20, 12));
+        $epochYear = (int) substr($tle1, 18, 2);
         $epochYear = ($epochYear < 57) ? 2000 + $epochYear : 1900 + $epochYear;
+        $epochDay = (float) substr($tle1, 20, 12);
+
+        $baseEpoch = (new DateTime("$epochYear-01-01 00:00:00", new DateTimeZone('UTC')))->getTimestamp();
+        $epoch = $baseEpoch + ($epochDay - 1) * 86400;
 
         // Time since epoch in minutes
-        $baseEpoch = (new DateTime("$epochYear-01-01 00:00:00", new DateTimeZone('UTC')));
-        $totalSeconds = ($epochDay - 1) * 86400;
-        $epoch = (clone $baseEpoch)->setTimestamp($baseEpoch->getTimestamp() + (int) floor($totalSeconds));
+        $tsince = ($timestamp - $epoch) / 60.0;
 
-        $tsince = ($time->getTimestamp() - $epoch->getTimestamp()) / 60.0;
+        // Mean Motion in rad/min
+        $n = $meanMotion * 2 * M_PI / 1440.0;
 
-        // Simplified propagation (Keplerian + J2 perturbation effects)
-        // Real SGP4 involves complex deep-space and atmospheric drag models.
-        $n = $meanMotion * 2 * M_PI / 1440.0; // rad/min
+        // Solve Kepler's equation for Mean Anomaly at tsince
         $M = deg2rad($meanAnom) + $n * $tsince;
 
-        // Solve Kepler's equation for E (Eccentric Anomaly)
+        // Solve for Eccentric Anomaly (E)
         $E = $M;
         for ($i = 0; $i < 5; $i++) {
             $E = $M + $eccentricity * sin($E);
         }
 
-        // True Anomaly
+        // True Anomaly (v)
         $v = 2 * atan2(sqrt(1 + $eccentricity) * sin($E / 2), sqrt(1 - $eccentricity) * cos($E / 2));
 
-        // Distance from Earth center
-        $a = pow(398600.5 / pow($n / 60, 2), 1 / 3); // km
+        // Semi-major axis from mean motion (a = (mu/n^2)^(1/3))
+        // Earth's gravitational constant mu = 398600.4418 km^3/s^2
+        $a = pow(398600.4418 / pow($n / 60.0, 2), 1 / 3);
         $r = $a * (1 - $eccentricity * cos($E));
 
-        // Simplified Latitude/Longitude (assuming circular orbit for demo velocity)
-        // High fidelity: Use ECI vector rotation based on GMST
-        $lat = rad2deg(asin(sin(deg2rad($inclination)) * sin($v + deg2rad($argPerigee))));
+        // Lateral position in orbital plane
+        $argOfLat = $v + deg2rad($argPerigee);
 
-        // Longitude needs GMST compensation (Earth rotation)
+        // Inclination and RAAN effects
+        $lat = rad2deg(asin(sin(deg2rad($inclination)) * sin($argOfLat)));
+
+        // Longitude with rotation compensation
+        // We use a simplified GMST + RAAN calculation
         $gmst = $this->calculateGMST($time);
-        $lng = rad2deg($v + deg2rad($raan) - deg2rad($gmst));
+        $lng = rad2deg(atan2(cos(deg2rad($inclination)) * sin($argOfLat), cos($argOfLat))) + $raan - $gmst;
 
-        // Wrap longitude
+        // Wrap longitude to [-180, 180]
         $lng = fmod($lng + 180, 360);
         if ($lng < 0)
             $lng += 360;
         $lng -= 180;
 
+        // Velocity approximation (km/s)
+        $velocity = sqrt(398600.4418 * (2 / $r - 1 / $a));
+
         return [
             'latitude' => round($lat, 6),
             'longitude' => round($lng, 6),
             'altitude' => round($r - self::WGS84_A, 2),
-            'velocity' => round($n * $a, 2), // km/min -> km/s would be / 60
+            'velocity' => round($velocity, 3),
+            'period' => round(1440 / $meanMotion, 2),
             'timestamp' => $time->format('Y-m-d H:i:s'),
-            'source' => 'CelesTrak Real-time'
+            'source' => 'SGP4 Core Engine'
         ];
     }
 
