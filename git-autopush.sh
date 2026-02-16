@@ -4,39 +4,37 @@
 REPO_PATH="/Users/creytdeveloper/Documents/vetinh"
 LOG_FILE="$REPO_PATH/git-autopush.log"
 
-echo "Starting StarWeather Ultra-Sync Watcher (V3 - Hardened)..."
-echo "Monitoring: $REPO_PATH"
+# Global Identity Enforcement (Local to Repo)
+cd "$REPO_PATH"
+git config user.name "creyt2012"
+git config user.email "mortarcloud@gmail.com"
 
-# fswatch with strict exclusions to prevent self-triggering
+echo "Starting StarWeather Ultra-Sync Watcher (V4 - Hyper-Granular)..."
+echo "Monitoring: $REPO_PATH (Commit-on-change: Enabled)"
+
+# fswatch with ultra-low latency (0.1s)
 fswatch -o "$REPO_PATH" -l 0.1 -r \
     -e "/\.git" \
     -e "/vendor" \
     -e "/node_modules" \
     -e "/storage" \
     -e "/public/build" \
-    -e "git-autopush\.log" \
-    -e "git-autopush\.out" | while read num; do
+    -e "\.log$" \
+    -e "\.out$" | while read num; do
     
     cd "$REPO_PATH"
     
-    # Identify if there are any changes besides the log files
-    # (Though adding them to .gitignore already handles this, this is dual-safety)
-    CHANGES=$(git status -s | grep -v "git-autopush.log" | grep -v "git-autopush.out")
-    
-    if [[ -n "$CHANGES" ]]; then
-        FIRST_FILE=$(echo "$CHANGES" | head -n 1 | cut -c 4-)
-        TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+    # Check for ANY change including untracked files
+    if [[ -n $(git status -s) ]]; then
+        FIRST_FILE=$(git status -s | head -n 1 | cut -c 4- | xargs)
+        TIMESTAMP=$(date '+%H:%M:%S.%3N') # Micro-precision
         
-        echo "[$TIMESTAMP] Change detected in $FIRST_FILE. Syncing..." >> "$LOG_FILE"
+        echo "[$TIMESTAMP] Hyper-Sync triggered by $FIRST_FILE" >> "$LOG_FILE"
         
-        # Ensure identity is local for this repo
-        git config user.name "creyt2012"
-        git config user.email "mortarcloud@gmail.com"
+        git add -A
+        git commit -m "Ultra-sync: $FIRST_FILE ($TIMESTAMP)"
+        git push origin main >> "$LOG_FILE" 2>&1
         
-        git add .
-        git commit -m "Auto-sync: $FIRST_FILE ($TIMESTAMP)"
-        git push origin main
-        
-        echo "[$TIMESTAMP] Successfully pushed to GitHub." >> "$LOG_FILE"
+        echo "[$TIMESTAMP] Pushed to GitHub. Contribution secured." >> "$LOG_FILE"
     fi
 done
