@@ -196,13 +196,6 @@ onMounted(async () => {
                 <p class="text-[8px] text-white/40 font-mono mt-1 uppercase">Resolving spatial vectors @ 2.5km/px</p>
             </div>
 
-            <!-- Right Panel: Micro Vitals -->
-            <div class="absolute top-8 right-8 z-10 space-y-4">
-                <div class="bg-black/40 backdrop-blur-md border border-white/5 p-4 text-right">
-                    <p class="text-[8px] font-black text-white/20 uppercase">CURSOR_COORDINATES</p>
-                    <p class="text-xs font-mono font-black italic text-vibrant-blue">10.7626° N, 106.6602° E</p>
-                </div>
-            </div>
 
             <!-- Globe Container -->
             <div ref="globeContainer" class="w-full h-full cursor-grab active:cursor-grabbing"></div>
