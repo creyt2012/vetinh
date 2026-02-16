@@ -492,24 +492,53 @@ const animate = () => {
             </div>
 
             <!-- Surface Tooltip (Weather Intelligence) -->
-            <div v-else-if="hoveredSurface" class="glass border border-white/10 px-3 py-3 rounded-lg shadow-2xl min-w-[140px] space-y-2">
-                <div class="flex items-center justify-between">
-                    <span class="text-[10px] font-black text-white/90 uppercase tracking-widest">Surface Int.</span>
-                    <span class="text-[8px] font-mono text-white/30 uppercase tracking-tighter">{{ hoveredSurface.lat.toFixed(1) }}°, {{ hoveredSurface.lng.toFixed(1) }}°</span>
+            <div v-else-if="hoveredSurface" class="glass border border-white/10 px-4 py-4 rounded-xl shadow-2xl min-w-[180px] space-y-3">
+                <div class="flex items-center justify-between border-b border-white/5 pb-2">
+                    <div class="flex flex-col">
+                        <span class="text-[10px] font-black text-white/90 uppercase tracking-widest leading-none">Scanning...</span>
+                        <span class="text-[7px] font-mono text-white/30 uppercase tracking-tighter">{{ hoveredSurface.lat.toFixed(2) }}°, {{ hoveredSurface.lng.toFixed(2) }}°</span>
+                    </div>
+                    <div class="w-8 h-8 rounded-lg bg-vibrant-blue/10 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-vibrant-blue animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
                 </div>
 
-                <!-- If over Vietnam Sector (Roughly) -->
-                <div v-if="hoveredSurface.lat > 8 && hoveredSurface.lat < 24 && hoveredSurface.lng > 102 && hoveredSurface.lng < 110" class="space-y-2 pt-2 border-t border-white/5">
-                    <div class="flex items-baseline justify-between">
-                        <span class="text-[8px] text-white/30 uppercase">Atm. Pressure</span>
-                        <span class="text-[10px] font-bold text-white">{{ weatherMetrics.pressure }} hPa</span>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="space-y-0.5">
+                        <span class="text-[7px] text-white/40 uppercase font-bold">Temperature</span>
+                        <div class="flex items-baseline space-x-1">
+                            <span class="text-xs font-black text-white">{{ hoveredSurface.temp }}</span>
+                            <span class="text-[8px] text-white/20">°C</span>
+                        </div>
                     </div>
-                    <div class="flex items-baseline justify-between">
-                        <span class="text-[8px] text-white/30 uppercase">Cloud Density</span>
-                        <span class="text-[10px] font-bold text-vibrant-blue">{{ Math.round(weatherMetrics.cloud_density) }}%</span>
+                    <div class="space-y-0.5 text-right">
+                        <span class="text-[7px] text-white/40 uppercase font-bold">Wind Speed</span>
+                        <div class="flex items-baseline justify-end space-x-1">
+                            <span class="text-xs font-black text-vibrant-green">{{ hoveredSurface.windSpeed }}</span>
+                            <span class="text-[8px] text-white/20">km/h</span>
+                        </div>
+                    </div>
+                    <div class="space-y-0.5">
+                        <span class="text-[7px] text-white/40 uppercase font-bold">Pressure</span>
+                        <div class="flex items-baseline space-x-1">
+                            <span class="text-xs font-black text-white/80">{{ hoveredSurface.pressure }}</span>
+                            <span class="text-[8px] text-white/20">hPa</span>
+                        </div>
+                    </div>
+                    <div class="space-y-0.5 text-right">
+                        <span class="text-[7px] text-white/40 uppercase font-bold">Humidity</span>
+                        <div class="flex items-baseline justify-end space-x-1">
+                            <span class="text-xs font-black text-vibrant-blue">{{ hoveredSurface.humidity }}%</span>
+                        </div>
                     </div>
                 </div>
-                <div v-else class="text-[8px] text-white/20 uppercase italic">Awaiting Sector Scan...</div>
+
+                <div class="pt-2 border-t border-white/5 flex items-center justify-between text-[7px] font-black text-white/20 uppercase tracking-widest">
+                    <span>Click to Pin</span>
+                    <span class="animate-bounce">↓</span>
+                </div>
             </div>
         </div>
     </div>
