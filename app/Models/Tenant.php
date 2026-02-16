@@ -12,15 +12,26 @@ class Tenant extends Model
     protected $fillable = [
         'name',
         'domain',
-        'plan',
+        'plan_id',
+        'plan', // Legacy or direct plan name
         'settings',
-        'expires_at',
+        'expires_at'
     ];
 
     protected $casts = [
         'settings' => 'array',
-        'expires_at' => 'datetime',
+        'expires_at' => 'datetime'
     ];
+
+    public function plan()
+    {
+        return $this->belongsTo(Plan::class);
+    }
+
+    public function subscription()
+    {
+        return $this->hasOne(Subscription::class)->latest();
+    }
 
     public function apiKeys()
     {
