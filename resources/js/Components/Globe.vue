@@ -7,6 +7,10 @@ const props = defineProps({
     satellites: {
         type: Array,
         default: () => []
+    },
+    weatherMetrics: {
+        type: Object,
+        default: () => ({})
     }
 });
 
@@ -16,6 +20,7 @@ let satelliteMarkers = new Map();
 let orbitPaths = new Map();
 let selectedSatellite = ref(null);
 let hoveredSatellite = ref(null);
+let hoveredSurface = ref(null); // { lat, lng }
 let toolTipPos = ref({ x: 0, y: 0 });
 
 const emit = defineEmits(['select', 'hover']);
