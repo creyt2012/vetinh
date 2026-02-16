@@ -18,6 +18,7 @@ class SatellitePropagateJob implements ShouldQueue
     {
         $satellites = Satellite::where('status', 'ACTIVE')->get();
 
+        /** @var \App\Models\Satellite $satellite */
         foreach ($satellites as $satellite) {
             try {
                 $trackData = $engine->propagate($satellite);
