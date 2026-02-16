@@ -826,3 +826,21 @@ After doing this, you may fix the identity used for this commit with:
  3 files changed, 39 insertions(+)
 To https://github.com/creyt2012/vetinh.git
    db6d13d..0886e41  main -> main
+[main 9e1b830] Auto-sync: database/migrations/2026_02_16_193424_create_activity_logs_table.php (2026-02-17 02:34:25)
+ Committer: Nguyễn Thành Biên <creytdeveloper@xdigital-2.local>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly. Run the
+following command and follow the instructions in your editor to edit
+your configuration file:
+
+    git config --global --edit
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 3 files changed, 46 insertions(+)
+ create mode 100644 database/migrations/2026_02_16_193424_create_activity_logs_table.php
+To https://github.com/creyt2012/vetinh.git
+   0886e41..9e1b830  main -> main
