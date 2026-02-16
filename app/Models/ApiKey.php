@@ -11,17 +11,29 @@ class ApiKey extends Model
 
     protected $fillable = [
         'tenant_id',
+        'user_id',
         'key',
         'secret',
         'name',
         'is_active',
+        'rate_limit',
+        'monthly_quota',
+        'usage_count',
         'last_used_at',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
         'last_used_at' => 'datetime',
+        'rate_limit' => 'integer',
+        'monthly_quota' => 'integer',
+        'usage_count' => 'integer',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function tenant()
     {
