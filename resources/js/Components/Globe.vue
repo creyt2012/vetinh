@@ -531,6 +531,7 @@ const onMouseDown = (event) => {
                 const sat = props.satellites.find(s => s.id === id);
                 selectedSatellite.value = sat;
                 emit('select', sat);
+                emit('satellite-click', sat);
                 highlightPath(id);
                 break;
             }
