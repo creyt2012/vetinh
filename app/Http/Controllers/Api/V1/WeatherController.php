@@ -108,11 +108,16 @@ class WeatherController extends Controller
     /**
      * Get Global Risk Heatmap data for the Globe visualization.
      */
-    public function heatmap(): JsonResponse
+    /**
+     * Get all ground stations and their latest metrics.
+     */
+    public function groundStations(): JsonResponse
     {
+        $stations = \App\Models\GroundStation::with('latestMetric')->get();
+
         return response()->json([
             'status' => 'success',
-            'data' => $this->geoEngine->getRiskHeatmap()
+            'data' => $stations
         ]);
     }
 }
