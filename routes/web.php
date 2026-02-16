@@ -11,6 +11,9 @@ Route::get('/weather/map', function () {
     return Inertia::render('User/WeatherMap');
 })->name('weather.map');
 
+Route::get('/alerts', [\App\Http\Controllers\User\AlertController::class, 'index'])->name('alerts.index');
+Route::get('/api-portal', [\App\Http\Controllers\User\ApiKeyController::class, 'index'])->name('apikeys.index');
+
 Route::get('/login', function () {
     return redirect()->route('home');
 })->name('login');
