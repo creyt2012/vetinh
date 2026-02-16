@@ -17,6 +17,9 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::put('/satellites/{satellite}', [\App\Http\Controllers\Admin\SatelliteManagementController::class, 'update'])->name('admin.satellites.update');
     Route::delete('/satellites/{satellite}', [\App\Http\Controllers\Admin\SatelliteManagementController::class, 'destroy'])->name('admin.satellites.destroy');
 
+    // Billing
+    Route::get('/billing', [\App\Http\Controllers\Admin\BillingController::class, 'index'])->name('admin.billing');
+
     // API Keys
     Route::get('/api-keys', [\App\Http\Controllers\Admin\ApiKeyManagementController::class, 'index'])->name('admin.apikeys.index');
     Route::post('/api-keys', [\App\Http\Controllers\Admin\ApiKeyManagementController::class, 'store'])->name('admin.apikeys.store');
