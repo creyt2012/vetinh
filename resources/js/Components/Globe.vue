@@ -138,6 +138,34 @@ const initScene = () => {
     updateSatelliteMarkers(props.satellites);
     window.addEventListener('resize', onWindowResize);
     window.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('keydown', onKeyDown);
+};
+
+const onKeyDown = (e) => {
+    switch(e.key) {
+        case '1': // North View
+            camera.position.set(0, 4, 0);
+            break;
+        case '2': // Pacific View
+            camera.position.set(4, 0, 4);
+            break;
+        case '3': // Atlantic View
+            camera.position.set(-4, 0, 4);
+            break;
+        case '4': // South View
+            camera.position.set(0, -4, 0);
+            break;
+        case 'r':
+        case 'R':
+            controls.autoRotate = !controls.autoRotate;
+            break;
+        case 'Escape':
+            selectedSatellite.value = null;
+            emit('select', null);
+            resetPaths();
+            break;
+    }
+    controls.update();
 };
 
 const updateSatelliteMarkers = (sats) => {
