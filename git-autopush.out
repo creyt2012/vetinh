@@ -403,3 +403,22 @@ are terminated then try again. If it still fails, a git process
 may have crashed in this repository earlier:
 remove the file manually to continue.
 Everything up-to-date
+On branch main
+Your branch is ahead of 'origin/main' by 1 commit.
+  (use "git push" to publish your local commits)
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	database/migrations/2026_02_16_222217_add_station_id_to_weather_metrics_table.php
+
+nothing added to commit but untracked files present (use "git add" to track)
+To https://github.com/creyt2012/vetinh.git
+ ! [remote rejected] main -> main (cannot lock ref 'refs/heads/main': is at afb2ef65a5486e53c11103f20debc35b5d43f58f but expected 75e1cc106001e809f1f14f163ff46c89d357cb06)
+error: failed to push some refs to 'https://github.com/creyt2012/vetinh.git'
+fatal: Unable to create '/Users/creytdeveloper/Documents/vetinh/.git/index.lock': File exists.
+
+Another git process seems to be running in this repository, e.g.
+an editor opened by 'git commit'. Please make sure all processes
+are terminated then try again. If it still fails, a git process
+may have crashed in this repository earlier:
+remove the file manually to continue.
