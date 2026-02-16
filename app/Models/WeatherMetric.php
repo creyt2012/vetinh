@@ -10,20 +10,21 @@ class WeatherMetric extends Model
     use HasFactory;
 
     protected $fillable = [
+        'station_id',
         'latitude',
         'longitude',
         'cloud_coverage',
-        'cloud_density',
         'rain_intensity',
-        'pressure',
-        'cloud_growth_rate',
         'risk_score',
         'risk_level',
-        'confidence_score',
+        'temperature',
+        'humidity',
+        'pressure',
+        'wind_speed',
+        'wind_direction',
         'source',
         'captured_at',
-        'data_sources',
-        'provenance',
+        'data_sources'
     ];
 
     protected $casts = [

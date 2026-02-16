@@ -445,3 +445,18 @@ To https://github.com/creyt2012/vetinh.git
    c7f0c62..c17f912  main -> main
 error: could not lock config file .git/config: File exists
 error: could not lock config file .git/config: File exists
+On branch main
+Your branch is ahead of 'origin/main' by 1 commit.
+  (use "git push" to publish your local commits)
+
+nothing to commit, working tree clean
+To https://github.com/creyt2012/vetinh.git
+ ! [remote rejected] main -> main (cannot lock ref 'refs/heads/main': is at 3ee0c43ffe19ff37e5fea679ae0b1a0c5eea7d17 but expected c17f912d77b6a4df7ea05f8a125852c0b2a2c380)
+error: failed to push some refs to 'https://github.com/creyt2012/vetinh.git'
+fatal: Unable to create '/Users/creytdeveloper/Documents/vetinh/.git/index.lock': File exists.
+
+Another git process seems to be running in this repository, e.g.
+an editor opened by 'git commit'. Please make sure all processes
+are terminated then try again. If it still fails, a git process
+may have crashed in this repository earlier:
+remove the file manually to continue.
