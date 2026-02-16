@@ -879,3 +879,21 @@ After doing this, you may fix the identity used for this commit with:
  create mode 100644 app/Models/ActivityLog.php
 To https://github.com/creyt2012/vetinh.git
    2aa506b..58d73f3  main -> main
+[main 76cad40] Auto-sync: database/migrations/2026_02_16_193526_add_role_to_users_table.php (2026-02-17 02:35:26)
+ Committer: Nguyễn Thành Biên <creytdeveloper@xdigital-2.local>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly. Run the
+following command and follow the instructions in your editor to edit
+your configuration file:
+
+    git config --global --edit
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 3 files changed, 48 insertions(+)
+ create mode 100644 database/migrations/2026_02_16_193526_add_role_to_users_table.php
+To https://github.com/creyt2012/vetinh.git
+   58d73f3..76cad40  main -> main
