@@ -12,6 +12,10 @@ Route::middleware(['auth.api_key', \App\Http\Middleware\CheckApiKeyLimits::class
     Route::get('/satellites/live', [SatelliteController::class, 'index']);
     Route::get('/health', [\App\Http\Controllers\Api\V1\HealthController::class, 'check']);
 
+    // Payments
+    Route::post('/payments/checkout', [\App\Http\Controllers\Api\V1\PaymentController::class, 'checkout']);
+    Route::post('/payments/webhook/{gateway}', [\App\Http\Controllers\Api\V1\PaymentController::class, 'webhook']);
+
     // Weather
     Route::get('/weather/latest', [WeatherController::class, 'latest']);
     Route::get('/weather/metrics', [WeatherController::class, 'metrics']);

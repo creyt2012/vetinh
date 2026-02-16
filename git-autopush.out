@@ -331,3 +331,7 @@ an editor opened by 'git commit'. Please make sure all processes
 are terminated then try again. If it still fails, a git process
 may have crashed in this repository earlier:
 remove the file manually to continue.
+fatal: cannot lock ref 'HEAD': is at c812dd870f6c505f9129d51f8434e6d09c359c88 but expected b19f456b5bb70c17fd75c6d5666f89822076a193
+To https://github.com/creyt2012/vetinh.git
+ ! [remote rejected] main -> main (cannot lock ref 'refs/heads/main': is at c812dd870f6c505f9129d51f8434e6d09c359c88 but expected b19f456b5bb70c17fd75c6d5666f89822076a193)
+error: failed to push some refs to 'https://github.com/creyt2012/vetinh.git'
