@@ -203,10 +203,3 @@ onMounted(() => {
     to { transform: rotate(360deg); }
 }
 </style>
-
-<style scoped>
-.font-outfit { font-family: 'Outfit', sans-serif; }
-.text-vibrant-blue { color: #0088ff; }
-.bg-vibrant-blue { background-color: #0088ff; }
-.text-vibrant-green { color: #00ffaa; }
-</style>
