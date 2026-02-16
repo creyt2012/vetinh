@@ -188,6 +188,42 @@ onMounted(() => {
                             </div>
                         </div>
                     </div>
+                    <!-- Mission Audit Trail -->
+                    <div class="bg-[#08080C] border border-white/5 p-8 relative overflow-hidden">
+                        <p class="text-[9px] font-black text-vibrant-blue uppercase tracking-[.5em] mb-6">Execution_Audit_Trail</p>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="border-b border-white/5">
+                                        <th class="py-4 text-[9px] font-black text-white/20 uppercase tracking-widest">Mark_Time</th>
+                                        <th class="py-4 text-[9px] font-black text-white/20 uppercase tracking-widest">Operator</th>
+                                        <th class="py-4 text-[9px] font-black text-white/20 uppercase tracking-widest">Action_Event</th>
+                                        <th class="py-4 text-[9px] font-black text-white/20 uppercase tracking-widest text-right">Payload_Sig</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="log in recent_logs" :key="log.id" class="border-b border-white/[0.02] group hover:bg-white/[0.01]">
+                                        <td class="py-4 text-[10px] font-mono text-white/40">{{ formatTime(log.created_at) }}</td>
+                                        <td class="py-4">
+                                            <span class="text-[10px] font-black uppercase text-white/80">{{ log.user?.name || 'SYSTEM_CORE' }}</span>
+                                        </td>
+                                        <td class="py-4">
+                                            <span class="px-2 py-0.5 text-[8px] font-black rounded" 
+                                                :class="log.action.includes('DEACTIVATED') ? 'bg-red-500/20 text-red-400' : 'bg-vibrant-blue/20 text-vibrant-blue'">
+                                                {{ log.action }}
+                                            </span>
+                                        </td>
+                                        <td class="py-4 text-right">
+                                            <span class="text-[9px] font-mono text-white/20">0x{{ log.id.toString(16).padStart(4, '0') }}</span>
+                                        </td>
+                                    </tr>
+                                    <tr v-if="recent_logs.length === 0">
+                                        <td colspan="4" class="py-10 text-center text-[10px] font-black text-white/10 uppercase tracking-widest italic">No activity detected on current frequency</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
