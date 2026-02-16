@@ -10,8 +10,14 @@ const props = defineProps({
     stats: Object,
     satellite_distribution: Object,
     usage_trend: Object,
-    recent_keys: Array
+    recent_keys: Array,
+    recent_logs: Array
 });
+
+const formatTime = (dateStr) => {
+    const date = new Date(dateStr);
+    return date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+};
 
 const typeChartRef = ref(null);
 const trendChartRef = ref(null);
