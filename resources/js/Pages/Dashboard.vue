@@ -91,8 +91,20 @@ const fetchLiveSatellites = async () => {
     }
 };
 
-const handleSurfaceClick = (data) => {
-    selectedLocation.value = data;
+const handleSurfaceClick = async (data) => {
+    selectedLocation.value = { ...data, history: [] };
+    
+    try {
+        const response = await fetch(`/api/v1/weather/history?lat=${data.lat}&lng=${data.lng}`, {
+            headers: { 'X-API-KEY': 'vetinh_dev_key_123' }
+        });
+        const json = await response.json();
+        if (json.status === 'success') {
+            selectedLocation.value.history = json.data;
+        }
+    } catch (e) {
+        console.error('Failed to fetch location history:', e);
+    }
 };
 </script>
 
