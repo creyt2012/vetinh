@@ -445,3 +445,20 @@ After doing this, you may fix the identity used for this commit with:
  3 files changed, 19 insertions(+), 3 deletions(-)
 To https://github.com/creyt2012/vetinh.git
    7c2c203..bd7f722  main -> main
+[main 25f3136] Auto-sync: resources/views/app.blade.php (2026-02-17 01:29:53)
+ Committer: Nguyễn Thành Biên <creytdeveloper@xdigital-2.local>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly. Run the
+following command and follow the instructions in your editor to edit
+your configuration file:
+
+    git config --global --edit
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 3 files changed, 20 insertions(+)
+To https://github.com/creyt2012/vetinh.git
+   bd7f722..25f3136  main -> main
