@@ -2,29 +2,18 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\SatelliteSyncJob;
 use Illuminate\Console\Command;
 
 class SatelliteSyncCommand extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'app:satellite-sync-command';
+    protected $signature = 'satellite:sync';
+    protected $description = 'Manually synchronize all satellites with CelesTrak TLE data';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Command description';
-
-    /**
-     * Execute the console command.
-     */
     public function handle()
     {
-        //
+        $this->info("Dispatching SatelliteSyncJob...");
+        dispatch_sync(new SatelliteSyncJob());
+        $this->info("Sync completed successfully.");
     }
 }
