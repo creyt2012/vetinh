@@ -240,3 +240,15 @@ an editor opened by 'git commit'. Please make sure all processes
 are terminated then try again. If it still fails, a git process
 may have crashed in this repository earlier:
 remove the file manually to continue.
+[main 23113e5] Auto-sync: app/Models/Plan.php (2026-02-17 05:15:42)
+ 3 files changed, 38 insertions(+), 1 deletion(-)
+To https://github.com/creyt2012/vetinh.git
+   b4537ff..23113e5  main -> main
+error: could not lock config file .git/config: File exists
+fatal: Unable to create '/Users/creytdeveloper/Documents/vetinh/.git/index.lock': File exists.
+
+Another git process seems to be running in this repository, e.g.
+an editor opened by 'git commit'. Please make sure all processes
+are terminated then try again. If it still fails, a git process
+may have crashed in this repository earlier:
+remove the file manually to continue.
