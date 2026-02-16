@@ -30,6 +30,8 @@ let hoveredSurface = ref(null); // Restore for tooltips
 let selectedLocation = ref(null); // { lat, lng, x, y, province, district, commune }
 let heatmapData = ref([]);
 let riskLayer = null;
+let gridLayer = null;
+let scanLine = null;
 
 
 // Color Map for Categories
@@ -150,6 +152,22 @@ const initScene = () => {
     clouds = new THREE.Mesh(cloudGeometry, cloudMaterial);
     scene.add(clouds);
 
+    // 5. Tactical Lat/Lng Grid
+    createTacticalGrid();
+
+    // 6. Global Scan Line (Vertical Plane)
+    const scanGeo = new THREE.PlaneGeometry(2.1, 2.1);
+    const scanMat = new THREE.MeshBasicMaterial({
+        color: 0x06b6d4,
+        transparent: true,
+        opacity: 0.1,
+        side: THREE.DoubleSide,
+        blending: THREE.AdditiveBlending,
+        map: createVerticalLineTexture()
+    });
+    scanLine = new THREE.Mesh(scanGeo, scanMat);
+    scene.add(scanLine);
+
     // Controls
     controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
@@ -214,6 +232,57 @@ const renderRiskHeatmap = () => {
     if (riskLayer) scene.remove(riskLayer);
     riskLayer = new THREE.Mesh(riskGeo, riskMat);
     scene.add(riskLayer);
+};
+
+const createTacticalGrid = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1024; canvas.height = 512;
+    const ctx = canvas.getContext('2d');
+    
+    ctx.strokeStyle = 'rgba(6, 182, 212, 0.2)';
+    ctx.lineWidth = 1;
+    
+    // Draw Latitudes
+    for (let i = 0; i <= 180; i += 15) {
+        const y = (i / 180) * canvas.height;
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+    }
+    
+    // Draw Longitudes
+    for (let i = 0; i <= 360; i += 15) {
+        const x = (i / 360) * canvas.width;
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+    }
+    
+    const texture = new THREE.CanvasTexture(canvas);
+    const gridGeo = new THREE.SphereGeometry(1.005, 64, 64);
+    const gridMat = new THREE.MeshBasicMaterial({
+        map: texture,
+        transparent: true,
+        opacity: 0.5,
+        blending: THREE.AdditiveBlending
+    });
+    gridLayer = new THREE.Mesh(gridGeo, gridMat);
+    scene.add(gridLayer);
+};
+
+const createVerticalLineTexture = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 64; canvas.height = 1024;
+    const ctx = canvas.getContext('2d');
+    const grad = ctx.createLinearGradient(0, 0, 64, 0);
+    grad.addColorStop(0, 'rgba(6, 182, 212, 0)');
+    grad.addColorStop(0.5, 'rgba(6, 182, 212, 0.8)');
+    grad.addColorStop(1, 'rgba(6, 182, 212, 0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 64, 1024);
+    return new THREE.CanvasTexture(canvas);
 };
 
 const onKeyDown = (e) => {
@@ -549,7 +618,11 @@ const animate = () => {
     if (clouds) clouds.rotation.y += 0.0003;
     if (globe) globe.rotation.y += 0.0001;
     if (riskLayer) riskLayer.rotation.y += 0.0001;
+    if (gridLayer) gridLayer.rotation.y += 0.0001;
     if (starfield) starfield.rotation.y -= 0.00005;
+    
+    // Rotate Scan Line
+    if (scanLine) scanLine.rotation.y += 0.005;
     
     // Update Leader Line projected position
     if (selectedLocation.value) {
