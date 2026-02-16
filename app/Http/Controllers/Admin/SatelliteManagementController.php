@@ -62,7 +62,7 @@ class SatelliteManagementController extends Controller
 
     public function update(Request $request, Satellite $satellite)
     {
-        if (!$request->user()->isOperator()) {
+        if (!$request->user()?->isOperator()) {
             abort(403, 'Unauthorized mission reconfiguration');
         }
 
@@ -88,7 +88,7 @@ class SatelliteManagementController extends Controller
 
     public function destroy(Request $request, Satellite $satellite)
     {
-        if (!$request->user()->isAdmin()) {
+        if (!$request->user()?->isAdmin()) {
             abort(403, 'Unauthorized asset deactivation');
         }
 
