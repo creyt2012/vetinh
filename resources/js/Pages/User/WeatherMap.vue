@@ -119,6 +119,77 @@ onMounted(async () => {
                 </div>
             </div>
 
+            <!-- Point Intelligence HUD -->
+            <Transition
+                enter-active-class="transition duration-500 ease-out"
+                enter-from-class="translate-x-full opacity-0"
+                enter-to-class="translate-x-0 opacity-100"
+                leave-active-class="transition duration-300 ease-in"
+                leave-from-class="translate-x-0 opacity-100"
+                leave-to-class="translate-x-full opacity-0"
+            >
+                <div v-if="selectedPoint" class="absolute top-8 right-8 z-20 w-80 bg-black/80 backdrop-blur-xl border border-vibrant-blue/30 shadow-[0_0_30px_rgba(0,136,255,0.1)]">
+                    <div class="p-4 border-b border-white/10 flex justify-between items-center bg-vibrant-blue/5">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-2 h-2 bg-vibrant-blue animate-pulse"></div>
+                            <h3 class="text-[10px] font-black uppercase tracking-[0.2em]">PT_INTELLIGENCE</h3>
+                        </div>
+                        <button @click="selectedPoint = null" class="text-white/20 hover:text-white transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div v-if="isLoadingPoint" class="p-12 text-center">
+                        <div class="inline-block w-8 h-8 border-2 border-vibrant-blue border-t-transparent rounded-full animate-spin mb-4"></div>
+                        <p class="text-[9px] font-black text-vibrant-blue uppercase tracking-widest animate-pulse">Retrieving_Data...</p>
+                    </div>
+
+                    <!-- Data Display -->
+                    <div v-else-if="pointData" class="p-6 space-y-6">
+                        <div class="space-y-1">
+                            <p class="text-[9px] text-white/30 uppercase tracking-widest">COORDINATE_TARGET</p>
+                            <p class="text-sm font-black italic text-vibrant-blue">{{ selectedPoint.lat.toFixed(4) }}° N, {{ selectedPoint.lng.toFixed(4) }}° E</p>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="p-3 bg-white/[0.02] border border-white/5">
+                                <p class="text-[8px] font-black text-white/20 uppercase mb-1">Temperature</p>
+                                <p class="text-xl font-black italic">{{ pointData.temperature.toFixed(1) }}°C</p>
+                            </div>
+                            <div class="p-3 bg-white/[0.02] border border-white/5">
+                                <p class="text-[8px] font-black text-white/20 uppercase mb-1">Wind_Speed</p>
+                                <p class="text-xl font-black italic">{{ pointData.wind_speed.toFixed(1) }} <span class="text-[10px]">km/h</span></p>
+                            </div>
+                            <div class="p-3 bg-white/[0.02] border border-white/5">
+                                <p class="text-[8px] font-black text-white/20 uppercase mb-1">Pressure</p>
+                                <p class="text-xl font-black italic">{{ (pointData.pressure / 1).toFixed(0) }} <span class="text-[10px]">hPa</span></p>
+                            </div>
+                            <div class="p-3 bg-white/[0.02] border border-white/5">
+                                <p class="text-[8px] font-black text-white/20 uppercase mb-1">Humidity</p>
+                                <p class="text-xl font-black italic">{{ pointData.humidity.toFixed(0) }}%</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center text-[9px] font-black uppercase tracking-widest">
+                                <span class="text-white/40">Cloud_Density</span>
+                                <span class="text-vibrant-blue">{{ pointData.cloud_density.toFixed(0) }}%</span>
+                            </div>
+                            <div class="h-1 w-full bg-white/5 overflow-hidden">
+                                <div class="h-full bg-vibrant-blue transition-all duration-1000" :style="{ width: pointData.cloud_density + '%' }"></div>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 border-t border-white/5">
+                            <button class="w-full py-3 bg-vibrant-blue text-white text-[9px] font-black uppercase tracking-widest hover:scale-[1.02] transition-all">
+                                GENERATE_DETAILED_FORECAST
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </Transition>
+
             <!-- Bottom Left Info -->
             <div class="absolute bottom-8 left-8 z-10 p-4 border-l border-white/20 bg-black/40 backdrop-blur-sm">
                 <p class="text-[10px] font-black uppercase italic text-vibrant-blue">ACTIVE_DATA_SOURCE: HIMAWARI_9</p>
