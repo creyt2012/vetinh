@@ -422,3 +422,9 @@ an editor opened by 'git commit'. Please make sure all processes
 are terminated then try again. If it still fails, a git process
 may have crashed in this repository earlier:
 remove the file manually to continue.
+[main 125a624] Auto-sync: database/migrations/2026_02_16_222217_add_station_id_to_weather_metrics_table.php (2026-02-17 05:22:21)
+ 3 files changed, 51 insertions(+)
+ create mode 100644 database/migrations/2026_02_16_222217_add_station_id_to_weather_metrics_table.php
+To https://github.com/creyt2012/vetinh.git
+ ! [remote rejected] main -> main (cannot lock ref 'refs/heads/main': is at 125a62497ddc5c07ce7cf323468dcefa45f2e489 but expected afb2ef65a5486e53c11103f20debc35b5d43f58f)
+error: failed to push some refs to 'https://github.com/creyt2012/vetinh.git'
