@@ -105,6 +105,11 @@ const handleSurfaceClick = async (data) => {
         const json = await response.json();
         if (json.status === 'success') {
             selectedLocation.value.history = json.data;
+            if (json.meta && json.meta.location) {
+                selectedLocation.value.province = json.meta.location.province;
+                selectedLocation.value.district = json.meta.location.district;
+                selectedLocation.value.commune = json.meta.location.commune;
+            }
         }
     } catch (e) {
         console.error('Failed to fetch location history:', e);
