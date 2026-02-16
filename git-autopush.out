@@ -748,3 +748,11 @@ Your branch is ahead of 'origin/main' by 1 commit.
 nothing to commit, working tree clean
 To https://github.com/creyt2012/vetinh.git
    595aa88..432098a  main -> main
+On branch main
+Your branch is ahead of 'origin/main' by 1 commit.
+  (use "git push" to publish your local commits)
+
+nothing to commit, working tree clean
+To https://github.com/creyt2012/vetinh.git
+ ! [remote rejected] main -> main (cannot lock ref 'refs/heads/main': is at 9c78fd821d41b6dde2828e3d34949cbbbf4b1f74 but expected 432098ada058cb97f9023209f7db852bc7195225)
+error: failed to push some refs to 'https://github.com/creyt2012/vetinh.git'
