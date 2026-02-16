@@ -48,14 +48,21 @@ class AlertMonitorJob implements ShouldQueue
             ] : null;
 
             // 2. Evaluate against Intelligence Rules
-            $evaluation = $conditionEngine->evaluate($currentState, $previousState, $rules);
+            $evaluation = $conditionEngine->evaluateModelRules($currentState, $previousState, $rules);
 
             if ($evaluation['triggered']) {
                 $notificationService->broadcastAlert(
                     'INTELLIGENT_THREAT_DETECTION',
-                    "{$evaluation['reason']} detected at {$metric->latitude}, {$metric->longitude}. Status: {$evaluation['level']}",
+                    "{$evaluation['reason']} detected. Status: {$evaluation['level']}",
                     $evaluation['level']
                 );
+
+                // If the rule has specific channels, notify them directly
+                if (!empty($evaluation['channels'])) {
+                    $targets = [];
+                    // This would need logic to map channel names to tenant config
+                    // For now, it pulses through the general broadcast
+                }
             }
         }
     }
