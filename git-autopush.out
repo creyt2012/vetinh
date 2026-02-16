@@ -489,3 +489,11 @@ To https://github.com/creyt2012/vetinh.git
  create mode 100644 app/Jobs/GroundIngestJob.php
 To https://github.com/creyt2012/vetinh.git
    b23ca52..30252d2  main -> main
+On branch main
+Your branch is ahead of 'origin/main' by 1 commit.
+  (use "git push" to publish your local commits)
+
+nothing to commit, working tree clean
+To https://github.com/creyt2012/vetinh.git
+ ! [remote rejected] main -> main (cannot lock ref 'refs/heads/main': is at fc7712b05067a2b29f588963deabdb6812e39be6 but expected 30252d22c9c5870d4cfeeb4c94d6db822db930c6)
+error: failed to push some refs to 'https://github.com/creyt2012/vetinh.git'
