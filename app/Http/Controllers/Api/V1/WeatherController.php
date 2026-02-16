@@ -44,7 +44,8 @@ class WeatherController extends Controller
                     'confidence' => $metric->confidence_score,
                     'growth' => $metric->cloud_growth_rate
                 ],
-                'provenance' => $metric->provenance
+                'provenance' => $metric->provenance,
+                'image_url' => $metric->provenance['image_url'] ?? null
             ]
         ]);
     }
