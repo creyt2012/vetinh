@@ -3,9 +3,13 @@
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('Dashboard');
-})->name('home');
+Route::get('/', [\App\Http\Controllers\User\UserDashboardController::class, 'index'])->name('home');
+
+Route::get('/dashboard', [\App\Http\Controllers\User\UserDashboardController::class, 'index'])->name('dashboard');
+
+Route::get('/weather/map', function () {
+    return Inertia::render('User/WeatherMap');
+})->name('weather.map');
 
 Route::get('/login', function () {
     return redirect()->route('home');
