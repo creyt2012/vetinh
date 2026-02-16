@@ -15,4 +15,5 @@ Route::middleware(['auth.api_key'])->prefix('v1')->group(function () {
     Route::get('/weather/latest', [WeatherController::class, 'latest']);
     Route::get('/weather/metrics', [WeatherController::class, 'metrics']);
     Route::get('/weather/history', [WeatherController::class, 'locationHistory']);
+    Route::get('/weather/heatmap', [WeatherController::class, 'heatmap']);
 });
