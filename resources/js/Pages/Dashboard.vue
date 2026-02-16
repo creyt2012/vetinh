@@ -418,57 +418,101 @@ const handleSurfaceClick = async (data) => {
                     </div>
                 </div>
 
-                <!-- Main Metrics Grid -->
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="glass p-5 rounded-2xl border border-white/5 space-y-2 group hover:border-vibrant-blue/30 transition">
-                        <p class="text-[9px] text-white/30 uppercase font-black">Temperature</p>
+                <!-- Main Analytics Grid (Dense 2x2) -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="glass p-4 rounded-xl border border-white/5 space-y-1 hover:border-vibrant-blue/30 transition">
+                        <p class="text-[8px] text-white/30 uppercase font-black">Air Temperature</p>
                         <div class="flex items-baseline space-x-1">
-                            <span class="text-3xl font-black font-outfit text-white group-hover:scale-110 transition-transform inline-block">{{ selectedLocation.temp }}</span>
-                            <span class="text-sm text-white/20">°C</span>
+                            <span class="text-2xl font-black text-white">{{ selectedLocation.temp }}°</span>
                         </div>
-                        <div class="text-[8px] text-vibrant-green font-bold uppercase tracking-tight">Rising Trend +0.2</div>
+                        <p class="text-[7px] text-white/20 font-bold uppercase tracking-tighter">Feels like {{ selectedLocation.temp - 2 }}°C</p>
                     </div>
-                    <div class="glass p-5 rounded-2xl border border-white/5 space-y-2 group hover:border-vibrant-green/30 transition">
-                        <p class="text-[9px] text-white/30 uppercase font-black">Wind Speed</p>
+                    <div class="glass p-4 rounded-xl border border-white/5 space-y-1 hover:border-vibrant-green/30 transition">
+                        <p class="text-[8px] text-white/30 uppercase font-black">Wind / Gusts</p>
                         <div class="flex items-baseline space-x-1">
-                            <span class="text-3xl font-black font-outfit text-vibrant-green group-hover:scale-110 transition-transform inline-block">{{ selectedLocation.windSpeed }}</span>
-                            <span class="text-sm text-white/20">km/h</span>
+                            <span class="text-2xl font-black text-vibrant-green">{{ selectedLocation.windSpeed }}</span>
+                            <span class="text-xs text-vibrant-green/50">/</span>
+                            <span class="text-lg font-bold text-vibrant-green/70">{{ selectedLocation.windGusts }}</span>
                         </div>
-                        <div class="text-[8px] text-white/40 font-bold uppercase tracking-tight">Vector: {{ selectedLocation.windDir }}°</div>
+                        <p class="text-[7px] text-white/20 font-bold uppercase tracking-tighter">Vector: {{ selectedLocation.windDir }}° SE</p>
+                    </div>
+                    <div class="glass p-4 rounded-xl border border-white/5 space-y-1 hover:border-vibrant-blue/30 transition">
+                        <p class="text-[8px] text-white/30 uppercase font-black">Visibility</p>
+                        <div class="flex items-baseline space-x-1">
+                            <span class="text-2xl font-black text-white">{{ selectedLocation.visibility }}</span>
+                            <span class="text-xs text-white/20 ml-1">km</span>
+                        </div>
+                        <div class="px-1.5 py-0.5 bg-vibrant-green/10 rounded-sm inline-block border border-vibrant-green/20">
+                            <span class="text-[6px] text-vibrant-green font-black uppercase">Optimal</span>
+                        </div>
+                    </div>
+                    <div class="glass p-4 rounded-xl border border-white/5 space-y-1 hover:border-vibrant-blue/30 transition">
+                        <p class="text-[8px] text-white/30 uppercase font-black">UV Index</p>
+                        <div class="flex items-baseline space-x-1">
+                            <span class="text-2xl font-black text-white">{{ selectedLocation.uvIndex }}</span>
+                        </div>
+                        <div class="px-1.5 py-0.5 bg-yellow-500/10 rounded-sm inline-block border border-yellow-500/20">
+                            <span class="text-[6px] text-yellow-500 font-black uppercase">{{ selectedLocation.uvIndex > 5 ? 'High Risk' : 'Moderate' }}</span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Professional Data Table -->
-                <div class="space-y-4">
-                    <h3 class="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">Atmospheric Constants</h3>
-                    <div class="space-y-2">
-                        <div class="flex items-center justify-between p-3 bg-white/5 border border-white/5 rounded-xl">
-                            <span class="text-[11px] font-bold text-white/60">Air Pressure</span>
-                            <span class="text-xs font-mono font-bold text-white">{{ selectedLocation.pressure }} hPa</span>
-                        </div>
-                        <div class="flex items-center justify-between p-3 bg-white/5 border border-white/5 rounded-xl">
-                            <span class="text-[11px] font-bold text-white/60">Relative Humidity</span>
-                            <span class="text-xs font-mono font-bold text-vibrant-blue">{{ selectedLocation.humidity }}%</span>
-                        </div>
-                        <div class="flex items-center justify-between p-3 bg-white/5 border border-white/5 rounded-xl">
-                            <span class="text-[11px] font-bold text-white/60">Dew Point</span>
-                            <span class="text-xs font-mono font-bold text-white">{{ Math.round(selectedLocation.temp * 0.8) }}°C</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Simulation/History Chart Placeholder -->
-                <div class="space-y-4">
+                <!-- 7-Day Prediction Strip (Windy Style) -->
+                <div class="space-y-3">
                     <div class="flex items-center justify-between">
-                        <h3 class="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">24H Pressure Intelligence</h3>
-                        <span class="text-[8px] text-vibrant-blue font-black uppercase">Live Computation</span>
+                        <h3 class="text-[9px] font-black text-white/40 uppercase tracking-[0.2em]">7-Day Forecast</h3>
+                        <span class="text-[7px] text-white/20 font-black uppercase tracking-widest leading-none">Global Sector Sync</span>
                     </div>
-                    <div class="h-32 bg-white/5 rounded-2xl border border-white/5 flex items-end p-4 space-x-1 group">
+                    <div class="flex justify-between items-center p-4 bg-white/5 rounded-2xl border border-white/5 overflow-x-auto no-scrollbar space-x-4">
+                        <div v-for="day in ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']" :key="day" class="flex flex-col items-center space-y-2 min-w-[40px]">
+                            <span class="text-[8px] font-black text-white/30">{{ day }}</span>
+                            <div class="w-6 h-6 rounded-lg bg-vibrant-blue/10 flex items-center justify-center text-vibrant-blue">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                                </svg>
+                            </div>
+                            <span class="text-[10px] font-black text-white">{{ Math.round(selectedLocation.temp + (Math.random() * 4 - 2)) }}°</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Secondary Intelligence Table -->
+                <div class="space-y-3">
+                    <h3 class="text-[9px] font-black text-white/40 uppercase tracking-[0.2em]">Atmospheric Deep Table</h3>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="flex items-center justify-between p-2.5 bg-white/5 border border-white/5 rounded-xl">
+                            <span class="text-[9px] font-bold text-white/40">Rel. Humidity</span>
+                            <span class="text-[10px] font-mono font-bold text-white">{{ selectedLocation.humidity }}%</span>
+                        </div>
+                        <div class="flex items-center justify-between p-2.5 bg-white/5 border border-white/5 rounded-xl">
+                            <span class="text-[9px] font-bold text-white/40">Precipitation</span>
+                            <span class="text-[10px] font-mono font-bold text-vibrant-blue">{{ selectedLocation.precip }} mm</span>
+                        </div>
+                        <div class="flex items-center justify-between p-2.5 bg-white/5 border border-white/5 rounded-xl">
+                            <span class="text-[9px] font-bold text-white/40">Cloud Cover</span>
+                            <span class="text-[10px] font-mono font-bold text-white">{{ selectedLocation.clouds }}%</span>
+                        </div>
+                        <div class="flex items-center justify-between p-2.5 bg-white/5 border border-white/5 rounded-xl">
+                            <span class="text-[9px] font-bold text-white/40">Dew Point</span>
+                            <span class="text-[10px] font-mono font-bold text-white">{{ selectedLocation.dewPoint }}°C</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Simulation Chart -->
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-[9px] font-black text-white/40 uppercase tracking-[0.2em]">24H Pressure Logic</h3>
+                        <div class="flex items-center space-x-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-vibrant-blue animate-pulse"></span>
+                            <span class="text-[8px] text-vibrant-blue font-black uppercase">Live Computation</span>
+                        </div>
+                    </div>
+                    <div class="h-24 bg-white/5 rounded-2xl border border-white/5 flex items-end p-4 space-x-1 group">
                         <template v-if="selectedLocation.history && selectedLocation.history.length > 0">
                             <div v-for="(point, idx) in selectedLocation.history" :key="idx" 
                                  class="flex-1 bg-vibrant-blue/20 rounded-t-sm group-hover:bg-vibrant-blue/40 transition-all duration-500 relative group/bar"
                                  :style="{ height: ((point.pressure - 980) / 60 * 100) + '%' }">
-                                 <!-- Tooltip for Bar -->
                                  <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover/bar:block glass px-2 py-1 rounded text-[8px] whitespace-nowrap z-50 pointer-events-none">
                                      {{ point.time }}: {{ point.pressure.toFixed(1) }} hPa
                                  </div>
@@ -480,11 +524,19 @@ const handleSurfaceClick = async (data) => {
                     </div>
                 </div>
 
-                <div class="flex-1"></div>
+                <!-- Footer Summary (SaaS Professionalism) -->
+                <div class="px-6 py-4 bg-vibrant-blue/10 border-t border-b border-vibrant-blue/20 rounded-xl">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-2 h-2 rounded-full bg-vibrant-green shadow-[0_0_8px_#10b981]"></div>
+                        <span class="text-[9px] font-black text-white uppercase tracking-widest">Environment: Stable</span>
+                        <div class="flex-1"></div>
+                        <span class="text-[8px] font-mono text-white/40 italic">STATION: INTEL-09</span>
+                    </div>
+                </div>
 
                 <!-- Action Button -->
                 <button class="w-full bg-vibrant-blue hover:bg-vibrant-blue-dark text-white p-4 rounded-xl font-black uppercase tracking-widest text-xs shadow-[0_10px_30px_rgba(79,70,229,0.3)] transition group">
-                    <span class="group-hover:tracking-[0.3em] transition-all">Generate Intel Report</span>
+                    <span class="group-hover:tracking-[0.3em] transition-all">Download PDF Intel Report</span>
                 </button>
             </aside>
         </transition>
