@@ -196,6 +196,7 @@ const onMouseMove = (event) => {
             if (m === marker) {
                 const sat = props.satellites.find(s => s.id === id);
                 hoveredSatellite.value = sat;
+                hoveredSurface.value = null;
                 toolTipPos.value = { x: event.clientX, y: event.clientY };
                 emit('hover', sat);
                 
@@ -205,14 +206,35 @@ const onMouseMove = (event) => {
             }
         }
     } else {
-        if (hoveredSatellite.value) {
-            // Reset scales
+        // Check for Earth surface hits
+        const sphereIntersects = raycaster.intersectObject(globe);
+        if (sphereIntersects.length > 0) {
+            const hit = sphereIntersects[0];
+            const point = hit.point.clone().normalize();
+            
+            // Convert point to Lat/Lng
+            const lat = Math.asin(point.y) * (180 / Math.PI);
+            const lng = Math.atan2(point.z, -point.x) * (180 / Math.PI);
+            
+            hoveredSurface.value = { lat, lng };
+            toolTipPos.value = { x: event.clientX, y: event.clientY };
+            hoveredSatellite.value = null;
+
+            // Reset marker scales
             for (let m of satelliteMarkers.values()) {
                 m.scale.set(1, 1, 1);
             }
+        } else {
+            if (hoveredSatellite.value || hoveredSurface.value) {
+                // Reset scales
+                for (let m of satelliteMarkers.values()) {
+                    m.scale.set(1, 1, 1);
+                }
+            }
+            hoveredSatellite.value = null;
+            hoveredSurface.value = null;
+            emit('hover', null);
         }
-        hoveredSatellite.value = null;
-        emit('hover', null);
     }
 };
 
@@ -410,10 +432,12 @@ const animate = () => {
         </div>
 
         <!-- Hover Tooltip -->
-        <div v-if="hoveredSatellite" 
+        <div v-if="hoveredSatellite || hoveredSurface" 
              class="fixed z-[100] pointer-events-none transition-all duration-75 ease-out"
              :style="{ left: toolTipPos.x + 20 + 'px', top: toolTipPos.y + 'px' }">
-            <div class="glass border border-white/10 px-3 py-2 rounded-lg shadow-2xl flex flex-col space-y-1">
+            
+            <!-- Satellite Tooltip -->
+            <div v-if="hoveredSatellite" class="glass border border-white/10 px-3 py-2 rounded-lg shadow-2xl flex flex-col space-y-1">
                 <div class="flex items-center space-x-2">
                     <span :style="{ backgroundColor: 'rgba(' + hexToRgb(CATEGORY_COLORS[hoveredSatellite.type] || CATEGORY_COLORS.DEFAULT) + ', 1)' }" class="w-1.5 h-1.5 rounded-full"></span>
                     <span class="text-[9px] font-black text-white/90 uppercase tracking-tighter">{{ hoveredSatellite.name }}</span>
@@ -421,6 +445,27 @@ const animate = () => {
                 <div class="text-[8px] font-mono text-white/40 uppercase">
                     {{ hoveredSatellite.latitude.toFixed(2) }}°N / {{ hoveredSatellite.longitude.toFixed(2) }}°E
                 </div>
+            </div>
+
+            <!-- Surface Tooltip (Weather Intelligence) -->
+            <div v-else-if="hoveredSurface" class="glass border border-white/10 px-3 py-3 rounded-lg shadow-2xl min-w-[140px] space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-black text-white/90 uppercase tracking-widest">Surface Int.</span>
+                    <span class="text-[8px] font-mono text-white/30 uppercase tracking-tighter">{{ hoveredSurface.lat.toFixed(1) }}°, {{ hoveredSurface.lng.toFixed(1) }}°</span>
+                </div>
+
+                <!-- If over Vietnam Sector (Roughly) -->
+                <div v-if="hoveredSurface.lat > 8 && hoveredSurface.lat < 24 && hoveredSurface.lng > 102 && hoveredSurface.lng < 110" class="space-y-2 pt-2 border-t border-white/5">
+                    <div class="flex items-baseline justify-between">
+                        <span class="text-[8px] text-white/30 uppercase">Atm. Pressure</span>
+                        <span class="text-[10px] font-bold text-white">{{ weatherMetrics.pressure }} hPa</span>
+                    </div>
+                    <div class="flex items-baseline justify-between">
+                        <span class="text-[8px] text-white/30 uppercase">Cloud Density</span>
+                        <span class="text-[10px] font-bold text-vibrant-blue">{{ Math.round(weatherMetrics.cloud_density) }}%</span>
+                    </div>
+                </div>
+                <div v-else class="text-[8px] text-white/20 uppercase italic">Awaiting Sector Scan...</div>
             </div>
         </div>
     </div>
