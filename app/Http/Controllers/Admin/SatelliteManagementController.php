@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Satellite;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -34,6 +35,10 @@ class SatelliteManagementController extends Controller
 
     public function store(Request $request)
     {
+        if (!$request->user()->isOperator()) {
+            abort(403, 'Unauthorized mission deployment');
+        }
+
         $validated = $request->validate([
             'name' => 'required|string',
             'norad_id' => 'required|string|unique:satellites,norad_id',
@@ -48,13 +53,19 @@ class SatelliteManagementController extends Controller
             'priority' => 'nullable|integer',
         ]);
 
-        Satellite::create($validated);
+        $satellite = Satellite::create($validated);
+
+        ActivityLog::log('SATELLITE_DEPLOYED', $satellite, $validated);
 
         return redirect()->back()->with('success', 'Satellite mission config initialized');
     }
 
     public function update(Request $request, Satellite $satellite)
     {
+        if (!$request->user()->isOperator()) {
+            abort(403, 'Unauthorized mission reconfiguration');
+        }
+
         $validated = $request->validate([
             'name' => 'required|string',
             'type' => 'required|string',
@@ -70,12 +81,22 @@ class SatelliteManagementController extends Controller
 
         $satellite->update($validated);
 
+        ActivityLog::log('SATELLITE_RECONFIGURED', $satellite, $validated);
+
         return redirect()->back()->with('success', 'Satellite configuration updated');
     }
 
-    public function destroy(Satellite $satellite)
+    public function destroy(Request $request, Satellite $satellite)
     {
+        if (!$request->user()->isAdmin()) {
+            abort(403, 'Unauthorized asset deactivation');
+        }
+
+        $satData = $satellite->toArray();
         $satellite->delete();
+
+        ActivityLog::log('SATELLITE_DEACTIVATED', null, ['deleted_id' => $satData['id'], 'name' => $satData['name']]);
+
         return redirect()->back()->with('success', 'Satellite removed');
     }
 }

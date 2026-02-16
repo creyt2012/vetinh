@@ -914,3 +914,20 @@ After doing this, you may fix the identity used for this commit with:
  3 files changed, 22 insertions(+), 3 deletions(-)
 To https://github.com/creyt2012/vetinh.git
    76cad40..5e8506b  main -> main
+[main de21975] Auto-sync: app/Models/User.php (2026-02-17 02:43:40)
+ Committer: Nguyễn Thành Biên <creytdeveloper@xdigital-2.local>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly. Run the
+following command and follow the instructions in your editor to edit
+your configuration file:
+
+    git config --global --edit
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 3 files changed, 39 insertions(+)
+To https://github.com/creyt2012/vetinh.git
+   5e8506b..de21975  main -> main
