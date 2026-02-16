@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\LiveStateController;
 use App\Http\Controllers\Api\V1\SatelliteController;
 use App\Http\Controllers\Api\V1\WeatherController;
+use App\Http\Controllers\Api\V1\MissionControlController;
+use Illuminate\Http\Request;
 
 Route::middleware(['auth.api_key', \App\Http\Middleware\CheckApiKeyLimits::class])->prefix('v1')->group(function () {
     Route::get('/live/state', [LiveStateController::class, 'index']);

@@ -724,3 +724,11 @@ remove the file manually to continue.
  3 files changed, 82 insertions(+), 1 deletion(-)
 To https://github.com/creyt2012/vetinh.git
    ebcfba6..183f6ac  main -> main
+On branch main
+Your branch is ahead of 'origin/main' by 1 commit.
+  (use "git push" to publish your local commits)
+
+nothing to commit, working tree clean
+To https://github.com/creyt2012/vetinh.git
+   183f6ac..8929dae  main -> main
+error: could not lock config file .git/config: File exists
