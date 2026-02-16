@@ -23,7 +23,7 @@ Nếu bạn muốn xây dựng ứng dụng riêng? Hệ thống API của Mình
 
 ---
 
-## 🛠️ Hướng dẫn sử dụng nhanh
+##  Hướng dẫn sử dụng nhanh
 
 ### Bắt đầu với Dashboard
 Ngay khi truy cập hệ thống, bạn sẽ thấy Dashboard trung tâm:
