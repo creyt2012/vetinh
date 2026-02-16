@@ -39,7 +39,8 @@ class HimawariIngestJob implements ShouldQueue
                 'data_sources' => ['JMA', 'Himawari-9'],
                 'provenance' => [
                     'sensor' => 'AHI',
-                    'image_id' => basename($imagePath)
+                    'image_id' => basename($imagePath),
+                    'image_url' => 'https://www.jma.go.jp/bosai/himawari/data/satimg/target/zoom/202402160020/ALASKA/TRUE_COLOR/zoom.png' // Simulation link
                 ]
             ]);
 
