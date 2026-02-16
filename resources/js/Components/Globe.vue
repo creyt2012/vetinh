@@ -428,6 +428,9 @@ const animate = () => {
             <div class="space-y-1 text-[9px] font-mono text-white/50">
                 <div class="flex justify-between"><span>ALT:</span> <span>{{ Math.round(selectedSatellite.altitude) }}km</span></div>
                 <div class="flex justify-between"><span>VEL:</span> <span>{{ Math.round(selectedSatellite.velocity) }}k/s</span></div>
+                <div class="flex justify-between pt-1 mt-1 border-t border-white/5 text-vibrant-blue/70">
+                    <span>SOURCE:</span> <span>LIVE API</span>
+                </div>
             </div>
         </div>
 
@@ -437,13 +440,20 @@ const animate = () => {
              :style="{ left: toolTipPos.x + 20 + 'px', top: toolTipPos.y + 'px' }">
             
             <!-- Satellite Tooltip -->
-            <div v-if="hoveredSatellite" class="glass border border-white/10 px-3 py-2 rounded-lg shadow-2xl flex flex-col space-y-1">
-                <div class="flex items-center space-x-2">
-                    <span :style="{ backgroundColor: 'rgba(' + hexToRgb(CATEGORY_COLORS[hoveredSatellite.type] || CATEGORY_COLORS.DEFAULT) + ', 1)' }" class="w-1.5 h-1.5 rounded-full"></span>
-                    <span class="text-[9px] font-black text-white/90 uppercase tracking-tighter">{{ hoveredSatellite.name }}</span>
+            <div v-if="hoveredSatellite" class="glass border border-white/10 px-3 py-2 rounded-lg shadow-2xl flex flex-col space-y-1 min-w-[120px]">
+                <div class="flex items-center justify-between space-x-2">
+                    <div class="flex items-center space-x-2">
+                        <span :style="{ backgroundColor: 'rgba(' + hexToRgb(CATEGORY_COLORS[hoveredSatellite.type] || CATEGORY_COLORS.DEFAULT) + ', 1)' }" class="w-1.5 h-1.5 rounded-full"></span>
+                        <span class="text-[9px] font-black text-white/90 uppercase tracking-tighter">{{ hoveredSatellite.name }}</span>
+                    </div>
                 </div>
-                <div class="text-[8px] font-mono text-white/40 uppercase">
-                    {{ hoveredSatellite.latitude.toFixed(2) }}°N / {{ hoveredSatellite.longitude.toFixed(2) }}°E
+                <div class="flex justify-between text-[8px] font-mono">
+                    <span class="text-white/40 uppercase">COORD:</span>
+                    <span class="text-white/60">{{ hoveredSatellite.latitude.toFixed(1) }}°N / {{ hoveredSatellite.longitude.toFixed(1) }}°E</span>
+                </div>
+                <div class="flex justify-between text-[8px] font-mono border-t border-white/5 pt-1 mt-1">
+                    <span class="text-vibrant-blue/60 uppercase">ORIGIN:</span>
+                    <span class="text-vibrant-blue/80 font-bold">CELESTRAK</span>
                 </div>
             </div>
 
