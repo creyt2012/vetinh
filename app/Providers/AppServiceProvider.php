@@ -21,6 +21,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        if (app()->environment('local')) {
+            error_reporting(error_reporting() & ~E_DEPRECATED);
+        }
     }
 }
