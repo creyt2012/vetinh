@@ -26,6 +26,7 @@ let orbitPaths = new Map();
 let selectedSatellite = ref(null);
 let hoveredSatellite = ref(null);
 let toolTipPos = ref({ x: 0, y: 0 });
+let hoveredSurface = ref(null); // Restore for tooltips
 let selectedLocation = ref(null); // { lat, lng, x, y, province, district, commune }
 let heatmapData = ref([]);
 let riskLayer = null;
@@ -166,7 +167,7 @@ const initScene = () => {
 const fetchHeatmap = async () => {
     try {
         const response = await fetch('/api/v1/weather/heatmap', {
-            headers: { 'X-API-KEY': 'STAR-7788-X' } // Using the established demo key
+            headers: { 'X-API-KEY': 'vetinh_dev_key_123' } // Fixed API Key
         });
         const result = await response.json();
         if (result.status === 'success') {
@@ -487,7 +488,7 @@ const onMouseDown = (event) => {
 const fetchLocationIntel = async (lat, lng, weather) => {
     try {
         const response = await fetch(`/api/v1/weather/history?lat=${lat}&lng=${lng}`, {
-            headers: { 'X-API-KEY': 'STAR-7788-X' }
+            headers: { 'X-API-KEY': 'vetinh_dev_key_123' } // Fixed API Key
         });
         const result = await response.json();
         if (result.status === 'success') {
