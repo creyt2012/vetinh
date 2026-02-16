@@ -4,7 +4,7 @@
 
 ---
 
-## 🌎 Hệ thống này dành cho ai?
+##  Hệ thống này dành cho ai?
 
 Cho dù bạn là một người đam mê thiên văn muốn theo dõi **ISS** hay **Starlink**, một chuyên gia nông nghiệp cần đánh giá lượng mưa, hay một nhà phát triển phần mềm muốn tích hợp dữ liệu thời tiết tin cậy vào ứng dụng của mình — StarWeather đều có những công cụ dành riêng cho bạn.
 
