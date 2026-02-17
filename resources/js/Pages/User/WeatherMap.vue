@@ -311,6 +311,7 @@ const generateAuroraData = () => {
         { lat: -80, lng: 0, color: '#00ccff', maxR: 35, propagationSpeed: 0.8, repeatPeriod: 2500 }
     ];
 };
+const toggleDrawingMode = () => {
     isDrawingZone.value = !isDrawingZone.value;
     if (isDrawingZone.value) {
         currentZonePoints.value = [];
@@ -1092,22 +1093,24 @@ const switchView = (mode) => {
                 <div class="space-y-1.5 pointer-events-auto max-h-[50vh] overflow-y-auto custom-scrollbar pr-2">
                     <button v-for="layer in layers" :key="layer.id"
                         @click="toggleLayer(layer.id)"
-                        :class="activeLayers.includes(layer.id) ? 'bg-vibrant-blue/20 border-vibrant-blue/50 text-white translate-x-1 shadow-[0_0_20px_rgba(0,136,255,0.1)]' : 'bg-black/40 border-white/5 text-white/40 hover:bg-black/60 hover:translate-x-1'"
+                        :class="activeLayers.includes(layer.id) ? 'bg-vibrant-blue/25 border-vibrant-blue/50 text-white translate-x-1 shadow-[0_0_20px_rgba(0,136,255,0.1)]' : 'bg-black/40 border-white/5 text-white/40 hover:bg-black/60 hover:translate-x-1'"
                         class="w-full text-left p-0 border transition-all flex items-stretch group relative overflow-hidden h-14">
                         
                         <!-- Tactical Color Strip -->
-                        <div :class="`bg-${layer.color}`" class="w-1.5 h-full opacity-60"></div>
+                        <div :class="`bg-${layer.color}`" class="w-1 h-full opacity-60"></div>
                         
-                        <div class="flex items-center space-x-4 px-4 flex-1">
-                            <span class="text-lg group-hover:scale-110 transition-transform filter drop-shadow-[0_0_5px_rgba(0,0,0,0.5)]">{{ layer.icon }}</span>
-                            <div class="flex flex-col">
-                                <span class="text-[9px] font-black tracking-[0.2em] uppercase leading-none">{{ layer.name }}</span>
-                                <span class="text-[7px] text-white/20 font-bold mt-1 tracking-widest">{{ activeLayers.includes(layer.id) ? 'DATA_STREAM_ACTIVE' : 'IDLE_MONITOR' }}</span>
+                        <div class="flex items-center space-x-3 px-3 flex-1">
+                            <div class="w-8 flex justify-center">
+                                <span class="text-xl group-hover:scale-110 transition-transform filter drop-shadow-[0_0_8px_rgba(0,0,0,0.5)]">{{ layer.icon }}</span>
+                            </div>
+                            <div class="flex flex-col flex-1 min-w-0">
+                                <span class="text-[9px] font-black tracking-[0.15em] uppercase leading-tight truncate">{{ layer.name }}</span>
+                                <span class="text-[7px] text-white/30 font-bold mt-1 tracking-widest">{{ activeLayers.includes(layer.id) ? 'STREAM_ENCRYPTED' : 'IDLE_VECTORS' }}</span>
                             </div>
                         </div>
                         
                         <!-- Status Indicator -->
-                        <div class="flex items-center px-4">
+                        <div class="flex items-center px-4 bg-black/20">
                             <div class="w-4 h-4 rounded-sm border border-white/10 flex items-center justify-center transition-all" 
                                  :class="activeLayers.includes(layer.id) ? 'bg-vibrant-blue border-vibrant-blue' : 'bg-white/5'">
                                 <svg v-if="activeLayers.includes(layer.id)" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
