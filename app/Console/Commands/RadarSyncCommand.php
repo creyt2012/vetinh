@@ -28,8 +28,8 @@ class RadarSyncCommand extends Command
 
             // Log for audit
             \App\Models\ActivityLog::log(
-                null,
                 'RADAR_SYNC_SUCCESS',
+                null,
                 "Synchronized global radar metadata for timestamp: " . $radarConfig['timestamp']
             );
         } else {
