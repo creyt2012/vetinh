@@ -248,6 +248,25 @@ class WeatherController extends Controller
             try {
                 $now = $engine->propagate($sat);
 
+                // 2. Resolve Overflying Country (Reverse Geocode current pos)
+                $location = $this->geoEngine->reverseGeocode($now['latitude'], $now['longitude']);
+
+                // 3. Detailed Specs & Modules (Simulated based on type/name)
+                $modules = [
+                    ['id' => 'CAM-01', 'name' => 'High-Res Optical', 'status' => 'ONLINE'],
+                    ['id' => 'SAR-02', 'name' => 'Synthetic Aperture Radar', 'status' => 'ONLINE'],
+                    ['id' => 'SPEC-03', 'name' => 'Hyper-Spectral Sensor', 'status' => 'ONLINE'],
+                ];
+
+                if ($sat->norad_id === '25544') { // ISS
+                    $modules = [
+                        ['id' => 'ZARYA-01', 'name' => 'Functional Cargo Block', 'status' => 'OPERATIONAL'],
+                        ['id' => 'ZVEZDA-02', 'name' => 'Service Module', 'status' => 'OPERATIONAL'],
+                        ['id' => 'DESTINY-03', 'name' => 'US Laboratory', 'status' => 'OPERATIONAL'],
+                        ['id' => 'COLUMBUS-04', 'name' => 'ESA Laboratory', 'status' => 'OPERATIONAL'],
+                    ];
+                }
+
                 // Generate orbit path (simplified: 100 points over one period)
                 $path = [];
                 $period = $now['period'] ?? 90; // minutes
@@ -264,17 +283,27 @@ class WeatherController extends Controller
                     'name' => $sat->name,
                     'norad_id' => $sat->norad_id,
                     'type' => $sat->type,
+                    'status' => $sat->status,
                     'position' => [
                         'lat' => $now['latitude'],
                         'lng' => $now['longitude'],
                         'alt' => $now['altitude'] / 1000
                     ],
+                    'location' => $location,
                     'telemetry' => [
                         'altitude' => $now['altitude'],
                         'velocity' => $now['velocity'],
                         'period' => $now['period'],
+                        'inclination' => $now['inclination'] ?? 51.6,
                         'timestamp' => $now['timestamp']
                     ],
+                    'specs' => [
+                        'launch_date' => $sat->api_config['launch_date'] ?? '2015-10-02',
+                        'operator' => $sat->api_config['operator'] ?? 'International Space Agency',
+                        'mass' => $sat->api_config['mass'] ?? '2,100 KG',
+                        'power' => $sat->api_config['power'] ?? '4.5 KW'
+                    ],
+                    'modules' => $modules,
                     'path' => $path
                 ];
             } catch (\Exception $e) {
