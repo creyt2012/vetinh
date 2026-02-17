@@ -699,11 +699,8 @@ onMounted(async () => {
                 group.add(mesh);
                 return group;
             })
-            .customLayerLat(d => d.position?.lat || 0)
-            .customLayerLng(d => d.position?.lng || 0)
-            .customLayerAltitude(d => Math.min(d.position?.alt || 0.1, 1.0) * 0.15 + 0.05)
             .customThreeObjectUpdate((obj, d) => {
-                if (!d.position) return;
+                if (!d.position || !world) return;
                 const { lat, lng, alt } = d.position;
                 const scaledAlt = Math.min(alt, 1.0) * 0.15; 
                 const coords = world.getCoords(lat, lng, scaledAlt + 0.05);
@@ -716,11 +713,11 @@ onMounted(async () => {
                 world.pointOfView({ lat: d.position.lat, lng: d.position.lng, altitude: 1.5 }, 1000);
             })
             .pathsData([])
-            .pathColor(() => 'rgba(0, 255, 255, 0.4)')
+            .pathColor(() => '#00ffff')
             .pathDashLength(0.08)
             .pathDashGap(0.02)
-            .pathDashAnimateTime(30000) 
-            .pathStroke(0.18)
+            .pathDashAnimateTime(10000) 
+            .pathStroke(0.2)
             .pathPointLat(p => p[0])
             .pathPointLng(p => p[1])
             .pathPointAlt(p => p[2] * 0.15)
@@ -731,7 +728,7 @@ onMounted(async () => {
 
         if (world.controls()) {
             world.controls().autoRotate = true;
-            world.controls().autoRotateSpeed = 0.5;
+            world.controls().autoRotateSpeed = 2.0;
         }
 
         world.pointOfView({ lat: 10, lng: 106, altitude: 2.5 }, 2000);
