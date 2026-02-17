@@ -536,9 +536,11 @@ const renderAisLayer = async () => {
                             <p>CARGO: ${d.cargo}</p>
                             <p>STATUS: ${d.status}</p>
                         </div>
-                        <div v-if="d.strategic_value === 'HIGH'" class="mt-2 text-[6px] text-yellow-500 font-black uppercase tracking-widest bg-yellow-500/10 p-1 text-center border border-yellow-500/20">
-                            ⚠️ STRATEGIC_IMPORTANCE_HIGH
-                        </div>
+                        ${d.strategic_value === 'HIGH' ? `
+                            <div class="mt-2 text-[6px] text-yellow-500 font-black uppercase tracking-widest bg-yellow-500/10 p-1 text-center border border-yellow-500/20">
+                                ⚠️ STRATEGIC_IMPORTANCE_HIGH
+                            </div>
+                        ` : ''}
                     </div>
                  `);
         }
@@ -1528,33 +1530,33 @@ const switchView = (mode) => {
                             </div>
                         </div>
                     </div>
-
-                    <!-- Timeline Scrubber Layer -->
-                    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center bg-black/60 backdrop-blur-xl px-6 py-2 border border-vibrant-blue/30 rounded-full space-x-6 shadow-[0_0_20px_rgba(0,136,255,0.2)]">
-                        <div class="flex flex-col">
-                            <span class="text-[7px] font-black text-vibrant-blue uppercase tracking-[0.2em]">Temporal_Shift</span>
-                            <span class="text-[9px] font-bold text-white uppercase">{{ timeOffset === 0 ? 'REAL_TIME' : '-' + timeOffset + ' MIN' }}</span>
-                        </div>
-                        <input 
-                            v-model.number="timeOffset"
-                            type="range" 
-                            min="0" 
-                            max="720" 
-                            class="w-80 accent-vibrant-blue bg-white/10 h-1.5 rounded-full cursor-pointer hover:bg-white/20 transition-colors"
-                        >
-                    </div>
-
-                    <!-- AI Command Toggle -->
-                    <button 
-                        @click="showCyberCommand = !showCyberCommand"
-                        class="absolute bottom-4 left-8 z-30 bg-vibrant-blue/20 hover:bg-vibrant-blue/40 border border-vibrant-blue/30 p-4 rounded-full transition-all group shadow-[0_0_20px_rgba(0,136,255,0.2)]"
-                    >
-                        <span class="text-xl group-hover:scale-125 transition-transform inline-block">🧠</span>
-                        <div class="absolute -top-1 -right-1 w-3 h-3 bg-vibrant-blue rounded-full animate-ping"></div>
-                        <div class="absolute -top-1 -right-1 w-3 h-3 bg-vibrant-blue rounded-full"></div>
-                    </button>
                 </div>
             </Transition>
+
+            <!-- AI Command Toggle (Always Visible) -->
+            <button 
+                @click="showCyberCommand = !showCyberCommand"
+                class="absolute bottom-4 left-8 z-[60] bg-vibrant-blue/20 hover:bg-vibrant-blue/40 border border-vibrant-blue/30 p-4 rounded-full transition-all group shadow-[0_0_20px_rgba(0,136,255,0.2)]"
+            >
+                <span class="text-xl group-hover:scale-125 transition-transform inline-block">🧠</span>
+                <div class="absolute -top-1 -right-1 w-3 h-3 bg-vibrant-blue rounded-full animate-ping"></div>
+                <div class="absolute -top-1 -right-1 w-3 h-3 bg-vibrant-blue rounded-full"></div>
+            </button>
+
+            <!-- Global Timeline Scrubber (Always Visible) -->
+            <div class="absolute bottom-24 left-1/2 -translate-x-1/2 z-40 flex items-center bg-black/60 backdrop-blur-xl px-6 py-2 border border-vibrant-blue/30 rounded-full space-x-6 shadow-[0_0_20px_rgba(0,136,255,0.2)]">
+                <div class="flex flex-col">
+                    <span class="text-[7px] font-black text-vibrant-blue uppercase tracking-[0.2em]">Temporal_Shift</span>
+                    <span class="text-[9px] font-bold text-white uppercase">{{ timeOffset === 0 ? 'REAL_TIME' : '-' + timeOffset + ' MIN' }}</span>
+                </div>
+                <input 
+                    v-model.number="timeOffset"
+                    type="range" 
+                    min="0" 
+                    max="720" 
+                    class="w-80 accent-vibrant-blue bg-white/10 h-1.5 rounded-full cursor-pointer hover:bg-white/20 transition-colors"
+                >
+            </div>
 
             <!-- View Mode Switcher -->
             <div class="absolute bottom-8 right-8 z-40 flex space-x-2">
@@ -1574,10 +1576,10 @@ const switchView = (mode) => {
             </div>
 
             <!-- Globe Container (3D) -->
-            <div v-show="viewMode === 'GLOBE'" ref="globeContainer" class="w-full h-full cursor-grab active:cursor-grabbing"></div>
+            <div v-show="viewMode === 'GLOBE'" ref="globeContainer" class="absolute inset-0 z-0 cursor-grab active:cursor-grabbing"></div>
             
             <!-- Leaflet Container (2D/Satellite) -->
-            <div v-show="viewMode !== 'GLOBE'" ref="leafletContainer" class="w-full h-full bg-[#050508] z-0"></div>
+            <div v-show="viewMode !== 'GLOBE'" ref="leafletContainer" class="absolute inset-0 bg-[#050508] z-0"></div>
                         <!-- HUD Overlay Decoration -->
             <div class="absolute inset-0 pointer-events-none border-[15px] border-black/5 z-20"></div>
 
