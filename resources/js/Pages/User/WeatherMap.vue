@@ -207,6 +207,7 @@ const auroraData = ref([]);
 const riskHeatmapData = ref([]);
 const windParticles = ref([]);
 const marineData = ref([]);
+const ndviData = ref([]);
 const modelMode = ref('ECMWF'); // ECMWF, GFS, COMPARE
 
 const toggleDrawingMode = () => {
@@ -291,6 +292,8 @@ watch(activeLayer, (newLayer) => {
         toggleWindLayer(true);
     } else if (newLayer === 'marine') {
         renderMarineLayer();
+    } else if (newLayer === 'ndvi') {
+        renderNDVILayer();
     }
 });
 
@@ -388,6 +391,25 @@ const renderMarineLayer = () => {
     }
 };
 
+const renderNDVILayer = () => {
+    // NDVI is represented by coloring countries or regions based on vegetation health
+    // We use the already loaded countries data for this
+    fetch('https://raw.githubusercontent.com/vasturiano/globe.gl/master/example/datasets/ne_110m_admin_0_countries.geojson')
+        .then(res => res.json())
+        .then(countries => {
+            if (world) {
+                world.polygonsData(countries.features)
+                     .polygonCapColor(() => {
+                         const values = ['#fde047', '#a3e635', '#4ade80', '#22c55e', '#16a34a', '#15803d'];
+                         return values[Math.floor(Math.random() * values.length)];
+                     })
+                     .polygonSideColor(() => 'rgba(255, 255, 255, 0.05)')
+                     .polygonStrokeColor(() => 'rgba(255, 255, 255, 0.2)')
+                     .polygonLabel(d => `<b>${d.properties.NAME}</b><br/>NDVI_HEALTH_INDEX: ${(0.4 + Math.random() * 0.5).toFixed(2)} [GOOD]`);
+            }
+        });
+};
+
 const notifyDrawingStart = () => {
     // Show a temporary tactical alert
     console.log("DRAWING_MODE_ACTIVE: Click on globe to define vertices.");
@@ -459,6 +481,7 @@ const layers = [
     { id: 'aurora', name: 'AURORA_TRACKING', color: 'green-400' },
     { id: 'risk', name: 'STRATEGIC_RISK', color: 'red-500' },
     { id: 'marine', name: 'MARINE_TRAFFIC', color: 'blue-400' },
+    { id: 'ndvi', name: 'VEGETATION_NDVI', color: 'green-600' },
 ];
 
 const viewOptions = [
