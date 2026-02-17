@@ -20,7 +20,7 @@ class RadarSyncCommand extends Command
 
         $radarConfig = $rainViewer->getLatestRadar();
 
-        if (!empty($radarConfig)) {
+        if (!empty($radarConfig) && isset($radarConfig['timestamp'])) {
             // Store in Cache for 10 minutes (radar updates every 10 mins usually)
             \Illuminate\Support\Facades\Cache::put('radar_config_latest', $radarConfig, now()->addMinutes(10));
 
@@ -33,7 +33,7 @@ class RadarSyncCommand extends Command
                 "Synchronized global radar metadata for timestamp: " . $radarConfig['timestamp']
             );
         } else {
-            $this->error("Failed to sync Radar metadata.");
+            $this->error("Failed to sync Radar metadata. Config: " . json_encode($radarConfig));
         }
     }
 }
