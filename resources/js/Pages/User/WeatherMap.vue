@@ -77,7 +77,10 @@ const propagateSatellites = () => {
 
     if (world) {
         world.customLayerData(activeSatellites.value);
-        syncCommsLinks();
+        // Only sync comms links every 10 frames to save CPU
+        if (Math.floor(now / 100) % 2 === 0) {
+            syncCommsLinks();
+        }
     }
     
     if (animationFrameId !== null) {
@@ -418,7 +421,11 @@ watch(showGroundStations, () => {
     syncLeafletMarkers();
 });
 
-onMounted(async () => {
+let frameCounter = 0; // For throttling comms links updates
+
+const initGlobe = async () => {
+    if (!globeContainer.value) return;
+
     const width = globeContainer.value.offsetWidth;
     const height = globeContainer.value.offsetHeight;
 
@@ -428,6 +435,10 @@ onMounted(async () => {
         .height(height)
         .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
         .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
+        .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-stars.png') // Added
+        .showAtmosphere(true) // Added
+        .atmosphereColor('#0088ff') // Added
+        .atmosphereDaylightAlpha(0.1) // Added
         .backgroundColor('#020205')
         
         // --- Boundaries Layer ---
