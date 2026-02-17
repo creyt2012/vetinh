@@ -653,14 +653,14 @@ onMounted(async () => {
         .height(height)
         .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
         .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
-        .backgroundColor('#020205')
-        
-        // Ensure initial sizing is correct after a small delay to allow layout to settle
-        setTimeout(() => {
-            handleResize();
-        }, 500);
-        
-        // --- Boundaries Layer ---
+        .backgroundColor('#020205'); // End chaining here
+
+    // Ensure initial sizing is correct after a small delay to allow layout to settle
+    setTimeout(() => {
+        handleResize();
+    }, 500);
+
+    world
         .lineHoverPrecision(0)
         .polygonCapColor(() => 'rgba(0, 136, 255, 0.05)')
         .polygonSideColor(() => 'rgba(0, 136, 255, 0.02)')
