@@ -1,7 +1,7 @@
 <script setup>
 import UserLayout from '@/Layouts/UserLayout.vue';
 import { Head } from '@inertiajs/vue3';
-import { onMounted, ref, nextTick } from 'vue';
+import { onMounted, ref } from 'vue';
 import Globe from 'globe.gl';
 import * as THREE from 'three';
 import axios from 'axios';
@@ -296,50 +296,7 @@ watch(activeLayer, (newLayer) => {
     } else if (newLayer === 'defense') {
         renderDefenseGrid();
     }
-    syncGlobeState();
 });
-
-const syncGlobeState = () => {
-    if (!world) return;
-    
-    console.log('[ENG] SYNCING_ALL_LAYERS_TO_GLOBE');
-    
-    // Satellites & Orbits
-    if (activeSatellites.value.length > 0) {
-        world.customLayerData(activeSatellites.value);
-        syncUnifiedPaths();
-        const strategic = activeSatellites.value.filter(s => s.norad_id === '41836' || s.norad_id === '25544' || s.norad_id === '40267');
-        world.labelsData([...activeStorms.value, ...strategic]);
-    }
-    
-    // Ground Stations & Storm Points
-    if (groundStations.value.length > 0 || activeStorms.value.length > 0) {
-        world.pointsData([...activeStorms.value, ...groundStations.value.map(s => ({
-            ...s,
-            pointColor: '#00ff88',
-            pointRadius: 0.8,
-            pointAltitude: 0.02,
-            isStation: true
-        }))]);
-        if (activeStorms.value.length > 0) {
-            world.ringsData(activeStorms.value);
-        }
-    }
-    
-    // Active Meteorological Layer
-    if (activeLayer.value === 'aurora') toggleAurora();
-    else if (activeLayer.value === 'risk') toggleRiskHeatmap();
-    else if (activeLayer.value === 'aqi') renderAQILayer();
-    else if (activeLayer.value === 'ais') renderAisLayer();
-    else if (activeLayer.value === 'sst') renderSSTLayer();
-    else if (activeLayer.value === 'wind') renderWindLayer();
-    else if (activeLayer.value === 'ndvi') renderNdviLayer();
-    else if (activeLayer.value === 'space_weather') renderSpaceWeather();
-    else if (activeLayer.value === 'aviation') renderAviationLayer();
-    else if (activeLayer.value === 'infrastructure') renderInfrastructureLayer();
-    else if (activeLayer.value === 'junk') renderSpaceJunkLayer();
-    else if (activeLayer.value === 'defense') renderDefenseGrid();
-};
 
 const renderSpaceWeather = async () => {
     try {
@@ -708,35 +665,30 @@ watch(showGroundStations, () => {
 
 let frameCounter = 0; // For throttling comms links updates
 
-const initGlobe = async () => {
-    if (!globeContainer.value) return;
-    
-    // Clean up existing instance if any
-    globeContainer.value.innerHTML = '';
-    if (world) {
-        try {
-            world._destructor(); 
-        } catch(e) {}
+const initGlobe = () => {
+    if (!globeContainer.value) {
+        console.error('GLOBE_CONTAINER_NOT_FOUND');
+        return;
     }
 
-    await nextTick();
+    // Force layout recalculation
+    const width = globeContainer.value.clientWidth || window.innerWidth;
+    const height = globeContainer.value.clientHeight || (window.innerHeight - 200);
 
-    const width = globeContainer.value.offsetWidth || window.innerWidth;
-    const height = globeContainer.value.offsetHeight || window.innerHeight;
-
-    console.log(`[MAP_ENGINE] INITIALIZING_GLOBE_CORE: ${width}x${height}`);
+    console.log(`INITIALIZING_TACTICAL_GLOBE: ${width}x${height}`);
 
     world = Globe()
         (globeContainer.value)
         .width(width)
         .height(height)
+        .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
+        .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
+        .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-stars.png')
         .showAtmosphere(true)
         .atmosphereColor('#0088ff')
-        .atmosphereDaylightAlpha(0.3)
+        .atmosphereDaylightAlpha(0.2)
         .backgroundColor('#020205')
-        .globeColor('#010a1a')
-        .globeImageUrl('https://unpkg.com/three-globe@2.31.0/example/img/earth-blue-marble.jpg')
-        .bumpImageUrl('https://unpkg.com/three-globe@2.31.0/example/img/earth-topology.png')
+        .globeColor('rgba(0, 136, 255, 0.1)') // Fallback color
         
         // --- Interactivity ---
         .onPointClick((point, event) => {
@@ -856,11 +808,8 @@ const initGlobe = async () => {
     fetch('https://raw.githubusercontent.com/vasturiano/globe.gl/master/example/datasets/ne_110m_admin_0_countries.geojson')
         .then(res => res.json())
         .then(countries => {
-            if (world) world.polygonsData(countries.features);
+            world.polygonsData(countries.features);
         });
-
-    // Sync all existing state
-    syncGlobeState();
 
     // Initial Fetch (triggered AFTER globe setup)
     try {
@@ -874,9 +823,7 @@ const initGlobe = async () => {
         activeStorms.value = stormRes.data;
         activeSatellites.value = satRes.data.data;
         groundStations.value = stationRes.data.data;
-        
-        syncGlobeState();
-        
+
         // Fetch Radar metadata
         const radarRes = await axios.get('https://api.rainviewer.com/public/weather-maps.json');
         radarTimestamp.value = radarRes.data.radar.past[radarRes.data.radar.past.length - 1].time;
@@ -975,12 +922,10 @@ onMounted(() => {
         window.addEventListener('resize', handleResize);
         animationFrameId = requestAnimationFrame(propagateSatellites);
         
-        // Initial POV Force
-        setTimeout(() => {
-            if (world) {
-                world.pointOfView({ lat: 10, lng: 106, altitude: 2.5 }, 2000);
-            }
-        }, 1000);
+        // Initial POV
+        if (world) {
+            world.pointOfView({ altitude: 2.5 }, 2000);
+        }
     }, 500);
 });
 
@@ -1154,14 +1099,10 @@ const syncLeafletMarkers = () => {
     map._markersLayer = markers;
 };
 
-const switchView = async (mode) => {
+const switchView = (mode) => {
     viewMode.value = mode;
     
-    await nextTick();
-    
-    if (mode === 'GLOBE') {
-        initGlobe();
-    } else {
+    if (mode !== 'GLOBE') {
         setTimeout(() => {
             initLeaflet();
             map.invalidateSize();
@@ -1651,16 +1592,18 @@ const switchView = async (mode) => {
 
             <!-- Globe Container (3D) -->
             <div 
-                v-if="viewMode === 'GLOBE'" 
+                v-show="viewMode === 'GLOBE'" 
                 ref="globeContainer" 
                 class="absolute inset-0 z-0 cursor-grab active:cursor-grabbing bg-[#020205]"
+                style="min-height: 500px; min-width: 100%;"
             ></div>
             
             <!-- Leaflet Container (2D/Satellite) -->
             <div 
-                v-if="viewMode !== 'GLOBE'" 
+                v-show="viewMode !== 'GLOBE'" 
                 ref="leafletContainer" 
                 class="absolute inset-0 bg-[#050508] z-0"
+                style="min-height: 500px; min-width: 100%;"
             ></div>
                         <!-- HUD Overlay Decoration -->
             <div class="absolute inset-0 pointer-events-none border-[15px] border-black/5 z-20"></div>
