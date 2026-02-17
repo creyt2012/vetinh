@@ -215,7 +215,7 @@ const ndviData = ref([]);
 const isLive = ref(true);
 const playbackTime = ref(Date.now());
 const modelMode = ref('ECMWF'); // ECMWF, GFS, COMPARE
-const timeMultiplier = ref(30); // 30x for clearly visible motion
+const timeMultiplier = ref(300); // 300x for fast orbital visualization
 
 const toggleLayer = (id) => {
     const index = activeLayers.value.indexOf(id);
@@ -747,7 +747,7 @@ onMounted(async () => {
 
         if (world.controls()) {
             world.controls().autoRotate = true;
-            world.controls().autoRotateSpeed = 0.2;
+            world.controls().autoRotateSpeed = 0.05;
         }
 
         world.pointOfView({ lat: 10, lng: 106, altitude: 2.5 }, 2000);
