@@ -270,6 +270,8 @@ watch(activeLayer, (newLayer) => {
         toggleRiskHeatmap();
     } else if (newLayer === 'aqi') {
         renderAQILayer();
+    } else if (newLayer === 'ais') {
+        renderAisLayer();
     } else if (newLayer === 'sst') {
         renderSSTLayer();
     } else if (newLayer === 'wind') {
@@ -417,6 +419,7 @@ const layers = [
     { id: 'sst', name: 'SEA_TEMPERATURE', color: 'orange-500' },
     { id: 'aurora', name: 'AURORA_TRACKING', color: 'green-400' },
     { id: 'risk', name: 'STRATEGIC_RISK', color: 'red-500' },
+    { id: 'ais', name: 'MARITIME_AIS', color: 'teal-400' },
 ];
 
 const viewOptions = [
