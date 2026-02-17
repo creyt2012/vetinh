@@ -75,7 +75,12 @@ const propagateSatellites = () => {
     });
 
     if (world) {
-        world.customLayerData([...activeSatellites.value]);
+        // Toggle satellite visibility based on activeLayers array
+        if (activeLayers.value.includes('satellites')) {
+            world.customLayerData([...activeSatellites.value]);
+        } else {
+            world.customLayerData([]);
+        }
         if (Math.floor(Date.now() / 100) % 10 === 0) syncCommsLinks();
     }
 };
