@@ -9,7 +9,7 @@ cd "$REPO_PATH"
 git config user.name "creyt2012"
 git config user.email "mortarcloud@gmail.com"
 
-echo "Starting StarWeather Bien Update Watcher (V4 - Hyper-Granular)..."
+echo "Starting StarWeather Ultra-Sync Watcher (V4 - Hyper-Granular)..."
 echo "Monitoring: $REPO_PATH (Commit-on-change: Enabled)"
 
 # fswatch with ultra-low latency (0.1s)
@@ -32,7 +32,7 @@ fswatch -o "$REPO_PATH" -l 0.1 -r \
         echo "[$TIMESTAMP] Hyper-Sync triggered by $FIRST_FILE" >> "$LOG_FILE"
         
         git add -A
-        git commit -m "Bien Update: $FIRST_FILE ($TIMESTAMP)"
+        git commit -m "Ultra-sync: $FIRST_FILE ($TIMESTAMP)"
         git push origin main >> "$LOG_FILE" 2>&1
         
         echo "[$TIMESTAMP] Pushed to GitHub. Contribution secured." >> "$LOG_FILE"
