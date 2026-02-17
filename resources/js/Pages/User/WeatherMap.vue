@@ -75,9 +75,13 @@ const propagateSatellites = () => {
     });
 
     if (world) {
-        // Only update if visible to save performance
+        // Toggle satellite visibility based on activeLayers array
         if (activeLayers.value.includes('satellites')) {
-            world.customLayerData([...activeSatellites.value]);
+            // Force a deep update by mapping to new objects if needed, 
+            // but usually customLayerData handles this if the array ref changes.
+            world.customLayerData([...activeSatellites.value.map(s => ({...s}))]);
+        } else {
+            world.customLayerData([]);
         }
         if (Math.floor(Date.now() / 100) % 10 === 0) syncCommsLinks();
     }
@@ -714,10 +718,10 @@ onMounted(async () => {
             })
             .pathsData([])
             .pathColor(() => '#00ffff')
-            .pathDashLength(0.08)
-            .pathDashGap(0.02)
-            .pathDashAnimateTime(10000) 
-            .pathStroke(0.2)
+            .pathDashLength(1)
+            .pathDashGap(0)
+            .pathDashAnimateTime(0) 
+            .pathStroke(0.15)
             .pathPointLat(p => p[0])
             .pathPointLng(p => p[1])
             .pathPointAlt(p => p[2] * 0.15)
