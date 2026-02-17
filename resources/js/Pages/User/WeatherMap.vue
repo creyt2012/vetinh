@@ -164,8 +164,19 @@ onMounted(async () => {
             axios.get('/internal/map/storms'),
             axios.get('/internal/map/satellites')
         ]);
+        
         activeStorms.value = stormRes.data;
         activeSatellites.value = satRes.data.data;
+        
+        // Manual Force Sync for non-reactive globe.gl
+        if (world && activeSatellites.value.length > 0) {
+            console.log('Force syncing satellite data to globe instance');
+            const newSats = activeSatellites.value;
+            world.customLayerData(newSats);
+            world.pathsData(newSats.map(s => s.path));
+            const strategic = newSats.filter(s => s.norad_id === '41836' || s.norad_id === '25544' || s.norad_id === '40267');
+            world.labelsData([...activeStorms.value, ...strategic]);
+        }
     } catch (e) {
         console.error('Failed to fetch data', e);
     }
