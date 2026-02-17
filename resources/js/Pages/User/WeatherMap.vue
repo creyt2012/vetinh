@@ -205,6 +205,8 @@ const currentZonePoints = ref([]);
 const watchZones = ref([]);
 const auroraData = ref([]);
 const riskHeatmapData = ref([]);
+const windParticles = ref([]);
+const modelMode = ref('ECMWF'); // ECMWF, GFS, COMPARE
 const modelMode = ref('ECMWF'); // ECMWF, GFS, COMPARE
 
 const toggleDrawingMode = () => {
@@ -285,6 +287,8 @@ watch(activeLayer, (newLayer) => {
         renderAQILayer();
     } else if (newLayer === 'sst') {
         renderSSTLayer();
+    } else if (newLayer === 'wind') {
+        toggleWindLayer(true);
     }
 });
 
@@ -322,6 +326,43 @@ const renderSSTLayer = () => {
             opacity: 0.5,
             colorInterpolator: t => `interpolateWarm(${t})`
         }]);
+    }
+};
+
+const generateWindParticles = () => {
+    // Generate ~2000 wind vectors
+    const particles = [];
+    for (let i = 0; i < 2000; i++) {
+        const startLat = (Math.random() - 0.5) * 160;
+        const startLng = (Math.random() - 0.5) * 360;
+        
+        // Simulating wind flow along latitudes (Trade winds/Westerlies)
+        const length = 2 + Math.random() * 5;
+        const windDirection = startLat > 0 ? 1 : -1; // General direction
+        const endLat = startLat + (Math.random() - 0.5) * 2;
+        const endLng = startLng + (5 + Math.random() * 10) * windDirection;
+
+        particles.push([
+            [startLat, startLng, 0.01],
+            [endLat, endLng, 0.01]
+        ]);
+    }
+    windParticles.value = particles;
+};
+
+const toggleWindLayer = (active) => {
+    if (active) {
+        generateWindParticles();
+        if (world) {
+            world.pathsData(windParticles.value)
+                 .pathColor(() => 'rgba(255, 255, 255, 0.3)')
+                 .pathDashLength(0.5)
+                 .pathDashGap(0.1)
+                 .pathDashAnimateTime(2000)
+                 .pathStroke(0.15);
+        }
+    } else {
+        if (world) world.pathsData([]);
     }
 };
 
