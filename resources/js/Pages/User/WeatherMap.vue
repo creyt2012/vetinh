@@ -272,8 +272,43 @@ watch(activeLayer, (newLayer) => {
         renderAQILayer();
     } else if (newLayer === 'sst') {
         renderSSTLayer();
+    } else if (newLayer === 'wind') {
+        renderWindLayer();
     }
 });
+
+const renderWindLayer = () => {
+    // Creating a global wind particle system via pathsData
+    const particleCount = 200;
+    const windPaths = Array.from({ length: particleCount }, () => {
+        const startLat = (Math.random() - 0.5) * 160;
+        const startLng = (Math.random() - 0.5) * 360;
+        const segments = 5;
+        const path = [];
+        for (let i = 0; i < segments; i++) {
+            // Wind flows mostly West to East at some latitudes
+            const latVar = Math.sin(startLat * Math.PI / 180) * 10;
+            path.push([
+                startLat + (Math.random() - 0.5) * 2,
+                startLng + (i * 5) + (Math.random() * 2)
+            ]);
+        }
+        return {
+            path,
+            color: ['#4ade80', '#22c55e', '#16a34a'][Math.floor(Math.random() * 3)],
+            width: 0.5 + Math.random() * 1.5
+        };
+    });
+
+    if (world) {
+        world.pathsData(windPaths)
+             .pathColor(d => d.color)
+             .pathDashLength(0.4)
+             .pathDashGap(0.1)
+             .pathDashAnimateTime(2000)
+             .pathStroke(d => d.width);
+    }
+};
 
 const renderAQILayer = () => {
     // Simulating AQI hotspots (e.g. Asia/India/China)
