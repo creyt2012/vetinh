@@ -70,14 +70,13 @@ onMounted(async () => {
         .pointRadius(0.5)
 
         // --- Satellites Layer ---
+        .customLayerData([]) // Start empty
         .customThreeObject(d => {
             const isStrategic = d.norad_id === '41836' || d.norad_id === '40267' || d.norad_id === '25544'; 
-            const size = isStrategic ? 1.5 : 0.8; // Larger for visibility
+            const size = isStrategic ? 1.5 : 0.8; 
             const color = isStrategic ? '#00ffff' : '#0088ff';
             
             const group = new THREE.Group();
-            
-            // Core mesh
             const mesh = new THREE.Mesh(
                 new THREE.BoxGeometry(size, size, size),
                 new THREE.MeshPhongMaterial({ 
@@ -90,7 +89,6 @@ onMounted(async () => {
             );
             group.add(mesh);
 
-            // Enhanced glow effect
             const glowMesh = new THREE.Mesh(
                 new THREE.SphereGeometry(size * 2, 16, 16),
                 new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.2 })
@@ -100,9 +98,11 @@ onMounted(async () => {
             return group;
         })
         .customThreeObjectUpdate((obj, d) => {
+            if (!d.position) return;
             const { lat, lng, alt } = d.position;
-            const scaledAlt = Math.min(alt, 1.0) * 0.15; // Increased scaling for visibility
-            Object.assign(obj.position, world.getCoords(lat, lng, scaledAlt + 0.05));
+            const scaledAlt = Math.min(alt, 1.0) * 0.15; 
+            const coords = world.getCoords(lat, lng, scaledAlt + 0.05);
+            obj.position.set(coords.x, coords.y, coords.z);
             obj.lookAt(0, 0, 0); 
         })
         .onCustomLayerClick(d => {
@@ -117,11 +117,11 @@ onMounted(async () => {
         })
 
         // --- Orbit Paths Layer ---
+        .pathsData([]) // Start empty
         .pathColor(() => 'rgba(0, 255, 255, 0.4)') // Brighter orbits
         .pathDashLength(0.08)
         .pathDashGap(0.02)
         .pathDashAnimateTime(30000) 
-        .pathAltitude(d => Math.min(d[0][2], 1.0) * 0.15 + 0.05) 
         .pathStroke(0.18)
         .pathPointLat(p => p[0])
         .pathPointLng(p => p[1])
