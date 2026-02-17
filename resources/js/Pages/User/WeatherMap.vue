@@ -215,7 +215,7 @@ const ndviData = ref([]);
 const isLive = ref(true);
 const playbackTime = ref(Date.now());
 const modelMode = ref('ECMWF'); // ECMWF, GFS, COMPARE
-const timeMultiplier = ref(1); // Default 1x real-time
+const timeMultiplier = ref(20); // 20x real-time for visible movement
 
 const toggleLayer = (id) => {
     const index = activeLayers.value.indexOf(id);
@@ -746,7 +746,7 @@ onMounted(async () => {
 
         if (world.controls()) {
             world.controls().autoRotate = true;
-            world.controls().autoRotateSpeed = 2.0;
+            world.controls().autoRotateSpeed = 0.7;
         }
 
         world.pointOfView({ lat: 10, lng: 106, altitude: 2.5 }, 2000);
