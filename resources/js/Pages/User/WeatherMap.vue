@@ -1,7 +1,7 @@
 <script setup>
 import UserLayout from '@/Layouts/UserLayout.vue';
 import { Head } from '@inertiajs/vue3';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, nextTick } from 'vue';
 import Globe from 'globe.gl';
 import * as THREE from 'three';
 import axios from 'axios';
@@ -666,28 +666,22 @@ watch(showGroundStations, () => {
 let frameCounter = 0; // For throttling comms links updates
 
 const initGlobe = async () => {
-    if (!globeContainer.value) {
-        console.error('GLOBE_CONTAINER_NOT_FOUND');
-        return;
-    }
+    if (!globeContainer.value) return;
 
-    // Force layout recalculation
-    const width = globeContainer.value.clientWidth || window.innerWidth;
-    const height = globeContainer.value.clientHeight || (window.innerHeight - 200);
+    await nextTick();
 
-    console.log(`INITIALIZING_TACTICAL_GLOBE: ${width}x${height}`);
+    const width = globeContainer.value.offsetWidth || window.innerWidth;
+    const height = globeContainer.value.offsetHeight || window.innerHeight;
 
     world = Globe()
         (globeContainer.value)
         .width(width)
         .height(height)
-        .showAtmosphere(true)
-        .atmosphereColor('#0088ff')
-        .atmosphereDaylightAlpha(0.2)
+        .showAtmosphere(false) // Temporarily disable to rule out shader bugs
         .backgroundColor('#020205')
-        .globeColor('#041d31') // Solid tactical blue fallback
-        .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
-        .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
+        .globeColor('#001529') // Deep tactical blue
+        .globeImageUrl('//unpkg.com/three-globe@2.31.0/example/img/earth-blue-marble.jpg')
+        .bumpImageUrl('//unpkg.com/three-globe@2.31.0/example/img/earth-topology.png')
         
         // --- Interactivity ---
         .onPointClick((point, event) => {
