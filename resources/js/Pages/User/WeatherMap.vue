@@ -65,24 +65,52 @@ onMounted(async () => {
         // --- Satellites Layer ---
         .customLayerData(activeSatellites.value)
         .customThreeObject(d => {
+            const isStrategic = d.norad_id === '41836' || d.norad_id === '40267' || d.norad_id === '25544'; 
+            const size = isStrategic ? 1.2 : 0.6;
+            const color = isStrategic ? '#00ffff' : '#0088ff';
+            
+            const group = new THREE.Group();
+            
+            // Core mesh
             const mesh = new THREE.Mesh(
-                new THREE.BoxGeometry(0.5, 0.5, 0.5),
-                new THREE.MeshLambertMaterial({ color: '#0088ff', transparent: true, opacity: 0.9 })
+                new THREE.BoxGeometry(size, size, size),
+                new THREE.MeshPhongMaterial({ color, emissive: color, emissiveIntensity: 0.5 })
             );
-            return mesh;
+            group.add(mesh);
+
+            // Glow effect
+            const glowMesh = new THREE.Mesh(
+                new THREE.SphereGeometry(size * 1.5, 16, 16),
+                new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.15 })
+            );
+            group.add(glowMesh);
+
+            return group;
         })
         .customThreeObjectUpdate((obj, d) => {
-            Object.assign(obj.position, world.getCoords(d.position.lat, d.position.lng, d.position.alt));
+            const { lat, lng, alt } = d.position;
+            Object.assign(obj.position, world.getCoords(lat, lng, alt));
+            obj.lookAt(0, 0, 0); // Always point towards earth
         })
 
         // --- Orbit Paths Layer ---
         .pathsData(activeSatellites.value.map(s => s.path))
-        .pathColor(() => 'rgba(0, 136, 255, 0.2)')
-        .pathDashLength(0.1)
-        .pathDashGap(0.008)
-        .pathDashAnimateTime(12000)
-        .pathAltitude(d => d[0][2]) // Relative altitude from data
-        .pathStroke(0.1)
+        .pathColor(() => 'rgba(0, 136, 255, 0.25)')
+        .pathDashLength(0.05)
+        .pathDashGap(0.01)
+        .pathDashAnimateTime(60000) // Much slower for realism
+        .pathAltitude(d => d[0][2] * 0.1) // Scaling down altitude for better visualization fit
+        .pathStroke(0.15)
+        
+        // --- Satellite Labels ---
+        .labelsData(activeSatellites.value.filter(s => s.norad_id === '41836' || s.norad_id === '25544' || s.norad_id === '40267'))
+        .labelLat(d => d.position.lat)
+        .labelLng(d => d.position.lng)
+        .labelText(d => d.name)
+        .labelSize(1.2)
+        .labelDotRadius(0)
+        .labelColor(() => '#00ffff')
+        .labelAltitude(d => d.position.alt * 0.1 + 0.05)
         
         .onGlobeClick(async ({ lat, lng }) => {
             selectedPoint.value = { lat, lng };
