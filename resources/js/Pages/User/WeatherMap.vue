@@ -155,6 +155,52 @@ const groundStations = ref([]);
 const radarTimestamp = ref(null);
 const showRadar = ref(false);
 const showGroundStations = ref(true);
+const showLightning = ref(false);
+const lightningData = ref([]);
+
+const toggleLightning = () => {
+    showLightning.value = !showLightning.value;
+    if (showLightning.value) {
+        startLightningSimulation();
+    } else {
+        stopLightningSimulation();
+    }
+};
+
+let lightningInterval = null;
+const startLightningSimulation = () => {
+    lightningInterval = setInterval(() => {
+        // Random strikes for simulation
+        const newStrike = {
+            lat: (Math.random() - 0.5) * 160,
+            lng: (Math.random() - 0.5) * 360,
+            size: 0.5 + Math.random() * 1.5,
+            color: '#ffffff',
+            id: Date.now()
+        };
+        lightningData.value = [newStrike]; // Show one strike at a time for dramatic effect
+        
+        if (world) {
+            world.pointsData(lightningData.value)
+                 .pointColor(() => '#ffffff')
+                 .pointAltitude(0.01)
+                 .pointRadius('size');
+        }
+
+        // Decay the strike after 400ms
+        setTimeout(() => {
+            if (showLightning.value) {
+                lightningData.value = [];
+                if (world) world.pointsData([]);
+            }
+        }, 400);
+    }, 2000);
+};
+
+const stopLightningSimulation = () => {
+    clearInterval(lightningInterval);
+    if (world) world.pointsData([]);
+};
 
 let world = null; // Globe.gl instance
 let map = null;   // Leaflet instance
