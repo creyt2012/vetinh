@@ -590,6 +590,8 @@ const stopLightningSimulation = () => {
 
 let world = null; // Globe.gl instance
 let map = null;   // Leaflet instance
+let rafId = null;
+let intervalId = null;
 
 const layers = [
     { id: 'satellites', name: 'ORBITAL_INTEL', color: 'vibrant-blue', icon: '📡' },
@@ -660,117 +662,74 @@ onMounted(async () => {
         handleResize();
     }, 500);
 
-    world
-        .lineHoverPrecision(0)
-        .polygonCapColor(() => 'rgba(0, 136, 255, 0.05)')
-        .polygonSideColor(() => 'rgba(0, 136, 255, 0.02)')
-        .polygonStrokeColor(() => 'rgba(255, 255, 255, 0.1)')
-        .polygonLabel(({ properties: d }) => `
-            <div class="bg-black/90 p-3 border border-vibrant-blue/30 backdrop-blur-xl">
-                <p class="text-[8px] font-black text-vibrant-blue uppercase mb-1">PROVINCE_INTEL</p>
-                <p class="text-xs font-black uppercase italic">${d.NAME_1 || d.NAME || 'UNKNOWN_REGION'}</p>
-            </div>
-        `)
-        
-        // --- Storms Layer ---
-        .ringColor(() => '#ef4444')
-        .ringMaxRadius(5)
-        .ringPropagationSpeed(2)
-        .ringRepeatPeriod(1000)
-        .pointColor(() => '#ef4444')
-        .pointAltitude(0.01)
-        .pointRadius(0.5)
-
-        // --- Satellites Layer ---
-        .customLayerData([]) // Start empty
-        .customThreeObject(d => {
-            const isStrategic = d.norad_id === '41836' || d.norad_id === '40267' || d.norad_id === '25544'; 
-            const size = isStrategic ? 1.5 : 0.8; 
-            const color = isStrategic ? '#00ffff' : '#0088ff';
+    // Configuration Chain with Safety
+    try {
+        world
+            .lineHoverPrecision(0)
+            .polygonCapColor(() => 'rgba(0, 136, 255, 0.05)')
+            .polygonSideColor(() => 'rgba(0, 136, 255, 0.02)')
+            .polygonStrokeColor(() => 'rgba(255, 255, 255, 0.1)')
+            .polygonLabel(({ properties: d }) => `
+                <div class="bg-black/90 p-3 border border-vibrant-blue/30 backdrop-blur-xl">
+                    <p class="text-[8px] font-black text-vibrant-blue uppercase mb-1">PROVINCE_INTEL</p>
+                    <p class="text-xs font-black uppercase italic">${d.NAME_1 || d.NAME || 'UNKNOWN_REGION'}</p>
+                </div>
+            `)
             
-            const group = new THREE.Group();
-            const mesh = new THREE.Mesh(
-                new THREE.BoxGeometry(size, size, size),
-                new THREE.MeshPhongMaterial({ 
-                    color, 
-                    emissive: color, 
-                    emissiveIntensity: 0.8,
-                    transparent: true,
-                    opacity: 0.9
-                })
-            );
-            group.add(mesh);
+            // --- Storms Layer ---
+            .ringColor(() => '#ef4444')
+            .ringMaxRadius(5)
+            .ringPropagationSpeed(2)
+            .ringRepeatPeriod(1000)
+            .pointColor(() => '#ef4444')
+            .pointAltitude(0.01)
+            .pointRadius(0.5)
 
-            const glowMesh = new THREE.Mesh(
-                new THREE.SphereGeometry(size * 2, 8, 8),
-                new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.2 })
-            );
-            group.add(glowMesh);
+            // --- Satellites Layer ---
+            .customLayerData([]) 
+            .customThreeObject(d => {
+                const isStrategic = d.norad_id === '41836' || d.norad_id === '40267' || d.norad_id === '25544'; 
+                const size = isStrategic ? 1.5 : 0.8; 
+                const color = isStrategic ? '#00ffff' : '#0088ff';
+                const group = new THREE.Group();
+                const mesh = new THREE.Mesh(
+                    new THREE.BoxGeometry(size, size, size),
+                    new THREE.MeshPhongMaterial({ color, emissive: color, emissiveIntensity: 0.8, transparent: true, opacity: 0.9 })
+                );
+                group.add(mesh);
+                return group;
+            })
+            .customLayerLat(d => d.position?.lat || 0)
+            .customLayerLng(d => d.position?.lng || 0)
+            .customLayerAltitude(d => Math.min(d.position?.alt || 0.1, 1.0) * 0.15 + 0.05)
+            .pathsData([])
+            .pathColor(() => 'rgba(0, 255, 255, 0.4)')
+            .pathDashLength(0.08)
+            .pathDashGap(0.02)
+            .pathDashAnimateTime(30000) 
+            .pathStroke(0.18)
+            .pathPointLat(p => p[0])
+            .pathPointLng(p => p[1])
+            .pathPointAlt(p => p[2] * 0.15)
+            .onGlobeClick(handleGlobeClick)
+            .onPolygonClick(handleGlobeClick)
+            .onPointClick(handleGlobeClick)
+            .onLabelClick(handleGlobeClick);
 
-            return group;
-        })
-        .customLayerLat(d => d.position?.lat || 0)
-        .customLayerLng(d => d.position?.lng || 0)
-        .customLayerAltitude(d => Math.min(d.position?.alt || 0.1, 1.0) * 0.15 + 0.05)
-        .customThreeObjectUpdate((obj, d) => {
-            if (!d.position) return;
-            const { lat, lng, alt } = d.position;
-            const scaledAlt = Math.min(alt, 1.0) * 0.15; 
-            const coords = world.getCoords(lat, lng, scaledAlt + 0.05);
-            obj.position.set(coords.x, coords.y, coords.z);
-            obj.lookAt(0, 0, 0); 
-        })
-        .onCustomLayerClick(d => {
-            selectedSatellite.value = d;
-            selectedPoint.value = null; 
-            
-            world.pointOfView({ 
-                lat: d.position.lat, 
-                lng: d.position.lng, 
-                altitude: 1.5 
-            }, 1000);
-        })
+        if (world.controls()) {
+            world.controls().autoRotate = true;
+            world.controls().autoRotateSpeed = 0.5;
+        }
 
-        // --- Comms Links (Arcs) ---
-        .arcsData([])
-        .arcColor(() => '#00ff88')
-        .arcDashLength(0.4)
-        .arcDashGap(0.2)
-        .arcDashAnimateTime(3000)
-        .arcStroke(0.1)
-        .arcAltitudeAutoScale(0.2)
+        world.pointOfView({ lat: 10, lng: 106, altitude: 2.5 }, 2000);
 
-        // --- Orbit Paths Layer ---
-        .pathsData([]) // Start empty
-        .pathColor(() => 'rgba(0, 255, 255, 0.4)') // Brighter orbits
-        .pathDashLength(0.08)
-        .pathDashGap(0.02)
-        .pathDashAnimateTime(30000) 
-        .pathStroke(0.18)
-        .pathPointLat(p => p[0])
-        .pathPointLng(p => p[1])
-        .pathPointAlt(p => p[2] * 0.15) // Consistent scaling
-        
-        // --- Shared Labels ---
-        .labelLat(d => d.latitude || d.position?.lat)
-        .labelLng(d => d.longitude || d.position?.lng)
-        .labelText(d => d.name)
-        .labelAltitude(d => d.position ? (Math.min(d.position.alt, 1.0) * 0.15 + 0.1) : 0.02)
-        .onGlobeClick(handleGlobeClick)
-        .onPolygonClick(handleGlobeClick)
-        .onPointClick(handleGlobeClick)
-        .onLabelClick(handleGlobeClick);
-    world.controls().autoRotate = true;
-    world.controls().autoRotateSpeed = 0.1;
-
-    world.pointOfView({ lat: 10, lng: 106, altitude: 2.5 }, 2000);
-
-    // Load Administrative Boundaries
-    fetch('https://raw.githubusercontent.com/vasturiano/globe.gl/master/example/datasets/ne_110m_admin_0_countries.geojson')
-        .then(res => res.json())
-        .then(countries => {
-            world.polygonsData(countries.features);
-        });
+        // Fetch Administrative Boundaries
+        const geoRes = await fetch('https://raw.githubusercontent.com/vasturiano/globe.gl/master/example/datasets/ne_110m_admin_0_countries.geojson');
+        const countries = await geoRes.json();
+        world.polygonsData(countries.features);
+    } catch (err) {
+        console.error("Globe config failure", err);
+    }
 
     // Initial Fetch (triggered AFTER globe setup)
     try {
@@ -857,8 +816,7 @@ const handleResize = () => {
 
     window.addEventListener('resize', handleResize);
 
-    // Orbital Propagator Loop (Using requestAnimationFrame for 60FPS)
-    let rafId;
+    // Orbital Propagator Loop
     const animate = () => {
         propagateSatellites();
         rafId = requestAnimationFrame(animate);
@@ -866,7 +824,7 @@ const handleResize = () => {
     rafId = requestAnimationFrame(animate);
     
     // Auto-sync data every 60 seconds
-    const intervalId = setInterval(refreshTacticalData, 60000);
+    intervalId = setInterval(refreshTacticalData, 60000);
     lastFetchTime.value = Date.now();
 });
 
