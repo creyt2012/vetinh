@@ -38,20 +38,18 @@ const togglePOV = () => {
 const propagateSatellites = () => {
     if (activeSatellites.value.length === 0) return;
     
-    const now = Date.now();
-    const delta = now - lastFetchTime.value; // ms since last sync
+    // In live mode, use real-world drift. In playback, use the exact playback timestamp.
+    const now = isLive.value ? Date.now() : playbackTime.value;
+    const delta = now - lastFetchTime.value;
     
     activeSatellites.value.forEach(sat => {
         if (!sat.path || sat.path.length < 2 || !sat.telemetry) return;
         
         const path = sat.path;
         const totalPoints = path.length;
-        
-        // Use actual orbital period from telemetry (default to 90 mins if missing)
         const periodMs = (sat.telemetry.period || 90) * 60 * 1000;
         const segmentDuration = periodMs / totalPoints;
         
-        // Calculate point index based on real-time elapsed
         const totalProgress = delta / segmentDuration;
         const index = Math.floor(totalProgress) % totalPoints;
         const nextIndex = (index + 1) % totalPoints;
@@ -70,17 +68,13 @@ const propagateSatellites = () => {
         };
 
         if (isPOVMode.value && selectedSatellite.value && selectedSatellite.value.norad_id === sat.norad_id && world) {
-            world.pointOfView({
-                lat: nextLat,
-                lng: nextLng,
-                altitude: 0.4
-            }, 0); 
+            world.pointOfView({ lat: nextLat, lng: nextLng, altitude: 0.4 }, 0); 
         }
     });
 
     if (world) {
         world.customLayerData(activeSatellites.value);
-        if (Math.floor(now / 100) % 10 === 0) syncCommsLinks();
+        if (Math.floor(Date.now() / 100) % 10 === 0) syncCommsLinks();
     }
 };
 
@@ -208,6 +202,8 @@ const riskHeatmapData = ref([]);
 const windParticles = ref([]);
 const marineData = ref([]);
 const ndviData = ref([]);
+const isLive = ref(true);
+const playbackTime = ref(Date.now());
 const modelMode = ref('ECMWF'); // ECMWF, GFS, COMPARE
 
 const toggleDrawingMode = () => {
@@ -1347,8 +1343,13 @@ const switchView = (mode) => {
 
                     <!-- Timeline Scrubber Layer -->
                     <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center bg-black/40 backdrop-blur-md px-4 py-2 border border-white/10 rounded-full space-x-4">
-                        <span class="text-[8px] font-black text-white/30 uppercase">Local_Timeline</span>
-                        <input type="range" min="0" max="47" class="w-96 accent-vibrant-blue bg-white/10 h-1 rounded-full cursor-pointer">
+                        <div @click="isLive = true" :class="isLive ? 'bg-vibrant-blue text-white' : 'text-white/40 ring-1 ring-white/10'" class="px-3 py-1 text-[8px] font-black uppercase cursor-pointer transition-all">
+                            LIVE_STREAM
+                        </div>
+                        <input type="range" min="-48" max="0" step="1" 
+                            @input="e => { playbackTime = Date.now() + e.target.value * 3600000; isLive = false; }"
+                            class="w-96 accent-vibrant-blue bg-white/10 h-1 rounded-full cursor-pointer">
+                        <span class="text-[8px] font-black text-white italic">{{ isLive ? 'REALTIME' : new Date(playbackTime).toLocaleString() }}</span>
                     </div>
                 </div>
             </Transition>
