@@ -36,7 +36,22 @@ const fetchForecast = async (lat, lng) => {
     }
 };
 
-const handleGlobeClick = async ({ lat, lng }) => {
+const handleGlobeClick = async (clickedObj) => {
+    // Globe.gl might pass { lat, lng } directly or an object where we need to extract them
+    let lat, lng;
+    
+    if (clickedObj.lat !== undefined && clickedObj.lng !== undefined) {
+        lat = clickedObj.lat;
+        lng = clickedObj.lng;
+    } else if (clickedObj.latitude !== undefined && clickedObj.longitude !== undefined) {
+        lat = clickedObj.latitude;
+        lng = clickedObj.longitude;
+    } else {
+        // Fallback for some event types or nested objects
+        console.warn('Unknown click object structure', clickedObj);
+        return;
+    }
+
     selectedPoint.value = { lat, lng };
     isLoadingPoint.value = true;
     pointData.value = null;
@@ -220,7 +235,9 @@ onMounted(async () => {
         .labelDotRadius(0.2)
         .labelColor(d => d.position ? '#00ffff' : '#ef4444')
         .labelAltitude(d => d.position ? (Math.min(d.position.alt, 1.0) * 0.15 + 0.1) : 0.02)
-        .onGlobeClick(handleGlobeClick);
+        .onGlobeClick(handleGlobeClick)
+        .onPolygonClick(handleGlobeClick)
+        .onPointClick(handleGlobeClick);
     world.controls().autoRotate = true;
     world.controls().autoRotateSpeed = 0.5;
 
