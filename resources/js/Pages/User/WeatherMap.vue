@@ -222,24 +222,95 @@ const toggleLayer = (id) => {
 const syncGlobeLayers = () => {
     if (!world) return;
 
-    // Reset some layers if they are not active
-    if (!activeLayers.value.includes('aurora')) world.ringsData(activeStorms.value); // Keep storms rings
-    if (!activeLayers.value.includes('risk') && !activeLayers.value.includes('sst')) world.heatmapsData([]);
-    if (!activeLayers.value.includes('aqi')) world.hexBinPointsData([]);
-    if (!activeLayers.value.includes('marine') && !activeLayers.value.includes('storms') && !activeLayers.value.includes('lightning')) world.pointsData([]);
+    // 1. Unified Points Layer (Storms + Marine + Lightning)
+    let combinedPoints = [];
+    if (activeLayers.value.includes('storms')) {
+        combinedPoints = [...combinedPoints, ...activeStorms.value.map(s => ({ ...s, isStorm: true }))];
+    }
+    if (activeLayers.value.includes('marine')) {
+        if (marineData.value.length === 0) generateMarineData();
+        combinedPoints = [...combinedPoints, ...marineData.value.map(v => ({ ...v, isMarine: true }))];
+    }
+    if (activeLayers.value.includes('lightning') && showLightning.value) {
+        combinedPoints = [...combinedPoints, ...lightningData.value.map(l => ({ ...l, isLightning: true }))];
+    }
     
-    // Trigger specific render functions for active layers
-    if (activeLayers.value.includes('aurora')) toggleAurora(true);
-    if (activeLayers.value.includes('risk')) toggleRiskHeatmap(true);
+    world.pointsData(combinedPoints)
+         .pointColor(d => d.isStorm ? '#ef4444' : (d.isMarine ? '#00ccff' : '#ffffff'))
+         .pointRadius(d => d.isStorm ? 0.5 : (d.isMarine ? 0.3 : 0.6))
+         .pointAltitude(d => d.isStorm ? 0.01 : 0.02)
+         .pointLabel(d => d.isMarine ? `🚢 ${d.name}\nTYPE: ${d.type}\nSPEED: ${d.speed}` : (d.isStorm ? `🌀 ${d.name}\nCAT: ${d.category}` : '⚡ LIGHTNING_STRIKE'));
+
+    // 2. Unified Rings Layer (Storms + Aurora)
+    let combinedRings = [];
+    if (activeLayers.value.includes('storms')) {
+        combinedRings = [...combinedRings, ...activeStorms.value];
+    }
+    if (activeLayers.value.includes('aurora')) {
+        if (auroraData.value.length === 0) generateAuroraData();
+        combinedRings = [...combinedRings, ...auroraData.value];
+    }
+    world.ringsData(combinedRings);
+
+    // 3. Unified Heatmaps (Risk + SST)
+    let combinedHeatmaps = [];
+    if (activeLayers.value.includes('risk')) {
+        combinedHeatmaps.push({
+            data: riskHeatmapData.value.length ? riskHeatmapData.value : generateRiskData(),
+            lat: d => d.lat, lng: d => d.lng, weight: d => d.weight,
+            radius: 15, opacity: 0.4, colorInterpolator: t => `rgba(255, 0, 0, ${t})`
+        });
+    }
+    if (activeLayers.value.includes('sst')) {
+        combinedHeatmaps.push({
+            data: Array.from({ length: 100 }, () => ({ lat: (Math.random() - 0.5) * 160, lng: (Math.random() - 0.5) * 360, temp: 20 + Math.random() * 10 })),
+            lat: d => d.lat, lng: d => d.lng, weight: d => (d.temp - 20) / 10,
+            radius: 25, opacity: 0.3, colorInterpolator: t => `rgba(255, 165, 0, ${t})`
+        });
+    }
+    world.heatmapsData(combinedHeatmaps);
+
+    // 4. Hexbins (AQI)
     if (activeLayers.value.includes('aqi')) renderAQILayer();
-    if (activeLayers.value.includes('sst')) renderSSTLayer();
-    if (activeLayers.value.includes('wind')) toggleWindLayer(true);
-    if (activeLayers.value.includes('marine')) renderMarineLayer();
+    else world.hexBinPointsData([]);
+
+    // 5. Polygons (NDVI + Watch Zones)
     if (activeLayers.value.includes('ndvi')) renderNDVILayer();
-    if (activeLayers.value.includes('lightning')) toggleLightning(true);
+    else world.polygonsData(watchZones.value); // Always keep watch zones if drawn
+
+    // 6. Paths (Wind + Orbits)
+    if (activeLayers.value.includes('wind')) toggleWindLayer(true);
+    else toggleWindLayer(false);
 };
 
-const toggleDrawingMode = () => {
+// Auto-sync on layer changes
+watch(activeLayers, () => syncGlobeLayers(), { deep: true });
+
+const generateMarineData = () => {
+    marineData.value = Array.from({ length: 500 }, () => ({
+        lat: (Math.random() - 0.5) * 120,
+        lng: (Math.random() - 0.5) * 360,
+        name: `VESSEL_${Math.floor(Math.random() * 9000 + 1000)}`,
+        type: ['CONTAINER', 'TANKER', 'CARGO'][Math.floor(Math.random() * 3)],
+        speed: (Math.random() * 25).toFixed(1) + ' kn'
+    }));
+};
+
+const generateRiskData = () => {
+    riskHeatmapData.value = Array.from({ length: 50 }, () => ({
+        lat: (Math.random() - 0.5) * 120,
+        lng: (Math.random() - 0.5) * 360,
+        weight: Math.random()
+    }));
+    return riskHeatmapData.value;
+};
+
+const generateAuroraData = () => {
+    auroraData.value = [
+        { lat: 80, lng: 0, color: '#00ff88', maxR: 40, propagationSpeed: 1, repeatPeriod: 2000 },
+        { lat: -80, lng: 0, color: '#00ccff', maxR: 35, propagationSpeed: 0.8, repeatPeriod: 2500 }
+    ];
+};
     isDrawingZone.value = !isDrawingZone.value;
     if (isDrawingZone.value) {
         currentZonePoints.value = [];
