@@ -7,6 +7,8 @@ import * as THREE from 'three';
 import axios from 'axios';
 
 const globeContainer = ref(null);
+const leafletContainer = ref(null);
+const viewMode = ref('GLOBE'); // GLOBE, SATELLITE, FLAT
 const activeLayer = ref('clouds');
 const activeStorms = ref([]);
 const activeSatellites = ref([]);
@@ -15,12 +17,19 @@ const selectedSatellite = ref(null);
 const pointData = ref(null);
 const isLoadingPoint = ref(false);
 
-let world = null;
+let world = null; // Globe.gl instance
+let map = null;   // Leaflet instance
 
 const layers = [
     { id: 'clouds', name: 'CLOUD_DENSITY', color: 'vibrant-blue' },
     { id: 'precip', name: 'PRECIPITATION', color: 'vibrant-green' },
     { id: 'wind', name: 'WIND_SPEED', color: 'yellow-500' },
+];
+
+const viewOptions = [
+    { id: 'GLOBE', name: 'TACTICAL_GLOBE', icon: '🌐' },
+    { id: 'SATELLITE', name: 'SAT_REALITY', icon: '🛰️' },
+    { id: 'FLAT', name: 'SYNOPTIC_FLAT', icon: '🗺️' },
 ];
 
 import { watch } from 'vue';
