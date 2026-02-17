@@ -709,6 +709,12 @@ const switchView = (mode) => {
                     <span class="text-xs">🗼</span>
                     <div class="absolute left-full ml-4 px-3 py-1 bg-black text-[8px] font-black uppercase opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-white/10">GROUND_STATIONS</div>
                 </button>
+                <button @click="toggleLightning"
+                    :class="showLightning ? 'bg-yellow-400 text-black shadow-[0_0_15px_rgba(250,204,21,0.4)]' : 'bg-black/60 text-white/40'"
+                    class="p-3 border border-white/10 backdrop-blur-md transition-all group relative">
+                    <span class="text-xs">⚡</span>
+                    <div class="absolute left-full ml-4 px-3 py-1 bg-black text-[8px] font-black uppercase opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-white/10">LIVE_LIGHTNING</div>
+                </button>
             </div>
 
             <!-- Sidebar Controls -->
