@@ -349,6 +349,11 @@ const initLeaflet = () => {
         backgroundColor: '#050508'
     });
 
+    map.on('click', (e) => {
+        const { lat, lng } = e.latlng;
+        handleGlobeClick({ lat, lng });
+    });
+
     // High-Detail Satellite (Esri)
     const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
         maxZoom: 19
