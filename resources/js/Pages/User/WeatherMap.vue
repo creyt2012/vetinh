@@ -215,7 +215,7 @@ const ndviData = ref([]);
 const isLive = ref(true);
 const playbackTime = ref(Date.now());
 const modelMode = ref('ECMWF'); // ECMWF, GFS, COMPARE
-const timeMultiplier = ref(20); // 20x real-time for visible movement
+const timeMultiplier = ref(30); // 30x for clearly visible motion
 
 const toggleLayer = (id) => {
     const index = activeLayers.value.indexOf(id);
@@ -322,6 +322,7 @@ const syncGlobeLayers = () => {
     // Ensure rotation is active
     if (world.controls()) {
         world.controls().autoRotate = true;
+        world.controls().autoRotateSpeed = 0.7;
     }
 
     // 7. Custom Layers (Satellites)
