@@ -619,13 +619,6 @@ const syncCommsLinks = () => {
     });
     world.arcsData(links);
 };
-                endLat: nearest.latitude,
-                endLng: nearest.longitude
-            });
-        }
-    });
-    world.arcsData(links);
-};
 
 // Haversine distance
 const getDistance = (lat1, lon1, lat2, lon2) => {
@@ -651,6 +644,12 @@ watch(groundStations, () => {
     }
     syncCommsLinks();
 }, { deep: true });
+
+const handleResize = () => {
+    if (!globeContainer.value || !world) return;
+    world.width(globeContainer.value.offsetWidth);
+    world.height(globeContainer.value.offsetHeight);
+};
 
 import { onUnmounted } from 'vue';
 
