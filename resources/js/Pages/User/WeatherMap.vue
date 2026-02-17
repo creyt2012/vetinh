@@ -228,7 +228,7 @@ const toggleLayer = (id) => {
 const syncGlobeLayers = () => {
     if (!world) return;
 
-    // 1. Unified Points Layer (Storms + Marine + Lightning)
+    // 1. Unified Points Layer (Storms + Marine + Lightning + Ground Stations)
     let combinedPoints = [];
     if (activeLayers.value.includes('storms')) {
         combinedPoints = [...combinedPoints, ...activeStorms.value.map(s => ({ ...s, isStorm: true }))];
@@ -240,12 +240,11 @@ const syncGlobeLayers = () => {
     if (activeLayers.value.includes('lightning') && showLightning.value) {
         combinedPoints = [...combinedPoints, ...lightningData.value.map(l => ({ ...l, isLightning: true }))];
     }
+    if (groundStations.value.length > 0) {
+        combinedPoints = [...combinedPoints, ...groundStations.value.map(s => ({ ...s, isStation: true }))];
+    }
     
-    world.pointsData(combinedPoints)
-         .pointColor(d => d.isStorm ? '#ef4444' : (d.isMarine ? '#00ccff' : '#ffffff'))
-         .pointRadius(d => d.isStorm ? 0.5 : (d.isMarine ? 0.3 : 0.6))
-         .pointAltitude(d => d.isStorm ? 0.01 : 0.02)
-         .pointLabel(d => d.isMarine ? `🚢 ${d.name}\nTYPE: ${d.type}\nSPEED: ${d.speed}` : (d.isStorm ? `🌀 ${d.name}\nCAT: ${d.category}` : '⚡ LIGHTNING_STRIKE'));
+    world.pointsData(combinedPoints);
 
     // 2. Unified Rings Layer (Storms + Aurora)
     let combinedRings = [];
@@ -283,14 +282,42 @@ const syncGlobeLayers = () => {
     // 5. Polygons (NDVI + Watch Zones)
     if (activeLayers.value.includes('ndvi')) renderNDVILayer();
     else {
-        // Only reset if NDVI was active, but keep watch zones
-        // Fetch original countries if needed or keep existing state
-        if (world) world.polygonsData(watchZones.value);
+        // Keep watch zones visible if not in NDVI mode
+        world.polygonsData(watchZones.value);
     }
 
     // 6. Paths (Wind + Orbits)
-    if (activeLayers.value.includes('wind')) toggleWindLayer(true);
-    else toggleWindLayer(false);
+    // Consolidate paths rendering
+    const showOrbits = activeLayers.value.includes('satellites');
+    const showWind = activeLayers.value.includes('wind');
+    const orbitPaths = showOrbits ? activeSatellites.value.map(s => s.path) : [];
+    
+    if (showWind) {
+        generateWindParticles();
+        world.pathsData([...orbitPaths, ...windParticles.value])
+             .pathColor(d => d.norad_id ? 'rgba(0, 136, 255, 0.4)' : 'rgba(255, 255, 255, 0.3)')
+             .pathDashLength(d => d.norad_id ? 0.01 : 0.5)
+             .pathDashAnimateTime(d => d.norad_id ? 0 : 2000)
+             .pathStroke(d => d.norad_id ? 0.3 : 0.15);
+    } else {
+        world.pathsData(orbitPaths)
+             .pathColor('rgba(0, 136, 255, 0.4)')
+             .pathStroke(0.3)
+             .pathDashAnimateTime(0);
+    }
+
+    // 7. Custom Layers (Satellites)
+    if (activeLayers.value.includes('satellites')) {
+        world.customLayerData([...activeSatellites.value]);
+    } else {
+        world.customLayerData([]);
+    }
+
+    // 8. Labels
+    const strategicSats = activeLayers.value.includes('satellites') 
+        ? activeSatellites.value.filter(s => s.norad_id === '41836' || s.norad_id === '25544' || s.norad_id === '40267')
+        : [];
+    world.labelsData([...activeStorms.value, ...strategicSats]);
 };
 
 // Auto-sync on layer changes
@@ -757,26 +784,8 @@ onMounted(async () => {
         const radarRes = await axios.get('https://api.rainviewer.com/public/weather-maps.json');
         radarTimestamp.value = radarRes.data.radar.past[radarRes.data.radar.past.length - 1].time;
         
-        // Manual Force Sync for non-reactive globe.gl
-        if (world) {
-            if (activeSatellites.value.length > 0) {
-                const newSats = activeSatellites.value;
-                world.customLayerData(newSats);
-                world.pathsData(newSats.map(s => s.path));
-                const strategic = newSats.filter(s => s.norad_id === '41836' || s.norad_id === '25544' || s.norad_id === '40267');
-                world.labelsData([...activeStorms.value, ...strategic]);
-            }
-            
-            if (groundStations.value.length > 0) {
-                world.pointsData([...activeStorms.value, ...groundStations.value.map(s => ({
-                    ...s,
-                    pointColor: '#00ff88',
-                    pointRadius: 0.8,
-                    pointAltitude: 0.02,
-                    isStation: true
-                }))]);
-            }
-        }
+        // Unified Force Sync
+        syncGlobeLayers();
     } catch (e) {
         console.error('Failed to fetch data', e);
     }
