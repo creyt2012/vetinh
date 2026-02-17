@@ -16,6 +16,9 @@ const selectedPoint = ref(null);
 const selectedSatellite = ref(null);
 const pointData = ref(null);
 const isLoadingPoint = ref(false);
+const showBottomForecast = ref(false);
+const forecastData = ref([]);
+const isLoadingForecast = ref(false);
 
 // Pro Upgrade State
 const searchQuery = ref('');
@@ -181,22 +184,40 @@ onMounted(async () => {
         .labelColor(d => d.position ? '#00ffff' : '#ef4444')
         .labelAltitude(d => d.position ? (Math.min(d.position.alt, 1.0) * 0.15 + 0.1) : 0.02)
         
-        .onGlobeClick(async ({ lat, lng }) => {
-            selectedPoint.value = { lat, lng };
-            isLoadingPoint.value = true;
-            pointData.value = null;
-
-            try {
-                const response = await axios.get('/api/v1/weather/point-info', {
-                    params: { lat, lng }
-                });
-                pointData.value = response.data.data;
-                isLoadingPoint.value = false;
-            } catch (e) {
-                console.error('Failed to fetch point intelligence', e);
-                isLoadingPoint.value = false;
-            }
+const fetchForecast = async (lat, lng) => {
+    isLoadingForecast.value = true;
+    showBottomForecast.value = true;
+    try {
+        const response = await axios.get('/api/v1/weather/forecast', {
+            params: { lat, lng }
         });
+        forecastData.value = response.data.data;
+    } catch (e) {
+        console.error('Forecast fetch failed', e);
+    } finally {
+        isLoadingForecast.value = false;
+    }
+};
+
+const handleGlobeClick = async ({ lat, lng }) => {
+    selectedPoint.value = { lat, lng };
+    isLoadingPoint.value = true;
+    pointData.value = null;
+    
+    // Trigger Windy-style Bottom Forecast
+    fetchForecast(lat, lng);
+
+    try {
+        const response = await axios.get('/api/v1/weather/point-info', {
+            params: { lat, lng }
+        });
+        pointData.value = response.data.data;
+        isLoadingPoint.value = false;
+    } catch (e) {
+        console.error('Failed to fetch point intelligence', e);
+        isLoadingPoint.value = false;
+    }
+};
 
     world.controls().autoRotate = true;
     world.controls().autoRotateSpeed = 0.5;
