@@ -76,17 +76,3 @@ Route::prefix('admin')->group(function () {
     // System Health (SLA) (NEW)
     Route::get('/system/health', [\App\Http\Controllers\Admin\SystemHealthController::class, 'index'])->name('admin.system.health');
 });
-
-// Internal Map Data APIs (Session Protected)
-Route::middleware(['auth'])->prefix('internal/map')->group(function () {
-    Route::get('/satellites', [\App\Http\Controllers\Api\V1\WeatherController::class, 'satellites']);
-    Route::get('/storms', function () {
-        return \App\Models\Storm::where('status', 'active')->get();
-    });
-    Route::get('/radar-config', function () {
-        return response()->json([
-            'status' => 'success',
-            'data' => \Illuminate\Support\Facades\Cache::get('radar_config_latest')
-        ]);
-    });
-});
