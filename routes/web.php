@@ -26,6 +26,14 @@ Route::prefix('api/internal-map')->group(function () {
         return app(\App\Http\Controllers\Api\V1\WeatherController::class)->satellites();
     });
 
+    Route::get('/ground-stations', function (\Illuminate\Http\Request $request) {
+        $internalToken = 'vethinh_strategic_internal_token_2026';
+        if ($request->query('token') !== $internalToken && !auth()->check()) {
+            return response()->json(['error' => 'Access Restricted'], 401);
+        }
+        return app(\App\Http\Controllers\Api\V1\WeatherController::class)->groundStations();
+    });
+
     Route::get('/storms', function (\Illuminate\Http\Request $request) {
         $internalToken = 'vethinh_strategic_internal_token_2026';
         if ($request->query('token') !== $internalToken && !auth()->check()) {
