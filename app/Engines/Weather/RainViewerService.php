@@ -24,7 +24,7 @@ class RainViewerService
                     'timestamp' => $latestRadar['time'],
                     'path' => $latestRadar['path'],
                     'host' => $data['host'],
-                    'tile_size' => $data['tileSize']
+                    'tile_size' => $data['tileSize'] ?? 256 // Default to 256 if missing
                 ];
             }
         } catch (\Exception $e) {
