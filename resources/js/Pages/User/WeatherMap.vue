@@ -160,9 +160,10 @@ onMounted(async () => {
 
     // Initial Fetch (triggered AFTER globe setup)
     try {
+        const token = 'vethinh_strategic_internal_token_2026';
         const [stormRes, satRes] = await Promise.all([
-            axios.get('/api/internal-map/storms'),
-            axios.get('/api/internal-map/satellites')
+            axios.get(`/api/internal-map/storms?token=${token}`),
+            axios.get(`/api/internal-map/satellites?token=${token}`)
         ]);
         
         activeStorms.value = stormRes.data;
