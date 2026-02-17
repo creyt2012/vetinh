@@ -7,6 +7,20 @@ use App\Http\Controllers\Api\V1\WeatherController;
 use App\Http\Controllers\Api\V1\MissionControlController;
 use Illuminate\Http\Request;
 
+// Internal Map Data APIs (Accessible via Session OR API Key)
+Route::middleware(['web', 'auth'])->prefix('v1/map')->group(function () {
+    Route::get('/satellites', [WeatherController::class, 'satellites']);
+    Route::get('/storms', function () {
+        return \App\Models\Storm::where('status', 'active')->get();
+    });
+    Route::get('/radar-config', function () {
+        return response()->json([
+            'status' => 'success',
+            'data' => \Illuminate\Support\Facades\Cache::get('radar_config_latest')
+        ]);
+    });
+});
+
 Route::middleware(['auth.api_key', \App\Http\Middleware\CheckApiKeyLimits::class])->prefix('v1')->group(function () {
     Route::get('/live/state', [LiveStateController::class, 'index']);
 
@@ -27,19 +41,8 @@ Route::middleware(['auth.api_key', \App\Http\Middleware\CheckApiKeyLimits::class
     Route::get('/weather/heatmap', [WeatherController::class, 'heatmap']);
     Route::get('/weather/forecast', [WeatherController::class, 'forecast']);
     Route::get('/weather/point-info', [WeatherController::class, 'pointInfo']);
-    Route::get('/weather/satellites', [WeatherController::class, 'satellites']);
-    Route::get('/weather/radar-config', function () {
-        return response()->json([
-            'status' => 'success',
-            'data' => \Illuminate\Support\Facades\Cache::get('radar_config_latest')
-        ]);
-    });
     Route::get('/weather/trends', function () {
         return \App\Models\DailyWeatherSummary::latest()->limit(30)->get();
-    });
-
-    Route::get('/weather/storms', function () {
-        return \App\Models\Storm::where('status', 'active')->get();
     });
 
     // Mission Control
