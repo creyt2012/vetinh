@@ -81,7 +81,8 @@ const weatherData = ref({
 
                     <!-- Corners UI -->
                     <div class="absolute top-6 left-6 p-4 border-l border-t border-white/10 opacity-40">
-                        <p class="text-[8px] font-black tracking-widest uppercase mb-1">Sector_Grid: Alpha-09</p>
+                         <p class="text-[10px] font-black tracking-widest uppercase text-vibrant-blue mb-1">INTELLIGENCE_DIAGNOSTICS</p>
+                        <p class="text-[8px] font-black tracking-widest uppercase">Sector_Grid: Alpha-09</p>
                         <p class="text-[8px] font-black tracking-widest uppercase">Targeting_Active</p>
                     </div>
                     <div class="absolute bottom-6 right-6 p-4 border-r border-b border-vibrant-blue/10">
