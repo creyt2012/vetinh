@@ -1014,7 +1014,7 @@ const switchView = (mode) => {
                     <p class="text-[9px] text-white/30 uppercase tracking-[0.3em] mt-1">Global Atmospheric Visualization</p>
                 </div>
 
-                <div class="space-y-2 pointer-events-auto max-h-[60vh] overflow-y-auto custom-scrollbar pr-2">
+                <div class="space-y-2 pointer-events-auto max-h-[50vh] overflow-y-auto custom-scrollbar pr-2">
                     <button v-for="layer in layers" :key="layer.id"
                         @click="activeLayer = layer.id"
                         :class="activeLayer === layer.id ? 'bg-vibrant-blue/20 border-vibrant-blue/50 text-white translate-x-1 shadow-[0_0_20px_rgba(0,136,255,0.15)]' : 'bg-black/40 border-white/5 text-white/40 hover:bg-black/60 hover:translate-x-1'"
