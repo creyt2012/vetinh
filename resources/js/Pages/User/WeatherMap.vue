@@ -424,9 +424,43 @@ const switchView = (mode) => {
 
     <UserLayout>
         <div class="h-[calc(100vh-12rem)] relative bg-[#050508] border border-white/5 overflow-hidden">
+            <!-- Search Hub Overlay -->
+            <div class="absolute top-8 left-1/2 -translate-x-1/2 z-50 w-full max-w-md">
+                <div class="relative group">
+                    <div class="absolute -inset-0.5 bg-gradient-to-r from-vibrant-blue/50 to-purple-600/50 rounded-full blur opacity-25 group-focus-within:opacity-75 transition duration-1000 group-focus-within:duration-200"></div>
+                    <div class="relative flex items-center bg-black/80 backdrop-blur-2xl border border-white/10 rounded-full px-6 py-2 shadow-2xl">
+                        <svg class="w-4 h-4 text-white/40 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <input 
+                            v-model="searchQuery"
+                            @keyup.enter="handleSearch"
+                            type="text" 
+                            placeholder="SEARCH_SAT_OR_COORDINATE..." 
+                            class="bg-transparent border-none focus:ring-0 text-[10px] font-black tracking-widest text-white placeholder-white/20 w-full uppercase"
+                        />
+                        <div v-if="isSearching" class="w-3 h-3 border border-vibrant-blue border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pro Control Panels -->
+            <div class="absolute top-24 left-8 z-10 flex flex-col space-y-2">
+                <button @click="toggleRadar"
+                    :class="showRadar ? 'bg-vibrant-blue text-white shadow-[0_0_15px_rgba(0,136,255,0.4)]' : 'bg-black/60 text-white/40'"
+                    class="p-3 border border-white/10 backdrop-blur-md transition-all group relative">
+                    <span class="text-xs">📡</span>
+                    <div class="absolute left-full ml-4 px-3 py-1 bg-black text-[8px] font-black uppercase opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-white/10">LIVE_RADAR</div>
+                </button>
+                <button @click="showGroundStations = !showGroundStations"
+                    :class="showGroundStations ? 'bg-[#00ff88] text-black shadow-[0_0_15px_rgba(0,255,136,0.4)]' : 'bg-black/60 text-white/40'"
+                    class="p-3 border border-white/10 backdrop-blur-md transition-all group relative">
+                    <span class="text-xs">🗼</span>
+                    <div class="absolute left-full ml-4 px-3 py-1 bg-black text-[8px] font-black uppercase opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-white/10">GROUND_STATIONS</div>
+                </button>
+            </div>
+
             <!-- Sidebar Controls -->
-            <div class="absolute top-8 left-8 z-10 w-64 space-y-6">
-                <div>
+            <div class="absolute top-8 left-8 z-10 w-64 space-y-6 pointer-events-none">
+                <div class="pointer-events-auto">
                     <h2 class="text-2xl font-black uppercase tracking-tighter italic">METEO_LAYERS</h2>
                     <p class="text-[9px] text-white/30 uppercase tracking-[0.3em] mt-1">Global Atmospheric Visualization</p>
                 </div>
