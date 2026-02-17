@@ -312,10 +312,15 @@ const syncGlobeState = () => {
         world.labelsData([...activeStorms.value, ...strategic]);
     }
     
-    // Storms
-    if (activeStorms.value.length > 0) {
-        world.ringsData(activeStorms.value);
-        world.pointsData(activeStorms.value);
+    // Ground Stations
+    if (groundStations.value.length > 0) {
+        world.pointsData([...activeStorms.value, ...groundStations.value.map(s => ({
+            ...s,
+            pointColor: '#00ff88',
+            pointRadius: 0.8,
+            pointAltitude: 0.02,
+            isStation: true
+        }))]);
     }
     
     // Active Meteorological Layer
@@ -857,13 +862,15 @@ const initGlobe = async () => {
     // Initial Fetch (triggered AFTER globe setup)
     try {
         const token = 'vethinh_strategic_internal_token_2026';
-        const [stormRes, satRes] = await Promise.all([
+        const [stormRes, satRes, stationRes] = await Promise.all([
             axios.get(`/api/internal-map/storms?token=${token}`),
-            axios.get(`/api/internal-map/satellites?token=${token}`)
+            axios.get(`/api/internal-map/satellites?token=${token}`),
+            axios.get(`/api/internal-map/ground-stations?token=${token}`)
         ]);
         
         activeStorms.value = stormRes.data;
         activeSatellites.value = satRes.data.data;
+        groundStations.value = stationRes.data.data;
         
         syncGlobeState();
         
