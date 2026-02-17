@@ -20,6 +20,19 @@ const showBottomForecast = ref(false);
 const forecastData = ref([]);
 const isLoadingForecast = ref(false);
 const orbitTick = ref(0);
+const isPOVMode = ref(false);
+
+const togglePOV = () => {
+    isPOVMode.value = !isPOVMode.value;
+    if (isPOVMode.value && selectedSatellite.value && world) {
+        // Initial transition
+        world.pointOfView({
+            lat: selectedSatellite.value.position.lat,
+            lng: selectedSatellite.value.position.lng,
+            altitude: 0.5
+        }, 1000);
+    }
+};
 
 const propagateSatellites = () => {
     if (activeSatellites.value.length === 0) return;
@@ -42,11 +55,23 @@ const propagateSatellites = () => {
         // Progress between the two points (0 to 1)
         const progress = (Date.now() % 2000) / 2000;
         
+        const nextLat = currentPos[0] + (nextPos[0] - currentPos[0]) * progress;
+        const nextLng = currentPos[1] + (nextPos[1] - currentPos[1]) * progress;
+
+        // If this is the selected satellite and POV is active, update camera
+        if (isPOVMode.value && selectedSatellite.value && selectedSatellite.value.norad_id === sat.norad_id && world) {
+            world.pointOfView({
+                lat: nextLat,
+                lng: nextLng,
+                altitude: 0.4 // Dynamic following altitude
+            }, 100); // Small duration for smooth chasing
+        }
+
         return {
             ...sat,
             position: {
-                lat: currentPos[0] + (nextPos[0] - currentPos[0]) * progress,
-                lng: currentPos[1] + (nextPos[1] - currentPos[1]) * progress,
+                lat: nextLat,
+                lng: nextLng,
                 alt: currentPos[2] || 0.1
             }
         };
@@ -781,8 +806,14 @@ const switchView = (mode) => {
                             </div>
                         </div>
 
-                        <div class="pt-4">
-                            <button class="w-full py-3 bg-white text-black text-[9px] font-black uppercase tracking-[0.3em] hover:bg-vibrant-blue hover:text-white transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+                        <div class="pt-4 space-y-3">
+                            <button @click="togglePOV" 
+                                :class="isPOVMode ? 'bg-vibrant-blue text-white shadow-[0_0_30px_#0088ff]' : 'bg-white text-black hover:bg-vibrant-blue hover:text-white'"
+                                class="w-full py-4 text-[10px] font-black uppercase tracking-[0.3em] transition-all flex items-center justify-center space-x-3">
+                                <span class="text-lg">👁️</span>
+                                <span>{{ isPOVMode ? 'EXIT_ORBITAL_POV' : 'ENTER_ORBITAL_POV' }}</span>
+                            </button>
+                            <button class="w-full py-3 bg-white/5 text-white/40 text-[9px] font-black uppercase tracking-[0.3em] hover:bg-white/10 transition-all border border-white/5">
                                 ACCESS_SENSOR_PAYLOAD
                             </button>
                         </div>
