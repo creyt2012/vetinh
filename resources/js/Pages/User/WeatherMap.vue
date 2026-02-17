@@ -430,18 +430,26 @@ const generateWindParticles = () => {
 };
 
 const toggleWindLayer = (active) => {
+    const showOrbits = activeLayers.value.includes('satellites');
+    const orbitPaths = showOrbits ? activeSatellites.value.map(s => s.path) : [];
+    
     if (active) {
         generateWindParticles();
         if (world) {
-            world.pathsData([...activeSatellites.value.map(s => s.path), ...windParticles.value])
+            world.pathsData([...orbitPaths, ...windParticles.value])
                  .pathColor(d => d.norad_id ? 'rgba(0, 136, 255, 0.4)' : 'rgba(255, 255, 255, 0.3)')
-                 .pathDashLength(0.5)
+                 .pathDashLength(d => d.norad_id ? 0.01 : 0.5)
                  .pathDashGap(0.1)
-                 .pathDashAnimateTime(d => d.norad_id ? 10000 : 2000)
-                 .pathStroke(d => d.norad_id ? 0.2 : 0.15);
+                 .pathDashAnimateTime(d => d.norad_id ? 0 : 2000)
+                 .pathStroke(d => d.norad_id ? 0.3 : 0.15);
         }
     } else {
-        if (world) world.pathsData(activeSatellites.value.map(s => s.path));
+        if (world) {
+            world.pathsData(orbitPaths)
+                 .pathColor('rgba(0, 136, 255, 0.4)')
+                 .pathStroke(0.3)
+                 .pathDashAnimateTime(0);
+        }
     }
 };
 
@@ -547,9 +555,12 @@ let world = null; // Globe.gl instance
 let map = null;   // Leaflet instance
 
 const layers = [
-    { id: 'clouds', name: 'CLOUD_DENSITY', color: 'vibrant-blue', icon: '📡' },
+    { id: 'satellites', name: 'ORBITAL_INTEL', color: 'vibrant-blue', icon: '📡' },
+    { id: 'clouds', name: 'CLOUD_DENSITY', color: 'vibrant-blue', icon: '☁️' },
+    { id: 'storms', name: 'STORM_RADAR_PRO', color: 'red-500', icon: '🌀' },
     { id: 'precip', name: 'PRECIPITATION', color: 'vibrant-green', icon: '🌧️' },
     { id: 'wind', name: 'WIND_SPEED', color: 'yellow-500', icon: '🌬️' },
+    { id: 'lightning', name: 'LIVE_LIGHTNING', color: 'white', icon: '⚡' },
     { id: 'aqi', name: 'AIR_QUALITY_INDEX', color: 'purple-500', icon: '🌫️' },
     { id: 'sst', name: 'SEA_TEMPERATURE', color: 'orange-500', icon: '🌡️' },
     { id: 'aurora', name: 'AURORA_TRACKING', color: 'green-400', icon: '✨' },
