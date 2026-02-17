@@ -20,7 +20,7 @@ const isActive = (route) => {
 </script>
 
 <template>
-    <div class="min-h-screen bg-[#020205] text-white font-outfit selection:bg-vibrant-blue/30 overflow-hidden flex flex-col">
+    <div class="h-screen bg-[#020205] text-white font-outfit selection:bg-vibrant-blue/30 overflow-hidden flex flex-col">
         <!-- Top Tactical Bar -->
         <header class="h-16 border-b border-white/5 bg-black/40 backdrop-blur-xl flex items-center justify-between px-8 z-50">
             <div class="flex items-center space-x-4">
@@ -56,7 +56,7 @@ const isActive = (route) => {
 
         <!-- Main Content Viewport -->
         <main class="flex-1 overflow-y-auto custom-scrollbar relative">
-            <div class="p-8 max-w-[1600px] mx-auto">
+            <div class="p-8 pb-20 max-w-[1600px] mx-auto">
                 <slot />
             </div>
 
@@ -77,15 +77,16 @@ const isActive = (route) => {
 
 <style>
 .custom-scrollbar::-webkit-scrollbar {
-    width: 2px;
+    width: 4px;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
     background: transparent;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(0, 136, 255, 0.2);
+    background: rgba(0, 136, 255, 0.3);
+    border-radius: 10px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 136, 255, 0.5);
+    background: rgba(0, 136, 255, 0.6);
 }
 </style>

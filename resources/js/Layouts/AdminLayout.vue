@@ -39,7 +39,7 @@ const isActive = (routeName) => {
 </script>
 
 <template>
-    <div class="min-h-screen bg-[#020205] text-white flex font-inter overflow-hidden">
+    <div class="h-screen bg-[#020205] text-white flex font-inter overflow-hidden">
         <!-- Sidebar -->
         <aside class="w-72 border-r border-white/5 bg-[#050508] flex flex-col relative z-20 shadow-[20px_0_50px_rgba(0,0,0,0.5)]">
             <!-- Sidebar Header -->
@@ -138,13 +138,13 @@ const isActive = (routeName) => {
 .bg-vibrant-green { background-color: #00ffaa; }
 
 .custom-scrollbar::-webkit-scrollbar {
-    width: 4px;
+    width: 6px;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
     background: #020205;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(0, 136, 255, 0.2);
+    background: rgba(0, 136, 255, 0.3);
     border-radius: 20px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
