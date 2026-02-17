@@ -349,6 +349,32 @@ const renderSSTLayer = () => {
     }
 };
 
+const renderAisLayer = () => {
+    // Simulating major shipping routes (e.g. Malacca, Suez, Panama)
+    const vesselCount = 100;
+    const vessels = Array.from({ length: vesselCount }, () => ({
+        lat: (Math.random() - 0.5) * 40, // Mostly mid-latitudes for trade
+        lng: (Math.random() - 0.5) * 360,
+        name: `VESSEL_${Math.floor(Math.random() * 90000 + 10000)}`,
+        type: ['CARGO', 'TANKER', 'CONTAINER'][Math.floor(Math.random() * 3)],
+        status: 'UNDERWAY'
+    }));
+    
+    if (world) {
+        world.pointsData(vessels)
+             .pointColor(() => '#2dd4bf') // Teal for AIS
+             .pointAltitude(0.01)
+             .pointRadius(0.5)
+             .pointLabel(d => `
+                <div class="bg-black/90 p-3 border border-teal-500/30 backdrop-blur-md">
+                    <p class="text-[8px] font-black text-teal-400 uppercase mb-1">MARITIME_UNIT</p>
+                    <h4 class="text-xs font-black text-white italic">${d.name}</h4>
+                    <p class="text-[7px] text-white/40 mt-1">TYPE: ${d.type} | STATUS: ${d.status}</p>
+                </div>
+             `);
+    }
+};
+
 const notifyDrawingStart = () => {
     // Show a temporary tactical alert
     console.log("DRAWING_MODE_ACTIVE: Click on globe to define vertices.");
