@@ -11,6 +11,7 @@ const activeLayer = ref('clouds');
 const activeStorms = ref([]);
 const activeSatellites = ref([]);
 const selectedPoint = ref(null);
+const selectedSatellite = ref(null);
 const pointData = ref(null);
 const isLoadingPoint = ref(false);
 
@@ -91,6 +92,17 @@ onMounted(async () => {
             const { lat, lng, alt } = d.position;
             Object.assign(obj.position, world.getCoords(lat, lng, alt));
             obj.lookAt(0, 0, 0); // Always point towards earth
+        })
+        .onCustomLayerClick(d => {
+            selectedSatellite.value = d;
+            selectedPoint.value = null; // Close point HUD if satellite is selected
+            
+            // Move camera to satellite
+            world.pointOfView({ 
+                lat: d.position.lat, 
+                lng: d.position.lng, 
+                altitude: 1.5 
+            }, 1000);
         })
 
         // --- Orbit Paths Layer ---
