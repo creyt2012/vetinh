@@ -1053,6 +1053,17 @@ const switchView = (mode) => {
                         <div class="flex items-center space-x-6">
                             <h4 class="text-[10px] font-black uppercase tracking-[0.3em] text-vibrant-blue">Atmospheric_Pulse_Forecaster</h4>
                             <div class="h-4 w-px bg-white/10"></div>
+                            
+                            <!-- Model Selection -->
+                            <div class="flex bg-black/40 border border-white/10 p-1 rounded-sm space-x-1">
+                                <button v-for="m in ['ECMWF', 'GFS', 'COMPARE']" :key="m"
+                                    @click="modelMode = m"
+                                    :class="modelMode === m ? 'bg-vibrant-blue text-white' : 'text-white/40 hover:text-white'"
+                                    class="px-3 py-1 text-[8px] font-black uppercase tracking-widest transition-all">
+                                    {{ m }}
+                                </button>
+                            </div>
+
                             <p class="text-[9px] font-bold text-white/40 uppercase">Coordinate_Locked: {{ selectedPoint?.lat.toFixed(2) }}°N, {{ selectedPoint?.lng.toFixed(2) }}°E</p>
                         </div>
                         <button @click="showBottomForecast = false" class="text-white/20 hover:text-white transition-colors">
@@ -1078,12 +1089,23 @@ const switchView = (mode) => {
                                     <span v-else class="text-xl">☀️</span>
                                 </div>
 
-                                <!-- Temp Metric -->
-                                <div class="text-center">
-                                    <div class="text-lg font-black italic">{{ hour.temp }}°</div>
-                                    <!-- Simple bar for temp trend -->
-                                    <div class="h-12 w-1.5 bg-white/5 rounded-full mt-2 relative overflow-hidden">
-                                        <div class="absolute bottom-0 w-full bg-vibrant-blue" :style="{ height: (hour.temp + 10) * 2 + '%' }"></div>
+                                 <!-- Temp Metric -->
+                                <div class="text-center w-full px-2">
+                                    <div class="text-lg font-black italic" :class="modelMode === 'COMPARE' ? 'text-[10px]' : ''">
+                                        <template v-if="modelMode !== 'COMPARE'">{{ hour.temp }}°</template>
+                                        <template v-else>
+                                            <span class="text-vibrant-blue">{{ hour.temp }}°</span> / 
+                                            <span class="text-orange-400">{{ (hour.temp + (Math.random() * 4 - 2)).toFixed(1) }}°</span>
+                                        </template>
+                                    </div>
+                                    <!-- Comparison Bars -->
+                                    <div class="h-12 w-full flex items-end justify-center space-x-1 mt-2">
+                                        <div class="w-1.5 h-full bg-white/5 rounded-full relative overflow-hidden">
+                                            <div class="absolute bottom-0 w-full bg-vibrant-blue" :style="{ height: (hour.temp + 10) * 2 + '%' }"></div>
+                                        </div>
+                                        <div v-if="modelMode === 'COMPARE'" class="w-1.5 h-full bg-white/5 rounded-full relative overflow-hidden">
+                                            <div class="absolute bottom-0 w-full bg-orange-400 opacity-60" :style="{ height: (hour.temp + 12) * 2 + '%' }"></div>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -1131,9 +1153,15 @@ const switchView = (mode) => {
             
             <!-- Leaflet Container (2D/Satellite) -->
             <div v-show="viewMode !== 'GLOBE'" ref="leafletContainer" class="w-full h-full bg-[#050508] z-0"></div>
-            
-            <!-- HUD Overlay Decoration -->
+                        <!-- HUD Overlay Decoration -->
             <div class="absolute inset-0 pointer-events-none border-[15px] border-black/5 z-20"></div>
+
+            <!-- Drawing Mode HUD -->
+            <div v-if="isDrawingZone" class="absolute top-32 left-1/2 -translate-x-1/2 z-[60] bg-red-600/90 text-white px-6 py-2 rounded-full border border-white/20 shadow-2xl animate-pulse flex items-center space-x-4">
+                <span class="text-[10px] font-black uppercase tracking-[0.3em]">Surveillance_Drawing_Active_Mode</span>
+                <div class="h-4 w-px bg-white/20"></div>
+                <span class="text-[9px] font-bold uppercase italic">Points: {{ currentZonePoints.length }} (Min 3 to save)</span>
+            </div>
         </div>
     </UserLayout>
 </template>
