@@ -749,6 +749,77 @@ const switchView = (mode) => {
                     </div>
                 </div>
             </Transition>
+            
+            <!-- Windy-Style Meteogram Panel (Bottom Slide) -->
+            <Transition
+                enter-active-class="transition duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]"
+                enter-from-class="translate-y-full"
+                enter-to-class="translate-y-0"
+                leave-active-class="transition duration-500 ease-in"
+                leave-from-class="translate-y-0"
+                leave-to-class="translate-y-full"
+            >
+                <div v-if="showBottomForecast" class="absolute bottom-0 left-0 right-0 z-50 bg-[#050508]/95 backdrop-blur-3xl border-t border-white/10 h-72 shadow-[0_-20px_50px_rgba(0,0,0,0.5)] overflow-hidden">
+                    <!-- Panel Header -->
+                    <div class="px-8 py-3 bg-white/[0.02] border-b border-white/5 flex justify-between items-center">
+                        <div class="flex items-center space-x-6">
+                            <h4 class="text-[10px] font-black uppercase tracking-[0.3em] text-vibrant-blue">Atmospheric_Pulse_Forecaster</h4>
+                            <div class="h-4 w-px bg-white/10"></div>
+                            <p class="text-[9px] font-bold text-white/40 uppercase">Coordinate_Locked: {{ selectedPoint?.lat.toFixed(2) }}°N, {{ selectedPoint?.lng.toFixed(2) }}°E</p>
+                        </div>
+                        <button @click="showBottomForecast = false" class="text-white/20 hover:text-white transition-colors">
+                            <span class="text-[10px] uppercase font-black tracking-widest mr-2">Close_System</span>
+                            <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
+                    </div>
+
+                    <!-- Forecast Scroll Container -->
+                    <div class="h-full overflow-x-auto overflow-y-hidden custom-scrollbar">
+                        <div class="flex p-8 min-w-max h-full">
+                            <div v-for="(hour, idx) in forecastData" :key="idx" class="w-24 flex flex-col items-center justify-between h-40 border-r border-white/5 px-2 group hover:bg-white/[0.02] transition-colors">
+                                <!-- Day/Time -->
+                                <div class="text-center">
+                                    <p class="text-[8px] font-black text-white/30 uppercase">{{ hour.day }}</p>
+                                    <p class="text-[10px] font-black text-white italic group-hover:text-vibrant-blue">{{ hour.display_short }}</p>
+                                </div>
+
+                                <!-- Dynamic Icon Placeholder -->
+                                <div class="my-2">
+                                    <span v-if="hour.cloud_cover > 70" class="text-xl">☁️</span>
+                                    <span v-else-if="hour.precip > 0.5" class="text-xl">🌧️</span>
+                                    <span v-else class="text-xl">☀️</span>
+                                </div>
+
+                                <!-- Temp Metric -->
+                                <div class="text-center">
+                                    <div class="text-lg font-black italic">{{ hour.temp }}°</div>
+                                    <!-- Simple bar for temp trend -->
+                                    <div class="h-12 w-1.5 bg-white/5 rounded-full mt-2 relative overflow-hidden">
+                                        <div class="absolute bottom-0 w-full bg-vibrant-blue" :style="{ height: (hour.temp + 10) * 2 + '%' }"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Wind/Rain -->
+                                <div class="mt-4 flex flex-col items-center space-y-1">
+                                    <div class="flex items-center space-x-1">
+                                        <svg class="w-3 h-3 text-vibrant-green group-hover:animate-spin" viewBox="0 0 24 24" :style="{ transform: `rotate(${hour.wind_deg}deg)` }">
+                                            <path fill="currentColor" d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71L12 2z"/>
+                                        </svg>
+                                        <span class="text-[8px] font-black text-white/50">{{ hour.wind_speed }}</span>
+                                    </div>
+                                    <div v-if="hour.precip > 0" class="text-[8px] font-black text-vibrant-blue">{{ hour.precip }}mm</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Timeline Scrubber Layer -->
+                    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center bg-black/40 backdrop-blur-md px-4 py-2 border border-white/10 rounded-full space-x-4">
+                        <span class="text-[8px] font-black text-white/30 uppercase">Local_Timeline</span>
+                        <input type="range" min="0" max="47" class="w-96 accent-vibrant-blue bg-white/10 h-1 rounded-full cursor-pointer">
+                    </div>
+                </div>
+            </Transition>
 
             <!-- View Mode Switcher -->
             <div class="absolute bottom-8 right-8 z-40 flex space-x-2">
@@ -855,5 +926,20 @@ const switchView = (mode) => {
     0% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
     70% { transform: translate(-50%, -50%) scale(0.9); opacity: 1; }
     100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+    height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(0, 136, 255, 0.3);
+    border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 136, 255, 0.5);
 }
 </style>
