@@ -610,11 +610,23 @@ const switchView = (mode) => {
                             <div class="space-y-3">
                                 <div class="flex justify-between items-end border-b border-white/5 pb-2">
                                     <span class="text-[9px] text-white/30 font-bold uppercase">Altitude</span>
-                                    <span class="text-sm font-black text-white">{{ selectedSatellite.telemetry.altitude.toLocaleString() }} <span class="text-[9px] text-white/20">KM</span></span>
+                                    <div class="flex items-center space-x-3">
+                                        <!-- Micro Chart -->
+                                        <svg class="w-12 h-4 text-vibrant-blue opacity-50" viewBox="0 0 100 20">
+                                            <polyline fill="none" stroke="currentColor" stroke-width="2" points="0,15 20,10 40,12 60,5 80,8 100,2" />
+                                        </svg>
+                                        <span class="text-sm font-black text-white">{{ selectedSatellite.telemetry.altitude.toLocaleString() }} <span class="text-[9px] text-white/20">KM</span></span>
+                                    </div>
                                 </div>
                                 <div class="flex justify-between items-end border-b border-white/5 pb-2">
                                     <span class="text-[9px] text-white/30 font-bold uppercase">Velocity</span>
-                                    <span class="text-sm font-black text-vibrant-green">{{ selectedSatellite.telemetry.velocity.toFixed(3) }} <span class="text-[9px] text-white/20">KM/S</span></span>
+                                    <div class="flex items-center space-x-3">
+                                        <!-- Micro Chart -->
+                                        <svg class="w-12 h-4 text-vibrant-green opacity-50" viewBox="0 0 100 20">
+                                            <polyline fill="none" stroke="currentColor" stroke-width="2" points="0,5 20,8 40,4 60,10 80,6 100,5" />
+                                        </svg>
+                                        <span class="text-sm font-black text-vibrant-green">{{ selectedSatellite.telemetry.velocity.toFixed(3) }} <span class="text-[9px] text-white/20">KM/S</span></span>
+                                    </div>
                                 </div>
                                 <div class="flex justify-between items-end border-b border-white/5 pb-2">
                                     <span class="text-[9px] text-white/30 font-bold uppercase">Orbit_Period</span>
