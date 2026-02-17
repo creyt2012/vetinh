@@ -241,63 +241,57 @@ class WeatherController extends Controller
      */
     public function satellites(): JsonResponse
     {
-        $engine = app(\App\Engines\Satellite\SatelliteEngine::class);
-        $satellites = \App\Models\Satellite::where('status', 'ACTIVE')->get();
+        return \Illuminate\Support\Facades\Cache::remember('satellite_intelligence_list', 60, function () {
+            $engine = app(\App\Engines\Satellite\SatelliteEngine::class);
+            $satellites = \App\Models\Satellite::where('status', 'ACTIVE')->get();
 
-        $data = $satellites->map(function ($sat) use ($engine) {
-            try {
-                $now = $engine->propagate($sat);
+            $data = $satellites->map(function ($sat) use ($engine) {
+                try {
+                    $now = $engine->propagate($sat);
 
-                // 2. Resolve Overflying Country (Reverse Geocode current pos)
-                $location = $this->geoEngine->reverseGeocode($now['latitude'], $now['longitude']);
+                    // Generate orbit path (Optimized: 60 points instead of 100)
+                    $path = [];
+                    $period = $now['period'] ?? 90;
+                    $interval = $period / 60;
 
-                // 3. Detailed Specs & Modules (Simulated based on type/name)
-                $modules = [
-                    ['id' => 'CAM-01', 'name' => 'High-Res Optical', 'status' => 'ONLINE'],
-                    ['id' => 'SAR-02', 'name' => 'Synthetic Aperture Radar', 'status' => 'ONLINE'],
-                    ['id' => 'SPEC-03', 'name' => 'Hyper-Spectral Sensor', 'status' => 'ONLINE'],
-                ];
+                    for ($i = 0; $i < 60; $i++) {
+                        $time = now()->addMinutes($i * $interval);
+                        $pos = $engine->propagate($sat, $time);
+                        $path[] = [$pos['latitude'], $pos['longitude'], $pos['altitude'] / 1000];
+                    }
 
-                if ($sat->norad_id === '25544') { // ISS
-                    $modules = [
-                        ['id' => 'ZARYA-01', 'name' => 'Functional Cargo Block', 'status' => 'OPERATIONAL'],
-                        ['id' => 'ZVEZDA-02', 'name' => 'Service Module', 'status' => 'OPERATIONAL'],
-                        ['id' => 'DESTINY-03', 'name' => 'US Laboratory', 'status' => 'OPERATIONAL'],
-                        ['id' => 'COLUMBUS-04', 'name' => 'ESA Laboratory', 'status' => 'OPERATIONAL'],
+                    return [
+                        'id' => $sat->id,
+                        'name' => $sat->name,
+                        'norad_id' => $sat->norad_id,
+                        'type' => $sat->type,
+                        'status' => $sat->status,
+                        'position' => [
+                            'lat' => $now['latitude'],
+                            'lng' => $now['longitude'],
+                            'alt' => $now['altitude'] / 1000
+                        ],
+                        'telemetry' => [
+                            'altitude' => $now['altitude'],
+                            'velocity' => $now['velocity'],
+                            'period' => $now['period'],
+                            'inclination' => $now['inclination'] ?? 51.6,
+                            'timestamp' => $now['timestamp']
+                        ],
+                        'path' => $path
                     ];
+                } catch (\Exception $e) {
+                    return null;
                 }
+            })->filter()->values();
 
-                // Generate orbit path (simplified: 100 points over one period)
-                $path = [];
-                $period = $now['period'] ?? 90; // minutes
-                $interval = $period / 100;
-
-                for ($i = 0; $i < 100; $i++) {
-                    $time = now()->addMinutes($i * $interval);
-                    $pos = $engine->propagate($sat, $time);
-                    $path[] = [$pos['latitude'], $pos['longitude'], $pos['altitude'] / 1000]; // altitude in relative units for globe.gl
-                }
-
-                return [
-                    'id' => $sat->id,
-                    'name' => $sat->name,
-                    'norad_id' => $sat->norad_id,
-                    'type' => $sat->type,
-                    'status' => $sat->status,
-                    'position' => [
-                        'lat' => $now['latitude'],
-                        'lng' => $now['longitude'],
-                        'alt' => $now['altitude'] / 1000
-                    ],
-                    'location' => $location,
-                    'telemetry' => [
-                        'altitude' => $now['altitude'],
-                        'velocity' => $now['velocity'],
-                        'period' => $now['period'],
-                        'inclination' => $now['inclination'] ?? 51.6,
-                        'timestamp' => $now['timestamp']
-                    ],
-                    'specs' => [
+            return response()->json([
+                'status' => 'success',
+                'data' => $data,
+                'cached_at' => now()->toDateTimeString()
+            ]);
+        });
+    }
                         'launch_date' => $sat->api_config['launch_date'] ?? '2015-10-02',
                         'operator' => $sat->api_config['operator'] ?? 'International Space Agency',
                         'mass' => $sat->api_config['mass'] ?? '2,100 KG',
