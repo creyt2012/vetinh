@@ -667,19 +667,31 @@ let frameCounter = 0; // For throttling comms links updates
 
 const initGlobe = async () => {
     if (!globeContainer.value) return;
+    
+    // Clean up existing instance if any
+    globeContainer.value.innerHTML = '';
+    if (world) {
+        try {
+            world._destructor(); 
+        } catch(e) {}
+    }
 
     await nextTick();
 
     const width = globeContainer.value.offsetWidth || window.innerWidth;
     const height = globeContainer.value.offsetHeight || window.innerHeight;
 
+    console.log(`[MAP_ENGINE] INITIALIZING_GLOBE_CORE: ${width}x${height}`);
+
     world = Globe()
         (globeContainer.value)
         .width(width)
         .height(height)
-        .showAtmosphere(false) // Temporarily disable to rule out shader bugs
+        .showAtmosphere(true)
+        .atmosphereColor('#0088ff')
+        .atmosphereDaylightAlpha(0.2)
         .backgroundColor('#020205')
-        .globeColor('#001529') // Deep tactical blue
+        .globeColor('#001a33')
         .globeImageUrl('//unpkg.com/three-globe@2.31.0/example/img/earth-blue-marble.jpg')
         .bumpImageUrl('//unpkg.com/three-globe@2.31.0/example/img/earth-topology.png')
         
@@ -1094,10 +1106,14 @@ const syncLeafletMarkers = () => {
     map._markersLayer = markers;
 };
 
-const switchView = (mode) => {
+const switchView = async (mode) => {
     viewMode.value = mode;
     
-    if (mode !== 'GLOBE') {
+    await nextTick();
+    
+    if (mode === 'GLOBE') {
+        initGlobe();
+    } else {
         setTimeout(() => {
             initLeaflet();
             map.invalidateSize();
@@ -1587,18 +1603,16 @@ const switchView = (mode) => {
 
             <!-- Globe Container (3D) -->
             <div 
-                v-show="viewMode === 'GLOBE'" 
+                v-if="viewMode === 'GLOBE'" 
                 ref="globeContainer" 
                 class="absolute inset-0 z-0 cursor-grab active:cursor-grabbing bg-[#020205]"
-                style="min-height: 500px; min-width: 100%;"
             ></div>
             
             <!-- Leaflet Container (2D/Satellite) -->
             <div 
-                v-show="viewMode !== 'GLOBE'" 
+                v-if="viewMode !== 'GLOBE'" 
                 ref="leafletContainer" 
                 class="absolute inset-0 bg-[#050508] z-0"
-                style="min-height: 500px; min-width: 100%;"
             ></div>
                         <!-- HUD Overlay Decoration -->
             <div class="absolute inset-0 pointer-events-none border-[15px] border-black/5 z-20"></div>
