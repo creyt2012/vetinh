@@ -68,6 +68,10 @@ watch(activeStorms, (newStorms) => {
     syncLeafletMarkers();
 }, { deep: true });
 
+watch(showGroundStations, () => {
+    syncLeafletMarkers();
+});
+
 onMounted(async () => {
     const width = globeContainer.value.offsetWidth;
     const height = globeContainer.value.offsetHeight;
@@ -509,8 +513,11 @@ const switchView = (mode) => {
                 leave-from-class="translate-x-0 opacity-100"
                 leave-to-class="translate-x-full opacity-0"
             >
-                <div v-if="selectedSatellite" class="absolute top-8 right-8 z-30 w-80 bg-black/90 backdrop-blur-2xl border border-vibrant-blue/50 shadow-[0_0_50px_rgba(0,136,255,0.2)]">
-                    <div class="p-5 border-b border-vibrant-blue/20 bg-vibrant-blue/10 flex justify-between items-center">
+                <div v-if="selectedSatellite" class="absolute top-8 right-8 z-30 w-80 bg-black/90 backdrop-blur-2xl border border-vibrant-blue/50 shadow-[0_0_50px_rgba(0,136,255,0.2)] overflow-hidden">
+                    <!-- Target Lock Decoration -->
+                    <div class="target-lock animate-target-scan"></div>
+                    
+                    <div class="p-5 border-b border-vibrant-blue/20 bg-vibrant-blue/10 flex justify-between items-center relative z-10">
                         <div>
                             <p class="text-[8px] font-black text-vibrant-blue uppercase tracking-[0.4em] mb-1">Satellite_Intel</p>
                             <h3 class="text-lg font-black uppercase tracking-tighter italic leading-none">{{ selectedSatellite.name }}</h3>
