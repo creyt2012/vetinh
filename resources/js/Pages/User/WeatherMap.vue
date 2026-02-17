@@ -190,6 +190,77 @@ onMounted(async () => {
                 </div>
             </div>
 
+            <!-- Satellite Telemetry HUD -->
+            <Transition
+                enter-active-class="transition duration-500 ease-out"
+                enter-from-class="translate-x-full opacity-0"
+                enter-to-class="translate-x-0 opacity-100"
+                leave-active-class="transition duration-300 ease-in"
+                leave-from-class="translate-x-0 opacity-100"
+                leave-to-class="translate-x-full opacity-0"
+            >
+                <div v-if="selectedSatellite" class="absolute top-8 right-8 z-30 w-80 bg-black/90 backdrop-blur-2xl border border-vibrant-blue/50 shadow-[0_0_50px_rgba(0,136,255,0.2)]">
+                    <div class="p-5 border-b border-vibrant-blue/20 bg-vibrant-blue/10 flex justify-between items-center">
+                        <div>
+                            <p class="text-[8px] font-black text-vibrant-blue uppercase tracking-[0.4em] mb-1">Satellite_Intel</p>
+                            <h3 class="text-lg font-black uppercase tracking-tighter italic leading-none">{{ selectedSatellite.name }}</h3>
+                        </div>
+                        <button @click="selectedSatellite = null" class="text-white/40 hover:text-white transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
+                    </div>
+
+                    <div class="p-6 space-y-6">
+                        <!-- Technical Profile -->
+                        <div class="grid grid-cols-2 gap-px bg-white/5 border border-white/10">
+                            <div class="p-4 bg-[#0a0a0f]">
+                                <p class="text-[8px] font-black text-white/20 uppercase mb-1">NORAD_ID</p>
+                                <p class="text-sm font-black text-vibrant-blue font-mono">{{ selectedSatellite.norad_id }}</p>
+                            </div>
+                            <div class="p-4 bg-[#0a0a0f]">
+                                <p class="text-[8px] font-black text-white/20 uppercase mb-1">TYPE</p>
+                                <p class="text-sm font-black text-white italic truncate">{{ selectedSatellite.type }}</p>
+                            </div>
+                        </div>
+
+                        <!-- Live Telemetry -->
+                        <div class="space-y-4">
+                            <h4 class="text-[10px] font-black text-white/40 uppercase tracking-widest border-l-2 border-vibrant-blue pl-3">Live_Telemetry_Stream</h4>
+                            
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-end border-b border-white/5 pb-2">
+                                    <span class="text-[9px] text-white/30 font-bold uppercase">Altitude</span>
+                                    <span class="text-sm font-black text-white">{{ selectedSatellite.telemetry.altitude.toLocaleString() }} <span class="text-[9px] text-white/20">KM</span></span>
+                                </div>
+                                <div class="flex justify-between items-end border-b border-white/5 pb-2">
+                                    <span class="text-[9px] text-white/30 font-bold uppercase">Velocity</span>
+                                    <span class="text-sm font-black text-vibrant-green">{{ selectedSatellite.telemetry.velocity.toFixed(3) }} <span class="text-[9px] text-white/20">KM/S</span></span>
+                                </div>
+                                <div class="flex justify-between items-end border-b border-white/5 pb-2">
+                                    <span class="text-[9px] text-white/30 font-bold uppercase">Orbit_Period</span>
+                                    <span class="text-sm font-black text-yellow-500">{{ selectedSatellite.telemetry.period.toFixed(2) }} <span class="text-[9px] text-white/20">MIN</span></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Position Vectors -->
+                        <div class="p-4 bg-vibrant-blue/5 border border-vibrant-blue/20">
+                            <p class="text-[8px] font-black text-vibrant-blue/60 uppercase tracking-widest mb-3 text-center">CURRENT_SPATIAL_VECTORS</p>
+                            <div class="flex justify-around font-mono text-xs font-bold italic">
+                                <div><span class="text-white/30 mr-1">LAT:</span> {{ selectedSatellite.position.lat.toFixed(4) }}</div>
+                                <div><span class="text-white/30 mr-1">LNG:</span> {{ selectedSatellite.position.lng.toFixed(4) }}</div>
+                            </div>
+                        </div>
+
+                        <div class="pt-4">
+                            <button class="w-full py-3 bg-white text-black text-[9px] font-black uppercase tracking-[0.3em] hover:bg-vibrant-blue hover:text-white transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+                                ACCESS_SENSOR_PAYLOAD
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </Transition>
+
             <!-- Point Intelligence HUD -->
             <Transition
                 enter-active-class="transition duration-500 ease-out"
