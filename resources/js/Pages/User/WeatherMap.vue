@@ -794,7 +794,6 @@ onMounted(async () => {
     } catch (e) {
         console.error('Failed to fetch data', e);
     }
-});
 
 const syncCommsLinks = () => {
     if (!world || activeSatellites.value.length === 0 || groundStations.value.length === 0) return;
@@ -869,13 +868,13 @@ const handleResize = () => {
     // Auto-sync data every 60 seconds
     const intervalId = setInterval(refreshTacticalData, 60000);
     lastFetchTime.value = Date.now();
+});
 
-    // Cleanup
-    return () => {
-        cancelAnimationFrame(rafId);
-        clearInterval(intervalId);
-        window.removeEventListener('resize', handleResize);
-    };
+import { onUnmounted } from 'vue';
+onUnmounted(() => {
+    cancelAnimationFrame(rafId);
+    clearInterval(intervalId);
+    window.removeEventListener('resize', handleResize);
 });
 
 import L from 'leaflet';
