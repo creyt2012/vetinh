@@ -185,6 +185,55 @@ const lightningData = ref([]);
 const isDrawingZone = ref(false);
 const currentZonePoints = ref([]);
 const watchZones = ref([]);
+const auroraData = ref([]);
+const riskHeatmapData = ref([]);
+
+const toggleAurora = () => {
+    if (auroraData.value.length > 0) {
+        auroraData.value = [];
+        if (world) world.ringsData([]);
+    } else {
+        // North & South Pole Auroras
+        auroraData.value = [
+            { lat: 80, lng: 0, color: '#00ff88', maxR: 40, propagationSpeed: 1, repeatPeriod: 2000 },
+            { lat: -80, lng: 0, color: '#00ccff', maxR: 35, propagationSpeed: 0.8, repeatPeriod: 2500 }
+        ];
+        if (world) {
+            world.ringsData(auroraData.value)
+                 .ringColor(d => d.color)
+                 .ringMaxRadius('maxR')
+                 .ringPropagationSpeed('propagationSpeed')
+                 .ringRepeatPeriod('repeatPeriod');
+        }
+    }
+};
+
+const toggleRiskHeatmap = () => {
+    if (riskHeatmapData.value.length > 0) {
+        riskHeatmapData.value = [];
+        if (world) world.heatmapsData([]);
+    } else {
+        // Generate random risk clusters
+        riskHeatmapData.value = Array.from({ length: 50 }, () => ({
+            lat: (Math.random() - 0.5) * 120,
+            lng: (Math.random() - 0.5) * 360,
+            weight: Math.random()
+        }));
+        if (world) {
+            world.heatmapsData([
+                {
+                    data: riskHeatmapData.value,
+                    lat: d => d.lat,
+                    lng: d => d.lng,
+                    weight: d => d.weight,
+                    radius: 15,
+                    opacity: 0.4,
+                    colorInterpolator: t => `rgba(255, 0, 0, ${t})`
+                }
+            ]);
+        }
+    }
+};
 const modelMode = ref('ECMWF'); // ECMWF, GFS, COMPARE
 
 const toggleDrawingMode = () => {
@@ -270,6 +319,8 @@ const layers = [
     { id: 'wind', name: 'WIND_SPEED', color: 'yellow-500' },
     { id: 'aqi', name: 'AIR_QUALITY_INDEX', color: 'purple-500' },
     { id: 'sst', name: 'SEA_TEMPERATURE', color: 'orange-500' },
+    { id: 'aurora', name: 'AURORA_TRACKING', color: 'green-400' },
+    { id: 'risk', name: 'STRATEGIC_RISK', color: 'red-500' },
 ];
 
 const viewOptions = [
