@@ -258,6 +258,12 @@ class WeatherController extends Controller
                         'lng' => $now['longitude'],
                         'alt' => $now['altitude'] / 1000
                     ],
+                    'telemetry' => [
+                        'altitude' => $now['altitude'],
+                        'velocity' => $now['velocity'],
+                        'period' => $now['period'],
+                        'timestamp' => $now['timestamp']
+                    ],
                     'path' => $path
                 ];
             } catch (\Exception $e) {
