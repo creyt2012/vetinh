@@ -6,7 +6,6 @@ import Globe from 'globe.gl';
 import * as THREE from 'three';
 import axios from 'axios';
 import AisVesselHUD from '@/Components/AisVesselHUD.vue';
-import CyberCommandHUD from '@/Components/CyberCommandHUD.vue';
 
 const globeContainer = ref(null);
 const leafletContainer = ref(null);
@@ -25,7 +24,6 @@ const orbitTick = ref(0);
 const isPOVMode = ref(false);
 const timeOffset = ref(0); // Offset in minutes
 const selectedVessel = ref(null);
-const showCyberCommand = ref(false);
 let animationFrameId = null;
 
 const togglePOV = () => {
@@ -285,148 +283,28 @@ watch(activeLayer, (newLayer) => {
         renderWindLayer();
     } else if (newLayer === 'ndvi') {
         renderNdviLayer();
-    } else if (newLayer === 'space_weather') {
-        renderSpaceWeather();
-    } else if (newLayer === 'aviation') {
-        renderAviationLayer();
-    } else if (newLayer === 'infrastructure') {
-        renderInfrastructureLayer();
-    } else if (newLayer === 'junk') {
-        renderSpaceJunkLayer();
-    } else if (newLayer === 'defense') {
-        renderDefenseGrid();
     }
 });
 
-const renderSpaceWeather = async () => {
-    try {
-        const token = 'vethinh_strategic_internal_token_2026';
-        const response = await axios.get('/api/v1/weather/space', { params: { token } });
-        const { data, points } = response.data;
-
-        // Space Weather Particles
-        const particleCount = 200 + (data.solar_wind_speed / 2);
-        const solarWind = Array.from({ length: particleCount }, () => {
-            const startLat = (Math.random() - 0.5) * 180;
-            const startLng = -180;
-            const path = [];
-            for (let i = 0; i < 10; i++) {
-                path.push([startLat + (Math.random() - 0.5) * 5, startLng + (i * 36)]);
-            }
-            return { path, color: data.kp_index > 6 ? '#ef4444' : '#00ff88' };
-        });
-
-        if (world) {
-            world.pathsData(solarWind)
-                 .pathColor(d => d.color)
-                 .pathDashAnimateTime(1000 / (data.solar_wind_speed / 400));
-            
-            world.ringsData(points.map(p => ({ ...p, color: '#ff0000', maxR: 5 })))
-                 .ringColor(d => d.color);
-        }
-    } catch (e) { console.error('Space Weather sync failed', e); }
-};
-
-const renderAviationLayer = async () => {
-    try {
-        const token = 'vethinh_strategic_internal_token_2026';
-        const response = await axios.get('/api/v1/weather/aviation', { params: { token } });
-        if (world) {
-            world.pointsData(response.data.data)
-                 .pointColor(d => d.strategic_priority === 'HIGH' ? '#ff0000' : '#ffffff')
-                 .pointAltitude(d => d.altitude / 800000)
-                 .pointRadius(0.5)
-                 .pointLabel(d => `
-                    <div class="bg-black/95 p-4 border-l-2 border-vibrant-blue backdrop-blur-2xl shadow-2xl">
-                        <p class="text-[7px] text-vibrant-blue font-black uppercase tracking-widest mb-1">ELITE_ADS_B_ASSET</p>
-                        <h4 class="text-xs font-black text-white italic truncate">${d.name} [${d.id}]</h4>
-                        <div class="mt-2 grid grid-cols-2 gap-2 text-[7px] font-mono text-white/60">
-                            <div>ALT: ${d.altitude} FT</div>
-                            <div>VEL: ${d.velocity} KM/H</div>
-                        </div>
-                        <p class="text-[6px] text-white/30 mt-2 uppercase">AIRLINE: ${d.airline}</p>
-                    </div>
-                 `);
-        }
-    } catch (e) { console.error('Aviation sync failed', e); }
-};
-
-const renderInfrastructureLayer = () => {
-    // Undersea Fiber Optic Cables
-    const cableCount = 50;
-    const cables = Array.from({ length: cableCount }, () => ({
-        startLat: (Math.random() - 0.5) * 40,
-        startLng: (Math.random() - 0.5) * 360,
-        endLat: (Math.random() - 0.5) * 40,
-        endLng: (Math.random() - 1) * 360,
-        color: '#ff00ff' // Neon purple for cyber infrastructure
-    }));
-
-    if (world) {
-        world.arcsData(cables)
-             .arcColor(() => '#ff00ff')
-             .arcDashLength(0.1)
-             .arcDashGap(0.05)
-             .arcDashAnimateTime(3000)
-             .arcStroke(0.2);
-    }
-};
-
-const renderSpaceJunkLayer = () => {
-    // Simulation of LEO debris clusters
-    const junkPoints = Array.from({ length: 500 }, () => ({
-        lat: (Math.random() - 0.5) * 160,
+const renderNdviLayer = () => {
+    // Simulating Vegetation Health (Global green zones)
+    const points = Array.from({ length: 400 }, () => ({
+        lat: (Math.random() - 0.5) * 120, // Focus on land areas roughly
         lng: (Math.random() - 0.5) * 360,
-        weight: Math.random()
+        value: 0.2 + Math.random() * 0.8 // NDVI range 0 to 1
     }));
-
+    
     if (world) {
-        world.heatmapsData([{
-            data: junkPoints,
-            lat: d => d.lat,
-            lng: d => d.lng,
-            weight: d => d.weight,
-            radius: 5,
-            opacity: 0.6,
-            colorInterpolator: t => `rgba(255, 255, 255, ${t * 0.5})`
-        }]);
-    }
-};
-
-const renderNdviLayer = async () => {
-    try {
-        const token = 'vethinh_strategic_internal_token_2026';
-        const response = await axios.get('/api/v1/weather/agri', { params: { token } });
-        if (world) {
-            world.hexBinPointsData(response.data.data)
-                 .hexBinResolution(4)
-                 .hexTopColor(d => {
-                     const avg = d.points.reduce((acc, p) => acc + p.value, 0) / d.points.length;
-                     return avg > 0.6 ? '#16a34a' : '#84cc16';
-                 })
-                 .hexSideColor(() => 'rgba(0, 255, 0, 0.05)')
-                 .hexBinMerge(true);
-        }
-    } catch (e) { console.error('NDVI sync failed', e); }
-};
-
-const renderDefenseGrid = () => {
-    // Planetary Shield Arcs
-    const arcs = Array.from({ length: 40 }, () => ({
-        startLat: (Math.random() - 0.5) * 120,
-        startLng: (Math.random() - 0.5) * 360,
-        endLat: (Math.random() - 0.5) * 120,
-        endLng: (Math.random() - 0.5) * 360,
-        color: 'rgba(0, 255, 255, 0.4)'
-    }));
-
-    if (world) {
-        world.arcsData(arcs)
-             .arcColor(d => d.color)
-             .arcDashLength(0.5)
-             .arcDashGap(1)
-             .arcDashAnimateTime(4000)
-             .arcStroke(0.1);
+        world.hexBinPointsData(points)
+             .hexBinResolution(4)
+             .hexTopColor(d => {
+                 const avg = d.sumWeight / d.points.length;
+                 if (avg > 0.7) return '#15803d'; // Healthy Forest
+                 if (avg > 0.4) return '#4ade80'; // Grassland
+                 return '#fde047'; // Sparse/Dry
+             })
+             .hexSideColor(() => 'rgba(0, 255, 0, 0.05)')
+             .hexBinMerge(true);
     }
 };
 
@@ -518,33 +396,30 @@ const renderSSTLayer = () => {
     }
 };
 
-const renderAisLayer = async () => {
-    try {
-        const token = 'vethinh_strategic_internal_token_2026';
-        const response = await axios.get('/api/v1/weather/ais', { params: { token } });
-        if (world) {
-            world.pointsData(response.data.data)
-                 .pointColor(d => d.strategic_value === 'HIGH' ? '#f59e0b' : '#2dd4bf')
-                 .pointAltitude(0.01)
-                 .pointRadius(0.8)
-                 .pointLabel(d => `
-                    <div class="bg-black/95 p-4 border-l-2 border-teal-500 backdrop-blur-2xl shadow-2xl w-48">
-                        <p class="text-[7px] text-teal-400 font-black uppercase tracking-widest mb-1">MARITIME_ASSET</p>
-                        <h4 class="text-xs font-black text-white italic truncate">${d.name}</h4>
-                        <div class="mt-2 space-y-1 text-[7px] font-mono text-white/60">
-                            <p>TYPE: ${d.type}</p>
-                            <p>CARGO: ${d.cargo}</p>
-                            <p>STATUS: ${d.status}</p>
-                        </div>
-                        ${d.strategic_value === 'HIGH' ? `
-                            <div class="mt-2 text-[6px] text-yellow-500 font-black uppercase tracking-widest bg-yellow-500/10 p-1 text-center border border-yellow-500/20">
-                                ⚠️ STRATEGIC_IMPORTANCE_HIGH
-                            </div>
-                        ` : ''}
-                    </div>
-                 `);
-        }
-    } catch (e) { console.error('AIS sync failed', e); }
+const renderAisLayer = () => {
+    // Simulating major shipping routes (e.g. Malacca, Suez, Panama)
+    const vesselCount = 100;
+    const vessels = Array.from({ length: vesselCount }, () => ({
+        lat: (Math.random() - 0.5) * 40, // Mostly mid-latitudes for trade
+        lng: (Math.random() - 0.5) * 360,
+        name: `VESSEL_${Math.floor(Math.random() * 90000 + 10000)}`,
+        type: ['CARGO', 'TANKER', 'CONTAINER'][Math.floor(Math.random() * 3)],
+        status: 'UNDERWAY'
+    }));
+    
+    if (world) {
+        world.pointsData(vessels)
+             .pointColor(() => '#2dd4bf') // Teal for AIS
+             .pointAltitude(0.01)
+             .pointRadius(0.5)
+             .pointLabel(d => `
+                <div class="bg-black/90 p-3 border border-teal-500/30 backdrop-blur-md">
+                    <p class="text-[8px] font-black text-teal-400 uppercase mb-1">MARITIME_UNIT</p>
+                    <h4 class="text-xs font-black text-white italic">${d.name}</h4>
+                    <p class="text-[7px] text-white/40 mt-1">TYPE: ${d.type} | STATUS: ${d.status}</p>
+                </div>
+             `);
+    }
 };
 
 const notifyDrawingStart = () => {
@@ -619,11 +494,6 @@ const layers = [
     { id: 'risk', name: 'STRATEGIC_RISK', color: 'red-500' },
     { id: 'ais', name: 'MARITIME_AIS', color: 'teal-400' },
     { id: 'ndvi', name: 'VEGETATION_HEALTH', color: 'green-600' },
-    { id: 'space_weather', name: 'SPACE_WEATHER', color: 'red-400' },
-    { id: 'aviation', name: 'ELITE_ADS_B', color: 'white' },
-    { id: 'infrastructure', name: 'CYBER_INFRA', color: 'purple-500' },
-    { id: 'junk', name: 'ORBITAL_DEBRIS', color: 'gray-400' },
-    { id: 'defense', name: 'PLANETARY_SHIELD', color: 'cyan-400', icon: '🛡️' },
 ];
 
 const viewOptions = [
@@ -665,17 +535,11 @@ watch(showGroundStations, () => {
 
 let frameCounter = 0; // For throttling comms links updates
 
-const initGlobe = () => {
-    if (!globeContainer.value) {
-        console.error('GLOBE_CONTAINER_NOT_FOUND');
-        return;
-    }
+const initGlobe = async () => {
+    if (!globeContainer.value) return;
 
-    // Force layout recalculation
-    const width = globeContainer.value.clientWidth || window.innerWidth;
-    const height = globeContainer.value.clientHeight || (window.innerHeight - 200);
-
-    console.log(`INITIALIZING_TACTICAL_GLOBE: ${width}x${height}`);
+    const width = globeContainer.value.offsetWidth;
+    const height = globeContainer.value.offsetHeight;
 
     world = Globe()
         (globeContainer.value)
@@ -686,9 +550,8 @@ const initGlobe = () => {
         .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-stars.png')
         .showAtmosphere(true)
         .atmosphereColor('#0088ff')
-        .atmosphereDaylightAlpha(0.2)
+        .atmosphereDaylightAlpha(0.1)
         .backgroundColor('#020205')
-        .globeColor('rgba(0, 136, 255, 0.1)') // Fallback color
         
         // --- Interactivity ---
         .onPointClick((point, event) => {
@@ -914,19 +777,11 @@ const handleResize = () => {
 
 import { onUnmounted } from 'vue';
 
-onMounted(() => {
-    // Small delay to ensure layout is settled
-    setTimeout(async () => {
-        initGlobe();
-        initLeaflet();
-        window.addEventListener('resize', handleResize);
-        animationFrameId = requestAnimationFrame(propagateSatellites);
-        
-        // Initial POV
-        if (world) {
-            world.pointOfView({ altitude: 2.5 }, 2000);
-        }
-    }, 500);
+onMounted(async () => {
+    await initGlobe();
+    initLeaflet();
+    window.addEventListener('resize', handleResize);
+    animationFrameId = requestAnimationFrame(propagateSatellites);
 });
 
 onUnmounted(() => {
@@ -1332,20 +1187,6 @@ const switchView = (mode) => {
                 </div>
             </Transition>
 
-            <!-- AI Neural Command Center HUD -->
-            <Transition
-                enter-active-class="transition duration-700 ease-out"
-                enter-from-class="-translate-x-full opacity-0"
-                enter-to-class="translate-x-0 opacity-100"
-                leave-active-class="transition duration-500 ease-in"
-                leave-from-class="translate-x-0 opacity-100"
-                leave-to-class="-translate-x-full opacity-0"
-            >
-                <div v-if="showCyberCommand" class="absolute top-8 left-8 z-40 w-96">
-                    <CyberCommandHUD @close="showCyberCommand = false" />
-                </div>
-            </Transition>
-
             <!-- Maritime Vessel Intelligence HUD -->
             <Transition
                 enter-active-class="transition duration-500 ease-out"
@@ -1545,33 +1386,23 @@ const switchView = (mode) => {
                             </div>
                         </div>
                     </div>
+
+                    <!-- Timeline Scrubber Layer -->
+                    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center bg-black/60 backdrop-blur-xl px-6 py-2 border border-vibrant-blue/30 rounded-full space-x-6 shadow-[0_0_20px_rgba(0,136,255,0.2)]">
+                        <div class="flex flex-col">
+                            <span class="text-[7px] font-black text-vibrant-blue uppercase tracking-[0.2em]">Temporal_Shift</span>
+                            <span class="text-[9px] font-bold text-white uppercase">{{ timeOffset === 0 ? 'REAL_TIME' : '-' + timeOffset + ' MIN' }}</span>
+                        </div>
+                        <input 
+                            v-model.number="timeOffset"
+                            type="range" 
+                            min="0" 
+                            max="720" 
+                            class="w-80 accent-vibrant-blue bg-white/10 h-1.5 rounded-full cursor-pointer hover:bg-white/20 transition-colors"
+                        >
+                    </div>
                 </div>
             </Transition>
-
-            <!-- AI Command Toggle (Always Visible) -->
-            <button 
-                @click="showCyberCommand = !showCyberCommand"
-                class="absolute bottom-4 left-8 z-[60] bg-vibrant-blue/20 hover:bg-vibrant-blue/40 border border-vibrant-blue/30 p-4 rounded-full transition-all group shadow-[0_0_20px_rgba(0,136,255,0.2)]"
-            >
-                <span class="text-xl group-hover:scale-125 transition-transform inline-block">🧠</span>
-                <div class="absolute -top-1 -right-1 w-3 h-3 bg-vibrant-blue rounded-full animate-ping"></div>
-                <div class="absolute -top-1 -right-1 w-3 h-3 bg-vibrant-blue rounded-full"></div>
-            </button>
-
-            <!-- Global Timeline Scrubber (Always Visible) -->
-            <div class="absolute bottom-24 left-1/2 -translate-x-1/2 z-40 flex items-center bg-black/60 backdrop-blur-xl px-6 py-2 border border-vibrant-blue/30 rounded-full space-x-6 shadow-[0_0_20px_rgba(0,136,255,0.2)]">
-                <div class="flex flex-col">
-                    <span class="text-[7px] font-black text-vibrant-blue uppercase tracking-[0.2em]">Temporal_Shift</span>
-                    <span class="text-[9px] font-bold text-white uppercase">{{ timeOffset === 0 ? 'REAL_TIME' : '-' + timeOffset + ' MIN' }}</span>
-                </div>
-                <input 
-                    v-model.number="timeOffset"
-                    type="range" 
-                    min="0" 
-                    max="720" 
-                    class="w-80 accent-vibrant-blue bg-white/10 h-1.5 rounded-full cursor-pointer hover:bg-white/20 transition-colors"
-                >
-            </div>
 
             <!-- View Mode Switcher -->
             <div class="absolute bottom-8 right-8 z-40 flex space-x-2">
@@ -1591,20 +1422,10 @@ const switchView = (mode) => {
             </div>
 
             <!-- Globe Container (3D) -->
-            <div 
-                v-show="viewMode === 'GLOBE'" 
-                ref="globeContainer" 
-                class="absolute inset-0 z-0 cursor-grab active:cursor-grabbing bg-[#020205]"
-                style="min-height: 500px; min-width: 100%;"
-            ></div>
+            <div v-show="viewMode === 'GLOBE'" ref="globeContainer" class="w-full h-full cursor-grab active:cursor-grabbing"></div>
             
             <!-- Leaflet Container (2D/Satellite) -->
-            <div 
-                v-show="viewMode !== 'GLOBE'" 
-                ref="leafletContainer" 
-                class="absolute inset-0 bg-[#050508] z-0"
-                style="min-height: 500px; min-width: 100%;"
-            ></div>
+            <div v-show="viewMode !== 'GLOBE'" ref="leafletContainer" class="w-full h-full bg-[#050508] z-0"></div>
                         <!-- HUD Overlay Decoration -->
             <div class="absolute inset-0 pointer-events-none border-[15px] border-black/5 z-20"></div>
 

@@ -13,27 +13,15 @@ class WeatherController extends Controller
     protected RiskEngine $riskEngine;
     protected \App\Repositories\StateRepository $stateRepo;
     protected \App\Engines\Geo\GeoEngine $geoEngine;
-    protected \App\Services\Intelligence\AviationIntelService $aviationService;
-    protected \App\Services\Intelligence\SpaceWeatherService $spaceWeatherService;
-    protected \App\Services\Intelligence\AisTrafficService $aisService;
-    protected \App\Engines\Satellite\SatelliteAgriEngine $agriEngine;
 
     public function __construct(
         RiskEngine $riskEngine,
         \App\Repositories\StateRepository $stateRepo,
-        \App\Engines\Geo\GeoEngine $geoEngine,
-        \App\Services\Intelligence\AviationIntelService $aviationService,
-        \App\Services\Intelligence\SpaceWeatherService $spaceWeatherService,
-        \App\Services\Intelligence\AisTrafficService $aisService,
-        \App\Engines\Satellite\SatelliteAgriEngine $agriEngine
+        \App\Engines\Geo\GeoEngine $geoEngine
     ) {
         $this->riskEngine = $riskEngine;
         $this->stateRepo = $stateRepo;
         $this->geoEngine = $geoEngine;
-        $this->aviationService = $aviationService;
-        $this->spaceWeatherService = $spaceWeatherService;
-        $this->aisService = $aisService;
-        $this->agriEngine = $agriEngine;
     }
 
     /**
@@ -326,53 +314,6 @@ class WeatherController extends Controller
         return response()->json([
             'status' => 'success',
             'data' => $data
-        ]);
-    }
-
-    /**
-     * Get Elite Aviation Traffic (ADS-B).
-     */
-    public function aviationTraffic(): JsonResponse
-    {
-        return response()->json([
-            'status' => 'success',
-            'data' => $this->aviationService->getGlobalTraffic(),
-            'meta' => ['turbulence' => $this->aviationService->getTurbulenceZones()]
-        ]);
-    }
-
-    /**
-     * Get Elite Space Weather status.
-     */
-    public function spaceWeather(): JsonResponse
-    {
-        return response()->json([
-            'status' => 'success',
-            'data' => $this->spaceWeatherService->getCurrentStatus(),
-            'points' => $this->spaceWeatherService->getMagnetosphereData()
-        ]);
-    }
-
-    /**
-     * Get Elite Maritime AIS Traffic.
-     */
-    public function maritimeTraffic(): JsonResponse
-    {
-        return response()->json([
-            'status' => 'success',
-            'data' => $this->aisService->getMaritimeTraffic()
-        ]);
-    }
-
-    /**
-     * Get Strategic Agricultural Intelligence (NDVI).
-     */
-    public function agriHealth(): JsonResponse
-    {
-        return response()->json([
-            'status' => 'success',
-            'data' => $this->agriEngine->generateNdviHeatmap(),
-            'anomalies' => $this->agriEngine->detectAnomalies()
         ]);
     }
 }

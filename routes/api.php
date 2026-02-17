@@ -27,10 +27,6 @@ Route::middleware(['auth.api_key', \App\Http\Middleware\CheckApiKeyLimits::class
     Route::get('/weather/heatmap', [WeatherController::class, 'heatmap']);
     Route::get('/weather/forecast', [WeatherController::class, 'forecast']);
     Route::get('/weather/point-info', [WeatherController::class, 'pointInfo']);
-    Route::get('/weather/aviation', [WeatherController::class, 'aviationTraffic']);
-    Route::get('/weather/space', [WeatherController::class, 'spaceWeather']);
-    Route::get('/weather/ais', [WeatherController::class, 'maritimeTraffic']);
-    Route::get('/weather/agri', [WeatherController::class, 'agriHealth']);
     Route::get('/weather/trends', function () {
         return \App\Models\DailyWeatherSummary::latest()->limit(30)->get();
     });
