@@ -148,7 +148,7 @@ Các đầu cuối dành cho khu vực quản trị, yêu cầu quyền `admin`.
 
 ---
 
-## [SYS] Hạ Tầng  (Infrastructure)
+## [SYS] Hạ Tầng & Vận Hành (Infrastructure)
 
 | Phương thức | Endpoint | Mô tả |
 | :--- | :--- | :--- |
