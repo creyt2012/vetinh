@@ -2,7 +2,7 @@
 
 Hệ thống StarWeather cung cấp các giao diện lập trình ứng dụng (API) chuẩn RESTful. Dưới đây là danh mục chi tiết toàn bộ các đầu cuối (endpoints) hiện có.
 
-## [AUTH] Xac thuc (Authentication)
+## [AUTH] Xác Thực (Authentication)
 
 Tất cả các yêu cầu yêu cầu Header `X-API-KEY`. Bạn có thể quản lý khóa API trong phần Portals của mình.
 
