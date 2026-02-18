@@ -71,6 +71,7 @@ class ApiExpansionTest extends TestCase
         ]);
 
         \App\Models\MissionFile::create([
+            'tenant_id' => $tenant->id,
             'name' => 'TEST_REPORT',
             'filename' => 'report_2026.pdf',
             'type' => 'METEOROLOGICAL_REPORT',
