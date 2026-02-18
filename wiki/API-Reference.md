@@ -49,7 +49,7 @@ X-API-KEY: your_api_key_here
 
 ---
 
-## [STORM] Theo doi Thien tai (Storms & Risk)
+## [STORM] Theo Dõi Thiên Tai (Storms & Risk)
 
 | Phương thức | Endpoint | Mô tả |
 | :--- | :--- | :--- |
