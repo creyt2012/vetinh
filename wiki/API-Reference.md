@@ -105,7 +105,7 @@ Các đầu cuối dành cho khu vực quản trị, yêu cầu quyền `admin`.
 
 ---
 
-## [ADM] Quản Trị Hệ Thống & Nguoi dung (System Admin)
+## [ADM] Quản Trị Hệ Thống & Người Dùng (System Admin)
 
 | Phương thức | Endpoint | Mô tả |
 | :--- | :--- | :--- |
