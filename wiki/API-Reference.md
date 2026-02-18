@@ -22,7 +22,7 @@ X-API-KEY: your_api_key_here
 
 ---
 
-## [SAT] Vệ tinh  (Satellites)
+## [SAT] Vệ tinh & Quỹ Đạo (Satellites)
 
 | Phương thức | Endpoint | Mô tả |
 | :--- | :--- | :--- |

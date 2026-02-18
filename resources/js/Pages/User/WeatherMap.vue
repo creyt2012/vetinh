@@ -1097,42 +1097,42 @@ const switchView = (mode) => {
                 </div>
             </div>
 
-            <!-- Pro Control Panels -->
-            <div class="absolute top-24 left-8 z-10 flex flex-col space-y-2">
-                <button @click="toggleRadar"
-                    :class="showRadar ? 'bg-vibrant-blue text-white shadow-[0_0_15px_rgba(0,136,255,0.4)]' : 'bg-black/60 text-white/40'"
-                    class="p-3 border border-white/10 backdrop-blur-md transition-all group relative">
-                    <span class="text-xs">📡</span>
-                    <div class="absolute left-full ml-4 px-3 py-1 bg-black text-[8px] font-black uppercase opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-white/10">LIVE_RADAR</div>
-                </button>
-                <button @click="showGroundStations = !showGroundStations"
-                    :class="showGroundStations ? 'bg-[#00ff88] text-black shadow-[0_0_15px_rgba(0,255,136,0.4)]' : 'bg-black/60 text-white/40'"
-                    class="p-3 border border-white/10 backdrop-blur-md transition-all group relative">
-                    <span class="text-xs">🗼</span>
-                    <div class="absolute left-full ml-4 px-3 py-1 bg-black text-[8px] font-black uppercase opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-white/10">GROUND_STATIONS</div>
-                </button>
-                <button @click="toggleLightning"
-                    :class="showLightning ? 'bg-yellow-400 text-black shadow-[0_0_15px_rgba(250,204,21,0.4)]' : 'bg-black/60 text-white/40'"
-                    class="p-3 border border-white/10 backdrop-blur-md transition-all group relative">
-                    <span class="text-xs">⚡</span>
-                    <div class="absolute left-full ml-4 px-3 py-1 bg-black text-[8px] font-black uppercase opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-white/10">LIVE_LIGHTNING</div>
-                </button>
-                <button @click="toggleDrawingMode"
-                    :class="isDrawingZone ? 'bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)]' : 'bg-black/60 text-white/40'"
-                    class="p-3 border border-white/10 backdrop-blur-md transition-all group relative">
-                    <span class="text-xs">📐</span>
-                    <div class="absolute left-full ml-4 px-3 py-1 bg-black text-[8px] font-black uppercase opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-white/10">DEFINE_WATCH_ZONE</div>
-                </button>
-            </div>
-
             <!-- Sidebar Controls -->
-            <div class="absolute top-8 left-8 z-10 w-64 space-y-6 pointer-events-none">
+            <div class="absolute top-8 left-8 z-10 w-64 space-y-4 pointer-events-none">
                 <div class="pointer-events-auto">
                     <h2 class="text-2xl font-black uppercase tracking-tighter italic">METEO_LAYERS</h2>
                     <p class="text-[9px] text-white/30 uppercase tracking-[0.3em] mt-1">Global Atmospheric Visualization</p>
                 </div>
 
-                <div class="space-y-1.5 pointer-events-auto max-h-[50vh] overflow-y-auto custom-scrollbar pr-2">
+                <!-- Pro Horizontal Controls (NEW LAYOUT) -->
+                <div class="flex flex-row space-x-2 pointer-events-auto">
+                    <button @click="toggleRadar"
+                        :class="showRadar ? 'bg-vibrant-blue text-white shadow-[0_0_15px_rgba(0,136,255,0.4)] border-vibrant-blue' : 'bg-black/60 text-white/40 border-white/5'"
+                        class="flex-1 py-3 border backdrop-blur-md transition-all group relative flex justify-center items-center">
+                        <span class="text-xs">📡</span>
+                        <div class="absolute bottom-full mb-3 px-3 py-1 bg-black text-[8px] font-black uppercase opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-white/10 z-50">LIVE_RADAR</div>
+                    </button>
+                    <button @click="showGroundStations = !showGroundStations"
+                        :class="showGroundStations ? 'bg-[#00ff88] text-black shadow-[0_0_15px_rgba(0,255,136,0.4)] border-[#00ff88]' : 'bg-black/60 text-white/40 border-white/5'"
+                        class="flex-1 py-3 border backdrop-blur-md transition-all group relative flex justify-center items-center">
+                        <span class="text-xs">🗼</span>
+                        <div class="absolute bottom-full mb-3 px-3 py-1 bg-black text-[8px] font-black uppercase opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-white/10 z-50">GROUND_STATIONS</div>
+                    </button>
+                    <button @click="toggleLightning"
+                        :class="showLightning ? 'bg-yellow-400 text-black shadow-[0_0_15px_rgba(250,204,21,0.4)] border-yellow-400' : 'bg-black/60 text-white/40 border-white/5'"
+                        class="flex-1 py-3 border backdrop-blur-md transition-all group relative flex justify-center items-center">
+                        <span class="text-xs">⚡</span>
+                        <div class="absolute bottom-full mb-3 px-3 py-1 bg-black text-[8px] font-black uppercase opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-white/10 z-50">LIVE_LIGHTNING</div>
+                    </button>
+                    <button @click="toggleDrawingMode"
+                        :class="isDrawingZone ? 'bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)] border-red-500' : 'bg-black/60 text-white/40 border-white/5'"
+                        class="flex-1 py-3 border backdrop-blur-md transition-all group relative flex justify-center items-center">
+                        <span class="text-xs">📐</span>
+                        <div class="absolute bottom-full mb-3 px-3 py-1 bg-black text-[8px] font-black uppercase opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-white/10 z-50">DEFINE_WATCH_ZONE</div>
+                    </button>
+                </div>
+
+                <div class="space-y-1.5 pointer-events-auto max-h-[45vh] overflow-y-auto custom-scrollbar pr-2">
                     <button v-for="layer in layers" :key="layer.id"
                         @click="toggleLayer(layer.id)"
                         :class="activeLayers.includes(layer.id) ? 'bg-vibrant-blue/25 border-vibrant-blue/50 text-white translate-x-1 shadow-[0_0_20px_rgba(0,136,255,0.1)]' : 'bg-black/40 border-white/5 text-white/40 hover:bg-black/60 hover:translate-x-1'"
