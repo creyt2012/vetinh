@@ -2,6 +2,7 @@
 import { Head } from '@inertiajs/vue3';
 import Globe from '@/Components/Globe.vue';
 import SatelliteTelemetryPanel from '@/Components/SatelliteTelemetryPanel.vue';
+import ImageryHistoryModal from '@/Components/ImageryHistoryModal.vue';
 import { ref, onMounted, computed } from 'vue';
 
 const metrics = ref({
@@ -19,10 +20,21 @@ const metrics = ref({
 
 const selectedLocation = ref(null); 
 const selectedSatellite = ref(null);
+const showHistory = ref(false);
+const historyLocation = ref(null);
 const satellites = ref([]);
 const groundStations = ref([]); // Added groundStations ref
 const activeLayers = ref(['COMMUNICATION', 'NAVIGATION', 'STATION', 'SCIENTIFIC', 'WEATHER', 'SPACE_DEBRIS', 'RISK_HEATMAP', 'RADAR_REFLECTIVITY']);
 const now = ref(new Date());
+
+const openHistory = (satellite = null) => {
+    if (satellite) {
+        historyLocation.value = { lat: satellite.latitude, lng: satellite.longitude, name: satellite.name };
+    } else if (selectedLocation.value) {
+        historyLocation.value = { ...selectedLocation.value };
+    }
+    showHistory.value = true;
+};
 
 const filteredSatellites = computed(() => {
     return satellites.value.filter(s => activeLayers.value.includes(s.type));
