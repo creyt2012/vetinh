@@ -222,9 +222,12 @@ const handleSurfaceClick = async (data) => {
                     </svg>
                 </button>
                 
-                <SatelliteTelemetryPanel :satellite="selectedSatellite" />
+                <SatelliteTelemetryPanel :satellite="selectedSatellite" @show-history="openHistory(selectedSatellite)" />
             </div>
         </div>
+
+        <!-- 2.2 IMAGERY HISTORY MODAL -->
+        <ImageryHistoryModal v-if="showHistory" :location="historyLocation" @close="showHistory = false" />
 
         <!-- 3. TOP TELEMETRY STRIP -->
         <header class="fixed top-12 left-16 right-16 z-50 flex justify-between items-start pointer-events-none">
