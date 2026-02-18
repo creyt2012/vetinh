@@ -1250,7 +1250,7 @@ const switchView = (mode) => {
                 leave-from-class="translate-x-0 opacity-100"
                 leave-to-class="translate-x-full opacity-0"
             >
-                <div v-if="selectedSatellite" class="absolute top-8 right-8 z-30 w-80 bg-black/90 backdrop-blur-2xl border border-vibrant-blue/50 shadow-[0_0_50px_rgba(0,136,255,0.2)] overflow-hidden flex flex-col max-h-[85vh]">
+                <div v-if="selectedSatellite" class="absolute top-8 right-8 z-[60] w-85 bg-black/90 backdrop-blur-2xl border border-vibrant-blue/50 shadow-[0_0_50px_rgba(0,136,255,0.2)] overflow-hidden flex flex-col max-h-[75vh]">
                     <!-- Target Lock Decoration -->
                     <div class="target-lock animate-target-scan"></div>
                     
@@ -1326,7 +1326,10 @@ const switchView = (mode) => {
                                         <svg class="w-12 h-4 text-vibrant-blue opacity-50" viewBox="0 0 100 20">
                                             <polyline fill="none" stroke="currentColor" stroke-width="2" points="0,15 20,10 40,12 60,5 80,8 100,2" />
                                         </svg>
-                                        <span class="text-sm font-black text-white">{{ selectedSatellite.telemetry.altitude.toLocaleString() }} <span class="text-[9px] text-white/20">KM</span></span>
+                                        <span class="text-sm font-black text-white">
+                                            {{ telemetryData?.orbital?.coordinates?.alt?.toLocaleString() || selectedSatellite.telemetry.altitude.toLocaleString() }} 
+                                            <span class="text-[9px] text-white/20">KM</span>
+                                        </span>
                                     </div>
                                 </div>
                                 <div class="flex justify-between items-end border-b border-white/5 pb-2">
@@ -1336,12 +1339,18 @@ const switchView = (mode) => {
                                         <svg class="w-12 h-4 text-vibrant-green opacity-50" viewBox="0 0 100 20">
                                             <polyline fill="none" stroke="currentColor" stroke-width="2" points="0,5 20,8 40,4 60,10 80,6 100,5" />
                                         </svg>
-                                        <span class="text-sm font-black text-vibrant-green">{{ selectedSatellite.telemetry.velocity.toFixed(3) }} <span class="text-[9px] text-white/20">KM/S</span></span>
+                                        <span class="text-sm font-black text-vibrant-green">
+                                            {{ telemetryData?.orbital?.physics?.velocity_kms?.toFixed(3) || selectedSatellite.telemetry.velocity.toFixed(3) }} 
+                                            <span class="text-[9px] text-white/20">KM/S</span>
+                                        </span>
                                     </div>
                                 </div>
                                 <div class="flex justify-between items-end border-b border-white/5 pb-2">
                                     <span class="text-[9px] text-white/30 font-bold uppercase">Orbit_Period</span>
-                                    <span class="text-sm font-black text-yellow-500">{{ selectedSatellite.telemetry.period.toFixed(2) }} <span class="text-[9px] text-white/20">MIN</span></span>
+                                    <span class="text-sm font-black text-yellow-500">
+                                        {{ telemetryData?.orbital?.physics?.period_min?.toFixed(2) || selectedSatellite.telemetry.period.toFixed(2) }} 
+                                        <span class="text-[9px] text-white/20">MIN</span>
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -1448,12 +1457,12 @@ const switchView = (mode) => {
                                     <span class="text-xl">📍</span>
                                     <div>
                                         <p class="text-[8px] font-black text-vibrant-blue uppercase tracking-widest">Currently_Overflying</p>
-                                        <p class="text-xs font-black text-white uppercase italic">{{ selectedSatellite.location || 'INTELLERNATIONAL_WATERS' }}</p>
+                                        <p class="text-xs font-black text-white uppercase italic">{{ telemetryData?.metadata?.location || selectedSatellite.location || 'INTELLERNATIONAL_WATERS' }}</p>
                                     </div>
                                 </div>
                                 <div class="flex justify-between font-mono text-[9px] font-bold text-white/40 border-t border-white/5 pt-2">
-                                    <div>LAT: {{ selectedSatellite.position.lat.toFixed(6) }}</div>
-                                    <div>LNG: {{ selectedSatellite.position.lng.toFixed(6) }}</div>
+                                    <div>LAT: {{ (telemetryData?.orbital?.coordinates?.lat || selectedSatellite.position.lat).toFixed(6) }}</div>
+                                    <div>LNG: {{ (telemetryData?.orbital?.coordinates?.lng || selectedSatellite.position.lng).toFixed(6) }}</div>
                                 </div>
                             </div>
                         </div>
