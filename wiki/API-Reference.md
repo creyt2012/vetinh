@@ -60,7 +60,7 @@ X-API-KEY: your_api_key_here
 
 ---
 
-## [ALRT] Logic Canh bao (Alerts)
+## [ALRT] Logic Cảnh Báo (Alerts)
 
 | Phương thức | Endpoint | Mô tả |
 | :--- | :--- | :--- |
