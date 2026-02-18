@@ -1,94 +1,96 @@
-# 🌌 StarWeather (Vệ Tinh)
-### Hệ Thống Theo Dõi Vệ Tinh & Trí Tuệ Khí Tượng Cấp Doanh Nghiệp
+# 🌌 Hệ Thống StarWeather (Dự án Vệ Tinh)
+## Nền Tảng Phân Tích Cơ Học Quỹ Đạo & Trí Tuệ Khí Tượng Tổng Hợp Cấp Liên Bang
 
-![Tái hiện địa cầu 3D StarWeather](public/assets/docs/images/globe_visualization.png)
+![Bảng điều khiển Trung tâm Nhiệm vụ StarWeather](public/assets/docs/images/mission_control_terminal.png)
 
-[![Laravel 11](https://img.shields.io/badge/Laravel-11.x-FF2D20?logo=laravel)](https://laravel.com)
-[![Vue 3](https://img.shields.io/badge/Vue-3.x-4FC08D?logo=vue.js)](https://vuejs.org)
-[![Three.js](https://img.shields.io/badge/Engine-Three.js-black?logo=three.js)](https://threejs.org)
-[![SGP4](https://img.shields.io/badge/Algorithm-SGP4-blue)](https://en.wikipedia.org/wiki/Simplified_perturbations_models)
+[![Tiêu chuẩn Hàng không Vũ trụ](https://img.shields.io/badge/Chuẩn-SGP4/WGS84-blue?style=for-the-badge)](https://en.wikipedia.org/wiki/Simplified_perturbations_models)
+[![Nền tảng Laravel](https://img.shields.io/badge/Framework-Laravel_11_Enterprise-FF2D20?style=for-the-badge&logo=laravel)](https://laravel.com)
+[![Đồ họa Real-time](https://img.shields.io/badge/Graphics-Three.js_WebGL-black?style=for-the-badge&logo=three.js)](https://threejs.org)
 
-**StarWeather** là một hệ thống trí tuệ thời tiết tinh vi, được thiết kế để xóa nhòa khoảng cách giữa độ chính xác của quỹ đạo vệ tinh và an toàn mặt đất. Bằng cách kết hợp dữ liệu đo xa vệ tinh thời gian thực với dữ liệu khí tượng đa phổ, StarWeather cung cấp những hiểu biết sâu sắc, có thể thực hiện được về các rủi ro khí quyển và hậu cần vệ tinh.
-
----
-
-## 🚀 Khả Năng Cốt Lõi & Thuật Toán Chuyên Sâu
-
-### 📡 Cơ Học Quỹ Đạo & Theo Dõi Vệ Tinh Độ Chính Xác Cao
-Hệ thống sử dụng các mô hình hàng không vũ trụ tiêu chuẩn để dự báo vị trí vật thể trên không gian:
-- **Engine Lan Truyền SGP4**: Triển khai mô hình *Simplified General Perturbations (SGP4)* để dự đoán quỹ đạo vệ tinh (ISS, Starlink, Himawari) dựa trên bộ dữ liệu TLE (Two-Line Element).
-- **Tính Toán Vận Tốc Tức Thời**: Sử dụng phương trình **Vis-Viva**: $v = \sqrt{\mu (2/r - 1/a)}$, trong đó $\mu$ là hằng số trọng trường của Trái đất ($398600.44 \text{ km}^3/\text{s}^2$), giúp cập nhật tốc độ vệ tinh chính xác theo từng giây.
-- **Bù Trừ Chuyển Động Quay Trái Đất**: Tính toán **Thời Gian Sidereal Trung Bình tại Greenwich (GMST)** để chuyển đổi tọa độ Inertial (ECI) sang tọa độ Địa lý (Lat/Lng), bù đắp cho vận tốc quay tự thân của Trái đất ($\approx 15.041^\circ/\text{giờ}$).
-
-### ⛈️ Trí Tuệ Khí Tượng & Xử Lý Ảnh Đa Phổ
-StarWeather không chỉ hiển thị ảnh, mà còn phân tích sâu vào các lớp dữ liệu:
-- **Xử Lý Phổ Himawari-9**: Thu thập và xử lý các dải phổ hồng ngoại (IR) và ánh sáng khả kiến (VIS). Thuật toán **Chuẩn Hóa Phổ** giúp phân biệt giữa mây băng tầng cao (nhiệt độ thấp) và hơi nước tầng thấp.
-- **Đồng Bộ Radar RainViewer**: Tích hợp hệ thống Mosaic Tiles chuẩn XYZ, cho phép chồng lớp dữ liệu radar lượng mưa thời gian thực lên bản đồ địa cầu với độ trễ cực thấp.
-- **Nhận Dạng Cấu Trúc Xoáy**: Tự động quét các chỉ số áp suất và vận tốc gió để phát hiện áp thấp nhiệt đới và bão. Sử dụng **Nội Suy Tuyến Tính** để dự báo quỹ đạo bão trong 30 giờ kế tiếp.
-
-### 🛡️ Hệ Thống Kiểm Soát Chất Lượng & QA/QC Dữ Liệu
-Để đảm bảo dữ liệu không bị sai lệch do cảm biến lỗi:
-- **Kiểm Tra Tính Nhất Quán Không Gian (Spatial Consistency)**: So sánh dữ liệu của một trạm khí tượng với các trạm lân cận. Nếu độ lệch nhiệt độ $> 5^\circ\text{C}$ hoặc áp suất $> 3\text{hPa}$, dữ liệu sẽ bị gắn cờ nghi vấn.
-- **Rào Cản Logic vật Lý**: Tự động loại bỏ các điểm dữ liệu phi lý (ví dụ: có mưa nhưng độ ẩm $< 30\%$) thông qua các bộ lọc QAQC chuyên sâu.
-
-### ⚠️ Engine Đánh Giá Rủi Ro Thông Minh
-- **Mô Hình Điểm Trọng Số**: Tính toán mức độ rủi ro (0-100) dựa trên mật độ mây, cường độ mưa và biến động áp suất.
-- **Điểm Tin Cậy (Confidence Score)**: Đi kèm với mỗi cảnh báo, được tính toán dựa trên độ mới của dữ liệu ($F = e^{- \lambda \cdot T}$) và sự đồng thuận giữa các nguồn dữ liệu (Consensus).
-
-![Bảng điều khiển Trung tâm Nhiệm vụ StarWeather](public/assets/docs/images/dashboard_mockup.png)
+**StarWeather** là một hệ sinh thái phân tích dữ liệu quy mô lớn, được thiết kế để giải quyết các bài toán phức tạp về sự giao thoa giữa cơ học thiên thể và động lực học khí quyển. Hệ thống cung cấp một giải pháp hợp nhất (Unified Solution) cho việc theo dõi vật thể quỹ đạo thấp (LEO) và phân tích các hiện tượng thời tiết cực đoan dựa trên dữ liệu đa phổ thời gian thực.
 
 ---
 
-## 🛠️ Công Nghệ Sử Dụng
+## 🏛️ Kiến Trúc Hệ Thống & Phân Lớp Kỹ Thuật
 
-| Lớp (Layer) | Công Nghệ & Thuật Toán |
+Dự án được xây dựng trên triết lý **"Data-Centric Architecture"**, ưu tiên xử lý dữ liệu hiệu năng cao mà không phụ thuộc vào ảo hóa (Non-Dockerized) để tận dụng tối đa tài nguyên phần cứng I/O.
+
+### 1. Phân Lớp Thu Thập & Chuyển Đổi (Ingestion & ETL)
+Hệ thống triển khai các Pipeline dữ liệu tự động cho phép hội tụ dữ liệu từ các nguồn phi tập trung:
+- **Orbital Ingestion**: Tự động đồng bộ hóa các bộ phần tử hai dòng (TLE) từ NORAD qua giao thức API an toàn.
+- **Meteorological Stream**: Phân tích luồng ảnh từ vệ tinh địa tĩnh Himawari-9 (JMA) với tần suất 10 phút/lần.
+- **Radar Mosaic integration**: Hợp nhất các mảnh radar (tiles) từ RainViewer để tạo ra một bản đồ lượng mưa toàn cầu không vết cắt.
+
+### 2. Engine Tính Toán Động Lực Học (Computational Dynamics Engine)
+Linh hồn của StarWeather nằm ở các mô hình toán học thuần túy được tối ưu hóa bằng PHP 8.3 JIT:
+
+#### 🛰️ Cơ Học Quỹ Đạo Vệ Tinh (Aerospace Mechanics)
+- **Mô Hình Lan Truyền SGP4**: Giải các phương trình nhiễu loạn để dự báo vị trí vệ tinh. Thuật toán xử lý các tham số Keplerian (Độ nghiêng, Độ lệch tâm, RAAN) để xác định vector trạng thái $(r, v)$ trong hệ quy chiếu ECI.
+- **Phương Trình Vis-Viva**: Tính toán vận tốc quỹ đạo tức thời:
+  $$v = \sqrt{\mu \left( \frac{2}{r} - \frac{1}{a} \right)}$$
+- **Hệ Quy Chiếu WGS84**: Chuyển đổi tọa độ từ không gian ECI sang địa lý Lat/Lng/Alt bằng cách sử dụng các hằng số định hình Trái đất (Bán trục lớn $a = 6378.137\text{ km}$, Độ dẹt $f = 1/298.257$).
+
+![Phác họa mạng lưới vệ tinh bảo phủ Trái đất](public/assets/docs/images/constellation_view.png)
+
+#### 🌡️ Vật Lý Khí Tượng & Phân Tích Đa Phổ
+- **Phân Tích Băng Thông Himawari**: Hệ thống xử lý các dải phổ Hồng Ngoại (IR) để xác định nhiệt độ đỉnh mây. Thuật toán **Spectral Normalization** giúp phân lập các vùng có nguy cơ tạo xoáy.
+- **Nhận Dạng Vortex**: Sử dụng các phương pháp phân tích gradient áp suất và trường vận tốc gió để xác định tâm bão.
+- **Dự Báo Quỹ Đạo Bão**: Áp dụng mô hình nội suy vectơ (Vector Interpolation) trên chuỗi thời gian để phác thảo lộ trình di chuyển tiềm năng.
+
+![Phân tích đa phổ và đo đạc nhiệt độ khí quyển](public/assets/docs/images/spectral_analysis.png)
+
+### 3. Engine Đánh Giá Rủi Ro Định Lượng (Deterministic Risk Engine)
+Hệ thống không dựa trên cảm tính, mà sử dụng các công thức toán học để định lượng rủi ro:
+- **Hàm Tổng Trọng Số (Weighted Sum Function)**:
+  $$RiskScore = \sum (Weight_i \times NormalizedValue_i)$$
+- **Chỉ Số Tin Cậy (Confidence Index)**: Mỗi điểm rủi ro được gán một mức độ tin cậy dựa trên độ mới của dữ liệu (Data Freshness Score) và sự hội tụ giữa các nguồn cảm biến khác nhau.
+
+---
+
+## 💻 Công Nghệ Nền Tảng (Core Stack)
+
+| Lớp (Layer) | Công Nghệ & Tiêu Chuẩn |
 |---|---|
-| **Core Engine** | PHP 8.2+ (Optimized FPM), Laravel 11 |
-| **Space Math** | SGP4 Core, WGS84 Reference Frame, Vis-Viva Dynamics |
-| **Xử Lý Ảnh** | Multi-spectral Normalization, UV Spherical Mapping |
-| **Frontend** | Vue 3, Inertia.js, Tailwind CSS |
-| **Đồ Họa** | Three.js, Globe.gl (Khối cầu WGS84) |
-| **Real-time** | Laravel Reverb (WebSocket), Redis (L1 Cache) |
+| **Back-end Core** | Laravel 11 (Skeleton tối ưu cho Enterprise), PHP 8.3 JIT |
+| **Real-time Pipeline** | Laravel Reverb (Giao thức WebSocket tốc độ cao cho dữ liệu quỹ đạo) |
+| **Data Persistence** | MySQL 8.0 (Partitioned Tables), Redis (L1 State Cache) |
+| **Front-end / GIS** | Vue 3, Inertia.js, Three.js (WebGL Engine) |
+| **GIS Visuals** | Globe.gl (UV Spherical Mapping cho dữ liệu WGS84) |
 
 ---
 
-## 📦 Cài Đặt & Triển Khai
+## 🛠️ Hướng Dẫn Triển Khai Hệ Thống (Deployment)
 
-### Yêu Cầu Hệ Thống
-- PHP 8.2+ & Composer
-- Node.js 18+ & NPM
-- MySQL 8+ & Redis
+### Yêu Cầu Hạ Tầng
+- **PHP**: Phiên bản 8.2 trở lên với các extension: `bcmath`, `gmp`, `redis`.
+- **Database**: MySQL 8.0 với hỗ trợ JSON/Spatial.
+- **Memory Store**: Redis server để quản lý hàng đợi và cache trạng thái.
 
-### Các Bước Thực Hiện
+### Quy Trình Cài Đặt
 ```bash
-# 1. Clone và Cài đặt
+# Bước 1: Khởi tạo mã nguồn và thư viện
 git clone https://github.com/creyt2012/vetinh.git
-cd vetinh
-composer install
-npm install
+composer install && npm install
 
-# 2. Cấu hình Môi trường
+# Bước 2: Thiết lập tham số môi trường
 cp .env.example .env
 php artisan key:generate
 
-# 3. Khởi tạo Cơ sở dữ liệu & Dữ liệu mẫu
+# Bước 3: Di cư cơ sở dữ liệu và nạp dữ liệu nền tảng
 php artisan migrate --seed
 
-# 4. Chạy Môi trường Phát triển
+# Bước 4: Khởi chạy hệ thống tích hợp (Concurrently)
+# Chạy đồng thời Web Server, Queue Worker và Vite Compiler
 npm run dev
 ```
 
 ---
 
-## 📖 Tài Liệu Kỹ Thuật (Wiki)
-
-Các bài viết chuyên sâu có sẵn trong Wiki nội bộ:
-- [Kiến trúc Hệ thống (System Architecture)](wiki/Architecture.md)
-- [Thuật toán Toán học chi tiết (SGP4 & Storm Tracking)](wiki/Algorithms.md)
-- [Phương pháp Tính điểm Rủi ro (Risk Scoring)](wiki/Risk-Engine.md)
-- [Tài liệu tham khảo API (API Reference)](wiki/API-Reference.md)
+## 📊 Lộ Trình Phát Triển (Scientific Roadmap)
+- [ ] Tích hợp hệ thống máy học (LSTM) để dự báo quỹ đạo bão phi tuyến tính.
+- [ ] Triển khai đo đạc mật độ Plasma tầng điện ly để phân tích ảnh hưởng đến tín hiệu liên lạc vệ tinh.
+- [ ] Dashboard dành riêng cho các cơ quan ứng phó thiên tai chuyên sâu.
 
 ---
-
-**Được phát triển với niềm đam mê dành cho Khoa học Trái đất**  
-*Cung cấp sức mạnh cho các quyết định dựa trên dữ liệu thông qua trí tuệ quỹ đạo và khí quyển.*
+**Một sản phẩm nghiên cứu và phát triển bởi Đội ngũ Kỹ thuật StarWeather Core.**  
+*Tận dụng sức mạnh trí tuệ không gian để bảo vệ sự sống trên bề mặt hành tinh.*
