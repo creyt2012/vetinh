@@ -68,8 +68,13 @@ Route::get('/api-portal', [\App\Http\Controllers\User\ApiKeyController::class, '
 Route::get('/api-docs', function () {
     return Inertia::render('User/ApiDocs');
 })->name('user.api-docs');
-Route::get('/reports', [\App\Http\Controllers\User\ReportController::class, 'index'])->name('user.reports.index');
 Route::get('/reports/{file}/download', [\App\Http\Controllers\User\ReportController::class, 'download'])->name('user.reports.download');
+
+// Satellite Intelligence APIs
+Route::prefix('api/user/satellite')->group(function () {
+    Route::get('/{norad_id}', [\App\Http\Controllers\User\SatelliteIntelController::class, 'show']);
+    Route::get('/{norad_id}/history', [\App\Http\Controllers\User\SatelliteIntelController::class, 'history']);
+});
 
 Route::get('/login', function () {
     return redirect()->route('home');
