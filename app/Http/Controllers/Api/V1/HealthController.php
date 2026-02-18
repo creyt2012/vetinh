@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use App\Models\SystemHealth;
 
 class HealthController extends Controller
 {
@@ -63,5 +64,37 @@ class HealthController extends Controller
     {
         return $status['services']['database']['status'] === 'connected'
             && $status['services']['cache']['status'] === 'operational';
+    }
+
+    /**
+     * Get detailed system performance metrics (SLA).
+     */
+    public function systemMetrics(): JsonResponse
+    {
+        $services = ['Database', 'Redis', 'API Gateway'];
+        $data = [];
+
+        foreach ($services as $service) {
+            $latest = SystemHealth::where('service_name', $service)->latest('recorded_at')->first();
+            $data[$service] = [
+                'status' => $latest->status ?? 'UNKNOWN',
+                'latency_ms' => $latest->latency_ms ?? 0,
+                'uptime_24h' => SystemHealth::where('service_name', $service)
+                    ->where('recorded_at', '>', now()->subHours(24))
+                    ->selectRaw('count(case when status = "operational" then 1 end) * 100.0 / count(*) as uptime')
+                    ->value('uptime') ?? 100.0,
+                'last_check' => $latest->recorded_at ?? null
+            ];
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $data,
+            'infrastructure' => [
+                'region' => 'EQUATORIAL_NODE_V3',
+                'p_node' => gethostbyname(gethostname()),
+                'version' => 'STW-2026.Q1'
+            ]
+        ]);
     }
 }
