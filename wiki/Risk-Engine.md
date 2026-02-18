@@ -1,6 +1,6 @@
 # Risk Engine: The Mathematical Foundation of Alerts
 
-![Risk Analytics Dashboard](/Users/creytdeveloper/.gemini/antigravity/brain/49cd3ed0-ce2b-49cc-a7bc-a25ea8ff049f/starweather_dashboard_final_1771426971917.png)
+![Risk Analytics Dashboard](../public/assets/docs/images/dashboard_mockup.png)
 
 The Risk Engine is a deterministic scoring system that converts raw sensor and satellite telemetry into a human-readable **Risk Score ($R$)**.
 
