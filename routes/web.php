@@ -47,7 +47,7 @@ Route::prefix('api/internal-map')->group(function () {
         if ($request->query('token') !== $internalToken && !auth()->check()) {
             return response()->json(['error' => 'Access Restricted'], 401);
         }
-        return app(\App\Http\Controllers\Api\V1\WeatherController::class)->pointInfo($request);
+        return app()->call([\App\Http\Controllers\Api\V1\WeatherController::class, 'pointInfo'], ['request' => $request]);
     });
 
     Route::get('/forecast', function (\Illuminate\Http\Request $request) {
