@@ -5592,3 +5592,9 @@ To https://github.com/creyt2012/vetinh.git
    bfad72d..a0cc544  main -> main
 [01:19:15.3N] Pushed to GitHub. Contribution secured.
 [01:22:43.3N] Hyper-Sync triggered by app/Engines/Satellite/SatelliteTelemetryManager.php
+remote: This repository moved. Please use the new location:        
+remote:   https://github.com/creyt2012/StarWeather.git        
+To https://github.com/creyt2012/vetinh.git
+   a0cc544..899a319  main -> main
+[01:22:43.3N] Pushed to GitHub. Contribution secured.
+[01:23:02.3N] Hyper-Sync triggered by app/Engines/Satellite/SatelliteTelemetryManager.php

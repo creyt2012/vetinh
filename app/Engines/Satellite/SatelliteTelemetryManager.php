@@ -149,7 +149,7 @@ class SatelliteTelemetryManager
         $x = cos(deg2rad($pos1['latitude'])) * sin(deg2rad($pos2['latitude'])) -
             sin(deg2rad($pos1['latitude'])) * cos(deg2rad($pos2['latitude'])) * cos(deg2rad($pos2['longitude'] - $pos1['longitude']));
 
-        return round((rad2deg(atan2($y, $x)) + 360) % 360, 2);
+        return round(fmod(rad2deg(atan2($y, $x)) + 360, 360), 2);
     }
 
     /**
