@@ -1462,7 +1462,9 @@ const switchView = (mode) => {
                                     <span class="text-xl">📍</span>
                                     <div>
                                         <p class="text-[8px] font-black text-vibrant-blue uppercase tracking-widest">Currently_Overflying</p>
-                                        <p class="text-xs font-black text-white uppercase italic">{{ telemetryData?.metadata?.location || selectedSatellite.location || 'INTELLERNATIONAL_WATERS' }}</p>
+                                        <p class="text-xs font-black text-white uppercase italic tracking-tighter">
+                                            {{ telemetryData?.metadata?.location || telemetryData?.loc || selectedSatellite.location || 'Retrieving_Zone_Intel...' }}
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="flex justify-between font-mono text-[9px] font-bold text-white/40 border-t border-white/5 pt-2">
