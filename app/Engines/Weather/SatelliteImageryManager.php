@@ -27,18 +27,18 @@ class SatelliteImageryManager
         Log::info("Global Satellite Imagery Sync Initiated...");
 
         // 1. Asia-Pacific (Himawari)
-        $path = $this->himawari->downloadLatest();
-        $results['asia_pacific']['41836'] = $path ? true : false;
+        $results['asia_pacific']['41836'] = (bool) $this->himawari->downloadLatest(); // H-9
+        // 40267 is Himawari-8, same service pattern could apply if needed
 
-        // 2. Americas (GOES-East & West)
-        $path19 = $this->noaa->downloadLatest('60133'); // GOES-19
-        $path16 = $this->noaa->downloadLatest('41866'); // GOES-16
-        $results['americas']['60133'] = $path19 ? true : false;
-        $results['americas']['41866'] = $path16 ? true : false;
+        // 2. Americas (GOES Network)
+        $goesIds = ['60133', '41866', '43226', '53461']; // 19, 16, 17, 18
+        foreach ($goesIds as $id) {
+            $path = $this->noaa->downloadLatest($id);
+            $results['americas'][$id] = $path ? true : false;
+        }
 
-        // 3. EMEA (Meteosat)
-        $pathMet = $this->eumetsat->downloadLatest('28912'); // Meteosat-9
-        $results['emea']['28912'] = $pathMet ? true : false;
+        // 3. EMEA (Meteosat Network)
+        $results['emea']['28912'] = (bool) $this->eumetsat->downloadLatest('28912'); // Met-9
 
         Log::info("Global Sync Complete.", $results);
 

@@ -5502,3 +5502,9 @@ To https://github.com/creyt2012/vetinh.git
    15aa0f3..48c0020  main -> main
 [00:59:29.3N] Pushed to GitHub. Contribution secured.
 [00:59:32.3N] Hyper-Sync triggered by app/Engines/Weather/EumetsatService.php
+remote: This repository moved. Please use the new location:        
+remote:   https://github.com/creyt2012/StarWeather.git        
+To https://github.com/creyt2012/vetinh.git
+   48c0020..60f63b7  main -> main
+[00:59:32.3N] Pushed to GitHub. Contribution secured.
+[00:59:34.3N] Hyper-Sync triggered by app/Engines/Weather/SatelliteImageryManager.php
