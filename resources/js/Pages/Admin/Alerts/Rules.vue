@@ -2,6 +2,7 @@
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
+import { TrendingUp, TrendingDown } from 'lucide-vue-next';
 
 const props = defineProps({
     rules: Array
@@ -32,8 +33,8 @@ const operators = [
     { value: '>', label: 'GREATER_THAN (>)' },
     { value: '<', label: 'LESS_THAN (<)' },
     { value: '=', label: 'EQUAL_TO (=)' },
-    { value: 'trend_up', label: 'TREND_UP (📈)' },
-    { value: 'trend_down', label: 'TREND_DOWN (📉)' }
+    { value: 'trend_up', label: 'TREND_UP', icon: TrendingUp },
+    { value: 'trend_down', label: 'TREND_DOWN', icon: TrendingDown }
 ];
 
 const severities = ['INFO', 'WARNING', 'CRITICAL'];

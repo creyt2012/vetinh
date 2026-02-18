@@ -3,6 +3,7 @@ import UserLayout from '@/Layouts/UserLayout.vue';
 import { Head, Link } from '@inertiajs/vue3';
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
+import { MapPin } from 'lucide-vue-next';
 
 const props = defineProps({
     metrics: Array,
@@ -247,7 +248,7 @@ const selectSatellite = async (sat) => {
                         <h4 class="text-[10px] font-black text-white/40 uppercase tracking-widest border-l-2 border-vibrant-blue pl-3">Ground_Impact_Intelligence</h4>
                         <div class="p-5 bg-vibrant-blue/5 border border-vibrant-blue/20 rounded-xl relative group">
                             <div class="flex items-center space-x-4 mb-4">
-                                <span class="text-2xl animate-pulse">📍</span>
+                                <MapPin class="w-6 h-6 text-vibrant-blue animate-pulse" />
                                 <div>
                                     <p class="text-[8px] font-black text-vibrant-blue uppercase tracking-widest mb-1">Currently_Overflying</p>
                                     <p class="text-sm font-black text-white uppercase italic">{{ selectedSatellite.location || 'INTELLERNATIONAL_WATERS' }}</p>

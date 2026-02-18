@@ -5,6 +5,11 @@ import { onMounted, ref } from 'vue';
 import Globe from 'globe.gl';
 import * as THREE from 'three';
 import axios from 'axios';
+import { 
+    Satellite, Cloud, CloudLightning, CloudRain, Wind, Zap, 
+    Droplets, Thermometer, Sparkles, AlertTriangle, Ship, Leaf,
+    Globe as GlobeIcon, Map as MapIcon, Sun
+} from 'lucide-vue-next';
 
 const globeContainer = ref(null);
 const leafletContainer = ref(null);
@@ -528,7 +533,7 @@ const renderMarineLayer = () => {
              .pointColor(() => '#00ccff')
              .pointRadius(0.4)
              .pointAltitude(0.02)
-             .pointLabel(d => `🚢 ${d.name}\nTYPE: ${d.type}\nSPEED: ${d.speed}`);
+             .pointLabel(d => `VESSEL: ${d.name}\nTYPE: ${d.type}\nSPEED: ${d.speed}`);
     }
 };
 
@@ -616,24 +621,24 @@ let rafId = null;
 let intervalId = null;
 
 const layers = [
-    { id: 'satellites', name: 'ORBITAL_INTEL', color: 'vibrant-blue', icon: '📡' },
-    { id: 'clouds', name: 'CLOUD_DENSITY', color: 'vibrant-blue', icon: '☁️' },
-    { id: 'storms', name: 'STORM_RADAR_PRO', color: 'red-500', icon: '🌀' },
-    { id: 'precip', name: 'PRECIPITATION', color: 'vibrant-green', icon: '🌧️' },
-    { id: 'wind', name: 'WIND_SPEED', color: 'yellow-500', icon: '🌬️' },
-    { id: 'lightning', name: 'LIVE_LIGHTNING', color: 'white', icon: '⚡' },
-    { id: 'aqi', name: 'AIR_QUALITY_INDEX', color: 'purple-500', icon: '🌫️' },
-    { id: 'sst', name: 'SEA_TEMPERATURE', color: 'orange-500', icon: '🌡️' },
-    { id: 'aurora', name: 'AURORA_TRACKING', color: 'green-400', icon: '✨' },
-    { id: 'risk', name: 'STRATEGIC_RISK', color: 'red-500', icon: '⚠️' },
-    { id: 'marine', name: 'MARINE_TRAFFIC', color: 'blue-400', icon: '🚢' },
-    { id: 'ndvi', name: 'VEGETATION_NDVI', color: 'green-600', icon: '🍃' },
+    { id: 'satellites', name: 'ORBITAL_INTEL', color: 'vibrant-blue', icon: Satellite },
+    { id: 'clouds', name: 'CLOUD_DENSITY', color: 'vibrant-blue', icon: Cloud },
+    { id: 'storms', name: 'STORM_RADAR_PRO', color: 'red-500', icon: CloudLightning },
+    { id: 'precip', name: 'PRECIPITATION', color: 'vibrant-green', icon: CloudRain },
+    { id: 'wind', name: 'WIND_SPEED', color: 'yellow-500', icon: Wind },
+    { id: 'lightning', name: 'LIVE_LIGHTNING', color: 'white', icon: Zap },
+    { id: 'aqi', name: 'AIR_QUALITY_INDEX', color: 'purple-500', icon: Droplets },
+    { id: 'sst', name: 'SEA_TEMPERATURE', color: 'orange-500', icon: Thermometer },
+    { id: 'aurora', name: 'AURORA_TRACKING', color: 'green-400', icon: Sparkles },
+    { id: 'risk', name: 'STRATEGIC_RISK', color: 'red-500', icon: AlertTriangle },
+    { id: 'marine', name: 'MARINE_TRAFFIC', color: 'blue-400', icon: Ship },
+    { id: 'ndvi', name: 'VEGETATION_NDVI', color: 'green-600', icon: Leaf },
 ];
 
 const viewOptions = [
-    { id: 'GLOBE', name: 'TACTICAL_GLOBE', icon: '🌐' },
-    { id: 'SATELLITE', name: 'SAT_REALITY', icon: '🛰️' },
-    { id: 'FLAT', name: 'SYNOPTIC_FLAT', icon: '🗺️' },
+    { id: 'GLOBE', name: 'TACTICAL_GLOBE', icon: GlobeIcon },
+    { id: 'SATELLITE', name: 'SAT_REALITY', icon: Satellite },
+    { id: 'FLAT', name: 'SYNOPTIC_FLAT', icon: MapIcon },
 ];
 
 import { watch } from 'vue';
@@ -1446,9 +1451,9 @@ const switchView = (mode) => {
 
                                 <!-- Dynamic Icon Placeholder -->
                                 <div class="my-2">
-                                    <span v-if="hour.cloud_cover > 70" class="text-xl">☁️</span>
-                                    <span v-else-if="hour.precip > 0.5" class="text-xl">🌧️</span>
-                                    <span v-else class="text-xl">☀️</span>
+                                    <Cloud v-if="hour.cloud_cover > 70" class="w-6 h-6 text-white/60" />
+                                    <CloudRain v-else-if="hour.precip > 0.5" class="w-6 h-6 text-vibrant-blue" />
+                                    <Sun v-else class="w-6 h-6 text-yellow-400" />
                                 </div>
 
                                  <!-- Temp Metric -->
@@ -1515,7 +1520,7 @@ const switchView = (mode) => {
                     @click="switchView(mode.id)"
                     :class="viewMode === mode.id ? 'bg-vibrant-blue border-vibrant-blue text-white shadow-[0_0_20px_rgba(0,136,255,0.4)]' : 'bg-black/60 border-white/10 text-white/40 hover:bg-black/80 hover:border-white/20'"
                     class="px-4 py-3 border backdrop-blur-md transition-all flex items-center space-x-3 group">
-                    <span class="text-sm">{{ mode.icon }}</span>
+                    <component :is="mode.icon" class="w-4 h-4" />
                     <span class="text-[9px] font-black tracking-widest uppercase hidden lg:block">{{ mode.name }}</span>
                 </button>
             </div>

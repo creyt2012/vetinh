@@ -1,4 +1,4 @@
-# 🌌 Hệ Thống StarWeather (Dự án Vệ Tinh)
+# Hệ Thống StarWeather (Dự án Vệ Tinh)
 ## Nền Tảng Phân Tích Cơ Học Quỹ Đạo & Trí Tuệ Khí Tượng Tổng Hợp Cấp Liên Bang
 
 ![Bảng điều khiển Trung tâm Nhiệm vụ StarWeather](public/assets/docs/images/mission_control_terminal.png)
@@ -24,7 +24,7 @@ Hệ thống triển khai các Pipeline dữ liệu tự động cho phép hội
 ### 2. Engine Tính Toán Động Lực Học (Computational Dynamics Engine)
 Linh hồn của StarWeather nằm ở các mô hình toán học thuần túy được tối ưu hóa bằng PHP 8.3 JIT:
 
-#### 🛰️ Cơ Học Quỹ Đạo Vệ Tinh (Aerospace Mechanics)
+### Cơ Học Quỹ Đạo Vệ Tinh (Aerospace Mechanics)
 - **Mô Hình Lan Truyền SGP4**: Giải các phương trình nhiễu loạn để dự báo vị trí vệ tinh. Thuật toán xử lý các tham số Keplerian (Độ nghiêng, Độ lệch tâm, RAAN) để xác định vector trạng thái $(r, v)$ trong hệ quy chiếu ECI.
 - **Phương Trình Vis-Viva**: Tính toán vận tốc quỹ đạo tức thời:
   $$v = \sqrt{\mu \left( \frac{2}{r} - \frac{1}{a} \right)}$$
@@ -32,14 +32,14 @@ Linh hồn của StarWeather nằm ở các mô hình toán học thuần túy �
 
 ![Phác họa mạng lưới vệ tinh bảo phủ Trái đất](public/assets/docs/images/constellation_view.png)
 
-#### 🌡️ Vật Lý Khí Tượng & Phân Tích Đa Phổ
+### Vật Lý Khí Tượng & Phân Tích Đa Phổ
 - **Phân Tích Băng Thông Himawari**: Hệ thống xử lý các dải phổ Hồng Ngoại (IR) để xác định nhiệt độ đỉnh mây. Thuật toán **Spectral Normalization** giúp phân lập các vùng có nguy cơ tạo xoáy.
 - **Nhận Dạng Vortex**: Sử dụng các phương pháp phân tích gradient áp suất và trường vận tốc gió để xác định tâm bão.
 - **Dự Báo Quỹ Đạo Bão**: Áp dụng mô hình nội suy vectơ (Vector Interpolation) trên chuỗi thời gian để phác thảo lộ trình di chuyển tiềm năng.
 
 ![Phân tích đa phổ và đo đạc nhiệt độ khí quyển](public/assets/docs/images/spectral_analysis.png)
 
-### 3. Engine Đánh Giá Rủi Ro Định Lượng (Deterministic Risk Engine)
+### Engine Đánh Giá Rủi Ro Định Lượng (Deterministic Risk Engine)
 Hệ thống không dựa trên cảm tính, mà sử dụng các công thức toán học để định lượng rủi ro:
 - **Hàm Tổng Trọng Số (Weighted Sum Function)**:
   $$RiskScore = \sum (Weight_i \times NormalizedValue_i)$$
