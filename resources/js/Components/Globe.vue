@@ -47,7 +47,8 @@ const CATEGORY_COLORS = {
     'SCIENTIFIC': 0xa855f7,    // Bright Purple
     'SPACE_DEBRIS': 0xf97316,  // Strong Orange
     'STATION': 0xffffff,       // White (ISS)
-    'WEATHER': 0x10b981,       // Green (Keep for backward compatibility or merge)
+    'WEATHER': 0x10b981,       // Green
+    'METEOROLOGICAL': 0x10b981, // Map to Weather Green
     'DEFAULT': 0xcccccc
 };
 
