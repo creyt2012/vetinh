@@ -34,7 +34,7 @@ class ApiExpansionTest extends TestCase
         ]);
 
         // Seed necessary data
-        Satellite::create([ // Changed from factory to create with specific data
+        $satA = Satellite::create([
             'name' => 'ISS',
             'norad_id' => '25544',
             'type' => 'SCIENCE',
@@ -42,6 +42,41 @@ class ApiExpansionTest extends TestCase
             'tle_line1' => '1 25544U 98067A   24047.53127814  .00015507  00000-0  27599-3 0  9990',
             'tle_line2' => '2 25544  51.6416 112.1868 0005748  42.4410  94.6225 15.49885895440231'
         ]);
+
+        $satB = Satellite::create([
+            'name' => 'STARLINK-TEST',
+            'norad_id' => '99999',
+            'type' => 'COMMUNICATION',
+            'status' => 'ACTIVE',
+            'tle_line1' => '1 99999U 24001A   24047.53127814  .00015507  00000-0  27599-3 0  9990',
+            'tle_line2' => '2 99999  53.0000 110.0000 0001000  40.0000  90.0000 15.00000000000001'
+        ]);
+
+        \App\Models\Conjunction::create([
+            'satellite_a_id' => $satA->id,
+            'satellite_b_id' => $satB->id,
+            'distance' => 1.5,
+            'probability' => 0.001,
+            'tca' => now()->addHours(2),
+            'status' => 'ACTIVE'
+        ]);
+
+        \App\Models\RiskArea::create([
+            'tenant_id' => $tenant->id,
+            'name' => 'TEST_ZONE',
+            'type' => 'CYCLONE_IMPACT',
+            'severity' => 'HIGH',
+            'is_active' => true
+        ]);
+
+        \App\Models\MissionFile::create([
+            'name' => 'TEST_REPORT',
+            'filename' => 'report_2026.pdf',
+            'type' => 'METEOROLOGICAL_REPORT',
+            'size' => 1024,
+            'path' => 'reports/test.pdf'
+        ]);
+
         Storm::create([
             'name' => 'EXPANSION_STORM',
             'status' => 'active',
@@ -105,5 +140,24 @@ class ApiExpansionTest extends TestCase
             'severity' => 'WARNING'
         ], ['X-API-KEY' => $this->apiKey]);
         $response->assertStatus(201);
+    }
+
+    public function test_batch_2_endpoints_accessible()
+    {
+        // Conjunctions
+        $response = $this->getJson('/api/v1/satellites/conjunctions', ['X-API-KEY' => $this->apiKey]);
+        $response->assertStatus(200)->assertJsonCount(1, 'data');
+
+        // Risk Areas
+        $response = $this->getJson('/api/v1/weather/risk-areas', ['X-API-KEY' => $this->apiKey]);
+        $response->assertStatus(200)->assertJsonCount(1, 'data');
+
+        // Reports
+        $response = $this->getJson('/api/v1/reports', ['X-API-KEY' => $this->apiKey]);
+        $response->assertStatus(200)->assertJsonCount(1, 'data');
+
+        // Alert History
+        $response = $this->getJson('/api/v1/alerts/history', ['X-API-KEY' => $this->apiKey]);
+        $response->assertStatus(200);
     }
 }
