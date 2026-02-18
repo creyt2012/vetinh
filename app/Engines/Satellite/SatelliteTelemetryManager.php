@@ -122,7 +122,7 @@ class SatelliteTelemetryManager
     private function deriveSolarState(float $lat, float $lng, \DateTime $time): array
     {
         $hour = (int) $time->format('H') + ($lng / 15); // Solar time approximation
-        $hour = ($hour + 24) % 24;
+        $hour = fmod($hour + 24, 24);
 
         $elevation = 90 - abs($lat - (23.45 * sin(deg2rad(360 / 365 * (date('z') + 10)))));
         $elevation = $elevation * sin(deg2rad(($hour - 6) * 15));
