@@ -1515,6 +1515,96 @@ const switchView = (mode) => {
                 </div>
             </Transition>
 
+            <!-- Sensor Payload HUD -->
+            <Transition
+                enter-active-class="transition duration-500 ease-out"
+                enter-from-class="translate-y-10 opacity-0"
+                enter-to-class="translate-y-0 opacity-100"
+                leave-active-class="transition duration-300 ease-in"
+                leave-from-class="translate-y-0 opacity-100"
+                leave-to-class="translate-y-10 opacity-0"
+            >
+                <div v-if="selectedSatellite && showSensorPayload" 
+                    class="absolute bottom-32 right-8 z-[70] w-85 bg-black/95 backdrop-blur-3xl border border-emerald-500/30 shadow-[0_0_50px_rgba(16,185,129,0.1)] overflow-hidden flex flex-col">
+                    
+                    <!-- Header -->
+                    <div class="px-4 py-2 border-b border-white/10 flex justify-between items-center bg-emerald-500/10">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-1.5 h-1.5 bg-emerald-500 animate-pulse rounded-full"></div>
+                            <h3 class="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-400">SENSOR_PAYLOAD_DECODING</h3>
+                        </div>
+                        <button @click="showSensorPayload = false" class="text-white/20 hover:text-white transition-colors">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
+                    </div>
+
+                    <div class="p-4 space-y-4 max-h-[50vh] overflow-y-auto custom-scrollbar">
+                        <!-- Atmosphere Vector -->
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-end border-b border-white/5 pb-1">
+                                <h4 class="text-[8px] font-black text-white/40 uppercase tracking-widest">Atmosphere_Vector</h4>
+                                <span class="text-[7px] font-mono text-emerald-500 italic">REALTIME_STREAM</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div class="bg-white/[0.02] p-2 border border-white/5">
+                                    <p class="text-[7px] text-white/20 uppercase font-black">Temp</p>
+                                    <p class="text-xs font-mono font-black text-white italic font-black uppercase text-emerald-500 italic">{{ (telemetryData?.scientific?.atmosphere?.temperature || 0).toFixed(1) }}°C</p>
+                                </div>
+                                <div class="bg-white/[0.02] p-2 border border-white/5">
+                                    <p class="text-[7px] text-white/20 uppercase font-black">Pressure</p>
+                                    <p class="text-xs font-mono font-black text-white italic">{{ (telemetryData?.scientific?.atmosphere?.pressure || 0).toFixed(1) }} hPa</p>
+                                </div>
+                                <div class="bg-white/[0.02] p-2 border border-white/5">
+                                    <p class="text-[7px] text-white/20 uppercase font-black">Humidity</p>
+                                    <p class="text-xs font-mono font-black text-white italic">{{ (telemetryData?.scientific?.atmosphere?.humidity || 0).toFixed(1) }}%</p>
+                                </div>
+                                <div class="bg-white/[0.02] p-2 border border-white/5">
+                                    <p class="text-[7px] text-white/20 uppercase font-black">Solar_Flux</p>
+                                    <p class="text-xs font-mono font-black text-white italic">{{ (telemetryData?.scientific?.atmosphere?.solar_flux || 0).toFixed(0) }} W/m²</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Strategic Intelligence -->
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-end border-b border-white/5 pb-1">
+                                <h4 class="text-[8px] font-black text-white/40 uppercase tracking-widest">Strategic_Intelligence</h4>
+                                <span class="text-[7px] font-mono text-blue-400 italic font-black">DECODED</span>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="bg-white/[0.02] p-3 border border-white/5 flex justify-between items-center">
+                                    <div>
+                                        <p class="text-[7px] text-white/20 uppercase font-black">Magnetic_Field</p>
+                                        <p class="text-[10px] font-black text-blue-400 uppercase tracking-tighter">{{ telemetryData?.intel?.magnetic_field?.model || 'Scanning...' }}</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-xs font-mono font-black text-white">{{ telemetryData?.intel?.magnetic_field?.field_strength_nt || '---' }}</p>
+                                        <p class="text-[6px] text-white/20 font-black uppercase tracking-widest">NANO_TESLA</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white/[0.02] p-3 border border-white/5 flex justify-between items-center">
+                                    <div>
+                                        <p class="text-[7px] text-white/20 uppercase font-black">Solar_Vantage</p>
+                                        <p class="text-xs font-black text-orange-400 italic">Daylight_Exposure</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-xs font-mono font-black text-white">{{ telemetryData?.intel?.solar?.sun_elevation_deg || '---' }}°</p>
+                                        <p class="text-[6px] text-white/20 font-black uppercase tracking-widest">ELEVATION_VECTOR</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer Meta -->
+                        <div class="pt-2 border-t border-emerald-500/20 flex justify-between items-center opacity-50">
+                            <div class="text-[7px] font-mono font-black text-emerald-400 uppercase tracking-widest">Payload_ID: {{ selectedSatellite.norad_id }}</div>
+                            <div class="text-[7px] font-mono text-white/30 italic">{{ telemetryData?.metadata?.timestamp || 'SYNCING' }}</div>
+                        </div>
+                    </div>
+                </div>
+            </Transition>
+
             <!-- Point Intelligence HUD -->
             <Transition
                 enter-active-class="transition duration-500 ease-out"
