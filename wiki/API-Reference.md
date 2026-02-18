@@ -81,7 +81,7 @@ X-API-KEY: your_api_key_here
 
 ---
 
-## [FIN] Thanh toan & Hang hai (Billing & Marine)
+## [FIN] Thanh Toán & Hang hai (Billing & Marine)
 
 | Phương thức | Endpoint | Mô tả |
 | :--- | :--- | :--- |
