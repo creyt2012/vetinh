@@ -1,6 +1,8 @@
 # 🌌 StarWeather (Vetinh)
 ### Enterprise-Grade Satellite Tracking & Meteorological Intelligence Platform
 
+![StarWeather Globe Visualization](/Users/creytdeveloper/.gemini/antigravity/brain/49cd3ed0-ce2b-49cc-a7bc-a25ea8ff049f/starweather_globe_visualization_1771426474667.png)
+
 [![Laravel 11](https://img.shields.io/badge/Laravel-11.x-FF2D20?logo=laravel)](https://laravel.com)
 [![Vue 3](https://img.shields.io/badge/Vue-3.x-4FC08D?logo=vue.js)](https://vuejs.org)
 [![Three.js](https://img.shields.io/badge/Engine-Three.js-black?logo=three.js)](https://threejs.org)
