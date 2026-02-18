@@ -109,8 +109,7 @@ Dịch vụ độc lập xử lý dữ liệu hình ảnh từ vệ tinh. Chạy
 
 ---
 
-## Giới hạn Tần suất (Rate Limits)
-
-- **FREE**: 10 yêu cầu/phút.
-- **PRO**: 1.000 yêu cầu/phút.
 - **ENTERPRISE**: Tùy chỉnh theo SLA.
+
+---
+[[Về Trang Chủ|Home]] | [[Kiến Trúc Hệ Thống|Architecture]] | [[Mô Hình Toán Học|Algorithms]]
