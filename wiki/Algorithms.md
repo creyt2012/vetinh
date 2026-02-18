@@ -52,4 +52,4 @@ Hệ thống triển khai một công cụ quét tự động (`StormTrackingSer
 - Mô Hình Nội Suy Vectơ: Dự báo quỹ đạo dựa trên hướng di chuyển lịch sử và các trường dòng chảy khí quyển tầng cao.
 
 ---
-[[Về Trang Chủ|Home]] | [[Kiến Trúc|Architecture]] | [[Engine Rủi To|Risk-Engine]]
+[Về Trang Chủ](Home) | [Kiến Trúc](Architecture) | [Engine Rủi Ro](Risk-Engine)

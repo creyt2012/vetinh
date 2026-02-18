@@ -46,4 +46,4 @@ $$C = F(t) \cdot P(n)$$
 ![Bảng điều khiển Phân tích Rủi ro StarWeather](../public/assets/docs/images/dashboard_mockup.png)
 
 ---
-[[Về Trang Chủ|Home]] | [[Thuật Toán|Algorithms]] | [[Chiến Lược Mở Rộng|Architecture]]
+[Về Trang Chủ](Home) | [Thuật Toán](Algorithms) | [Chiến Lược Mở Rộng](Architecture)
