@@ -50,3 +50,6 @@ Dữ liệu từ cảm biến AHI (Advanced Himawari Imager) được xử lý q
 Hệ thống triển khai một công cụ quét tự động (`StormTrackingService`) để phát hiện các bất thường khí quyển:
 - Phân tích Gradient: Tính toán tốc độ thay đổi áp suất theo thời gian ($dP/dt$).
 - Mô Hình Nội Suy Vectơ: Dự báo quỹ đạo dựa trên hướng di chuyển lịch sử và các trường dòng chảy khí quyển tầng cao.
+
+---
+[[Về Trang Chủ|Home]] | [[Kiến Trúc|Architecture]] | [[Engine Rủi To|Risk-Engine]]
