@@ -143,6 +143,7 @@ class SatelliteController extends Controller
                     'id' => $sat->id,
                     'name' => $sat->name,
                     'norad_id' => $sat->norad_id,
+                    'type' => $sat->type,
                     'last_track' => $latestTrack ? [
                         'latitude' => $latestTrack->latitude,
                         'longitude' => $latestTrack->longitude,
