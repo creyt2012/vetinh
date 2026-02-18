@@ -1141,9 +1141,9 @@ const switchView = (mode) => {
                         <!-- Tactical Color Strip -->
                         <div :class="`bg-${layer.color}`" class="w-1 h-full opacity-60"></div>
                         
-                        <div class="flex items-center space-x-3 px-3 flex-1">
+                        <div class="flex items-center space-x-3 px-3 flex-1 relative z-10">
                             <div class="w-8 flex justify-center">
-                                <span class="text-xl group-hover:scale-110 transition-transform filter drop-shadow-[0_0_8px_rgba(0,0,0,0.5)]">{{ layer.icon }}</span>
+                                <component :is="layer.icon" class="w-5 h-5 group-hover:scale-110 transition-transform filter drop-shadow-[0_0_8px_rgba(0,0,0,0.5)]" />
                             </div>
                             <div class="flex flex-col flex-1 min-w-0">
                                 <div class="flex items-center space-x-2">
