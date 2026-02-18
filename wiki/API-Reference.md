@@ -117,7 +117,7 @@ Các đầu cuối dành cho khu vực quản trị, yêu cầu quyền `admin`.
 
 ---
 
-## [ADM] Tài Chính & Canh bao (Billing & Alert Settings)
+## [ADM] Tài Chính & Cảnh Báo (Billing & Alert Settings)
 
 | Phương thức | Endpoint | Mô tả |
 | :--- | :--- | :--- |
