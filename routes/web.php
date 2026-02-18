@@ -68,6 +68,7 @@ Route::get('/api-portal', [\App\Http\Controllers\User\ApiKeyController::class, '
 Route::get('/api-docs', function () {
     return Inertia::render('User/ApiDocs');
 })->name('user.api-docs');
+Route::get('/reports', [\App\Http\Controllers\User\ReportController::class, 'index'])->name('user.reports.index');
 Route::get('/reports/{file}/download', [\App\Http\Controllers\User\ReportController::class, 'download'])->name('user.reports.download');
 
 // Satellite Intelligence APIs
