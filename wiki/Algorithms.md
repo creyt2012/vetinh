@@ -1,57 +1,52 @@
-# Thuật Toán Cốt Lõi & Mô Hình Toán Học
+# Phân Tích Thuật Toán & Mô Hình Toán Học Nâng Cao
 
-Hệ thống StarWeather dựa trên các mô hình hàng không vũ trụ và khí tượng đã được thiết kế để cung cấp dữ liệu với độ trung thực cao.
+Hệ thống StarWeather được vận hành bởi các mô hình hàng không vũ trụ và vật lý khí quyển tiêu chuẩn quốc tế, đảm bảo tính nhất quán và độ chính xác của dữ liệu đầu ra.
 
 ---
 
-## 🛰️ Propagate Quỹ Đạo Vệ Tinh (SGP4) & Động Lực Học Quỹ Đạo
+## 🛰️ 1. Động Lực Học Quỹ Đạo Vệ Tinh (Orbital Dynamics)
 
-Hệ thống sử dụng mô hình **Simplified General Perturbations (SGP4)** để dự báo vị trí và vận tốc của vệ tinh.
+Hệ thống sử dụng các phương pháp mô phỏng số để xác định trạng thái của vệ tinh trong không gian ba chiều.
 
-### 1. Engine Lan Truyền SGP4
-`SatelliteEngine` phân tích các bộ TLE để trích xuất các phần tử Keplerian:
-- **Mean Motion ($n$)**: Được chuyển đổi từ số vòng/ngày sang rad/phút ($n = \text{meanMotion} \cdot 2\pi / 1440$).
-- **Bán trục lớn ($a$)**: Được suy ra từ Định luật thứ ba của Kepler $a = (\mu / n^2)^{1/3}$.
+### 1.1. Lan Truyền SGP4 (Simplified General Perturbations)
+Thuật toán SGP4 giải quyết các phương trình vi phân chuyển động có tính đến các lực nhiễu loạn chính:
+- **Độ dẹt của Trái đất ($J_2$)**: Ảnh hưởng của hình dạng không cầu đối với quỹ đạo.
+- **Lực cản khí quyển**: Đặc biệt quan trọng đối với các vệ tinh ở quỹ đạo thấp (LEO).
 
-### 2. Tính Toán Vận Tốc Tức Thời
-Chúng tôi tính toán vận tốc quỹ đạo dựa trên phương trình **Vis-Viva**, cho phép cập nhật dữ liệu đo xa theo thời gian thực:
+**Các tham số đầu vào chính từ TLE:**
+- **Độ nghiêng ($i$)**: Góc giữa mặt phẳng quỹ đạo và mặt phẳng xích đạo.
+- **RAAN ($\Omega$)**: Kinh độ của nút lên, xác định hướng của mặt phẳng quỹ đạo trong không gian.
+- **Độ lệch tâm ($e$)**: Độ "méo" của quỹ đạo (0 cho hình tròn hoàn hảo).
+
+### 1.2. Tính Toán Vận Tốc Tức Thời (Vis-Viva Equation)
+Tốc độ của vệ tinh tại bất kỳ điểm nào trên quỹ đạo được tính bằng hàm số của khoảng cách đến tâm Trái đất:
 $$v = \sqrt{\mu \left(2/r - 1/a \right)}$$
-trong đó $r$ là độ lớn của vectơ vị trí.
+Trong đó:
+- $\mu$: Hằng số trọng trường Trái đất ($398600.44\text{ km}^3/\text{s}^2$).
+- $r$: Khoảng cách tức thời từ vệ tinh đến tâm địa cầu.
+- $a$: Bán trục lớn của quỹ đạo elip.
 
-### 3. Quay Trái Đất & Chuyển Đổi Địa Lý (GMST)
-Để lập bản đồ vệ tinh chính xác trên các trạm mặt đất, chúng tôi tính toán **Thời gian Sidereal Trung bình tại Greenwich (GMST)**:
-$$GMST = 280.46061837 + 360.98564736629 \cdot (JD - 2451545.0)$$
-Điều này đảm bảo kinh độ $\lambda$ tính đến vòng quay của Trái đất so với RAAN quỹ đạo.
-
----
-
-## 🌩️ Xử Lý Khí Tượng Đa Phổ & Dữ Liệu Radar
-
-### 1. Hợp Nhất Phổ Himawari IR/VIS
-`HimawariService` đồng bộ hóa các dải phổ từ API động của NICT.
-- **Chuẩn Hóa Động (Dynamic Normalization)**: Dữ liệu pixel thô được xử lý để phân biệt giữa mây băng tầng cao (nhiệt độ thấp) và hơi nước.
-- **UV Spherical Mapping**: Hình ảnh được ánh xạ lên một khối ellipsoid WGS84 trong Three.js bằng tọa độ UV tiêu chuẩn, đảm bảo không bị biến dạng tại xích đạo.
-
-### 2. Mosaic Radar XYZ
-Dữ liệu từ **RainViewer** được xử lý thông qua hệ thống phân mảnh (tiling) XYZ. Điều này cho phép hệ thống tải chính xác theo vùng nhìn của người dùng, giảm tải băng thông và tăng tốc độ hiển thị các lớp lượng mưa.
+### 1.3. Hệ Quy Chiếu & Bù Trừ Chuyển Động Quay WGS84
+Do Trái đất quay quanh trục của nó, một điểm cố định trong không gian Inertial (ECI) sẽ có tọa độ địa lý thay đổi theo thời gian. Chúng tôi sử dụng **Giờ Sidereal Trung bình tại Greenwich (GMST)** để thực hiện phép xoay tọa độ:
+$$lng = \alpha - GMST$$
+trong đó $\alpha$ là độ thăng thiên thẳng (Right Ascension) của vệ tinh.
 
 ---
 
-## ⛈️ Phát Hiện Bão & Dự Báo Quỹ Đạo
+## 🌩️ 2. Xử Lý Phổ Khí Tượng & Hợp Nhất Dữ Liệu (Data Fusion)
 
-### 1. Nhận Dạng Cấu Trúc Xoáy (Vortex Identification)
-`StormTrackingService` xác định các lốc xoáy khí quyển bằng cách phân tích các số liệu thời tiết trong thời gian thực:
-- Quét các ngưỡng gió $> 60$ km/h và áp suất $< 1000$ hPa.
-- Sử dụng thuật toán **Tìm kiếm Vùng lân cận (Proximity Search)** với bán kính $2^\circ$ để liên kết dữ liệu mới với các cơn bão đang hoạt động.
+### 2.1. Phân Tích Băng Thông Đa Phổ Himawari
+Dữ liệu từ cảm biến AHI (Advanced Himawari Imager) được xử lý qua hai kênh chính:
+- **Kênh Hồng Ngoại (Băng 13 - 10.4µm)**: Dùng để xác định nhiệt độ bức xạ của đỉnh mây. Nhiệt độ càng thấp tương ứng với mây càng cao và dày (nguy cơ bão lớn).
+- **Kênh Khả Kiến (Băng 3 - 0.64µm)**: Dùng để phân tích cấu trúc bề mặt mây và độ phản xạ Albedo.
 
-### 2. Dự Báo Quỹ Đạo (Path Extrapolation)
-Sử dụng vectơ tuyến tính dựa trên 2 điểm quan sát gần nhất để dự đoán tọa độ trong các khoảng thời gian 6 giờ:
-$$\vec{P}_{next} = \vec{P}_{last} + (\vec{P}_{last} - \vec{P}_{prev}) \cdot \Delta t$$
+### 2.2. Thuật Toán Mosaic Radar XYZ
+Để duy trì hiệu năng hiển thị, dữ liệu radar lượng mưa được phân phối dưới dạng các mảnh (tiles) 256x256 pixel. Hệ thống sử dụng thuật toán nội suy song tuyến tính (Bilinear Interpolation) để đảm bảo các cạnh của các mảnh radar khớp nhau hoàn hảo trên địa cầu 3D.
 
 ---
 
-## 🛡️ Kiểm Soát Chất Lượng (QA/QC)
+## ⛈️ 3. Định Danh Xoáy Thuận & Dự Báo (Vortex ID)
 
-Mỗi điểm dữ liệu trước khi được đưa vào Risk Engine phải trải qua bộ lọc **QAQCProcessor**:
-- **Spatial Consistency**: So sánh trạm hiện tại với trung bình của $N$ trạm lân cận.
-- **Range Constraint**: Nhiệt độ phải nằm trong khoảng $[-80, 60]^\circ\text{C}$ và áp suất $[800, 1100]\text{hPa}$.
+Hệ thống triển khai một công cụ quét tự động (`StormTrackingService`) để phát hiện các bất thường khí quyển:
+- **Phân tích Gradient**: Tính toán tốc độ thay đổi áp suất theo thời gian ($dP/dt$).
+- **Mô Hình Nội Suy Vectơ**: Dự báo quỹ đạo dựa trên hướng di chuyển lịch sử và các trường dòng chảy khí quyển tầng cao.
