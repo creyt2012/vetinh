@@ -76,7 +76,7 @@ composer install && npm install
 cp .env.example .env
 php artisan key:generate
 
-# Bước 3: Di cư cơ sở dữ liệu và nạp dữ liệu nền tảng
+# Bước 3: Đổ cơ sở dữ liệu và nạp dữ liệu nền tảng
 php artisan migrate --seed
 
 # Bước 4: Khởi chạy hệ thống tích hợp (Concurrently)
