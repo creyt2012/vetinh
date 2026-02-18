@@ -59,6 +59,18 @@ StarWeather được tối ưu hóa để chạy trên các server vật lý m�
 - L1 Cache (Redis): Lưu trữ "Hot States" - trạng thái hiện tại của tất cả vệ tinh đang hoạt động để truy xuất tức thì.
 - L2 Cache (Filesystem/CDN): Lưu trữ các tệp tin hình ảnh vệ tinh và radar đã qua xử lý.
 
+## [STOR] Hạ Tầng Lưu Trữ (Storage Infrastructure)
+
+Dữ liệu hình ảnh (Imagery) từ vệ tinh và radar được quản lý tập trung tại:
+- **Đường dẫn vật lý**: `storage/app/public/weather/`
+- **Truy cập công khai**: `public/storage/weather/` (được liên kết qua symbolic link).
+- **Quy tắc đặt tên**:
+    - `himawari_latest.png`: Ảnh vệ tinh mới nhất phục vụ hiển thị thời gian thực trên Globe.
+    - `himawari_YYYYMMDD_HHMMSS.png`: Dữ liệu lịch sử phục vụ tính năng Imagery History.
+
+> [!NOTE]
+> AI Core xử lý dữ liệu hoàn toàn trên RAM để đảm bảo hiệu suất tối đa, không lưu trữ dữ liệu trung gian tại thư mục cục bộ của Microservice.
+
 ### 2. Quản Lý Hàng Đợi (Queue Orchestration)
 Sử dụng **Laravel Horizon** để giám sát và điều phối hàng trăm Worker. Các tác vụ được phân bổ vào các hàng đợi có ưu tiên khác nhau:
 - `high`: Dùng cho các cảnh báo bão và rủi ro khẩn cấp.
