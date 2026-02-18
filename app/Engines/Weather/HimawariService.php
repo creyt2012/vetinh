@@ -40,11 +40,12 @@ class HimawariService
                 return $this->usePlaceholder();
             }
 
-            $path = "weather/himawari_{$year}{$month}{$day}_{$time}.png";
+            $path = "imagery/41836/{$year}{$month}{$day}_{$time}.png";
             Storage::disk('public')->put($path, $response->body());
 
             // Also update the latest pointer for the current map view
-            Storage::disk('public')->put('weather/himawari_latest.png', $response->body());
+            Storage::disk('public')->put('imagery/41836/latest.png', $response->body());
+            Storage::disk('public')->put('weather/himawari_latest.png', $response->body()); // Legacy support
 
             return Storage::disk('public')->path($path);
         } catch (\Exception $e) {
