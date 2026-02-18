@@ -11,9 +11,14 @@ class SatelliteController extends Controller
 {
     protected \App\Repositories\StateRepository $stateRepo;
 
-    public function __construct(\App\Repositories\StateRepository $stateRepo)
-    {
+    protected \App\Engines\Satellite\SatelliteEngine $engine;
+
+    public function __construct(
+        \App\Repositories\StateRepository $stateRepo,
+        \App\Engines\Satellite\SatelliteEngine $engine
+    ) {
         $this->stateRepo = $stateRepo;
+        $this->engine = $engine;
     }
 
     /**
@@ -31,6 +36,50 @@ class SatelliteController extends Controller
         return response()->json([
             'status' => 'success',
             'data' => array_values($states)
+        ]);
+    }
+
+    public function telemetry(Satellite $satellite): JsonResponse
+    {
+        try {
+            $prop = $this->engine->propagate($satellite);
+            return response()->json([
+                'status' => 'success',
+                'data' => [
+                    'id' => $satellite->id,
+                    'name' => $satellite->name,
+                    'norad_id' => $satellite->norad_id,
+                    'telemetry' => [
+                        'latitude' => $prop['latitude'],
+                        'longitude' => $prop['longitude'],
+                        'altitude' => $prop['altitude'],
+                        'velocity' => $prop['velocity'],
+                        'period' => $prop['period'],
+                        'timestamp' => $prop['timestamp']
+                    ]
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => 'Telemetry link severed'], 500);
+        }
+    }
+
+    /**
+     * Get Two-Line Element (TLE) set for the unit.
+     */
+    public function tle(Satellite $satellite): JsonResponse
+    {
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'satellite' => $satellite->name,
+                'norad_id' => $satellite->norad_id,
+                'tle' => [
+                    'line1' => $satellite->tle_line1,
+                    'line2' => $satellite->tle_line2,
+                    'updated_at' => $satellite->updated_at->toIso8601String()
+                ]
+            ]
         ]);
     }
 
