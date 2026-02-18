@@ -82,6 +82,9 @@ php artisan migrate --seed
 # Bước 4: Khởi chạy hệ thống tích hợp (Concurrently)
 # Chạy đồng thời Web Server, Queue Worker và Vite Compiler
 npm run dev
+
+# Bước 5: Kích hoạt luồng dữ liệu thời gian thực 1Hz (Cần thiết cho HUD/Dashboard)
+php artisan satellite:monitor
 ```
 
 ---
