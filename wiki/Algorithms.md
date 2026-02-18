@@ -1,4 +1,4 @@
-# Phân Tích Thuật Toán & Mô Hình Toán Học Nâng Cao
+# Phan Tich Thuat Toan & Mo Hinh Toan Hoc Nang Cao
 
 Hệ thống StarWeather được vận hành bởi các mô hình hàng không vũ trụ và vật lý khí quyển tiêu chuẩn quốc tế, đảm bảo tính nhất quán và độ chính xác của dữ liệu đầu ra.
 
