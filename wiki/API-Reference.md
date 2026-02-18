@@ -87,6 +87,42 @@ Yêu cầu Header `X-API-KEY`. Đối với các API Internal, sử dụng tham 
 
 ---
 
+## [ADM] Quản lý Vệ tinh & Trạm (Admin Assets)
+
+Các đầu cuối dành cho khu vực quản trị, yêu cầu quyền `admin`.
+
+| Phương thức | Endpoint | Mô tả |
+| :--- | :--- | :--- |
+| `GET` | `/admin/satellites` | Liệt kê danh sách vệ tinh trong hệ thống quản lý. |
+| `POST`| `/admin/satellites` | Đăng ký vệ tinh mới vào mạng lưới. |
+| `PUT` | `/admin/satellites/{satellite}` | Cập nhật thông số TLE hoặc trạng thái vệ tinh. |
+| `GET` | `/admin/ground-stations` | Quản lý hạ tầng trạm mặt đất toàn cầu. |
+| `POST`| `/admin/ground-stations` | Thiết lập trạm thu phát mới. |
+
+---
+
+## [ADM] Quản trị Hệ thống & Người dùng (System Admin)
+
+| Phương thức | Endpoint | Mô tả |
+| :--- | :--- | :--- |
+| `GET` | `/admin/users` | Danh sách người dùng và phân quyền truy cập. |
+| `POST`| `/admin/users` | Tạo tài khoản người dùng/doanh nghiệp mới. |
+| `GET` | `/admin/api-keys` | Quản lý và thu hồi các khóa API của khách hàng. |
+| `GET` | `/admin/system/audit-logs` | Nhật ký hoạt động và truy vết thay đổi hệ thống. |
+| `GET` | `/admin/system/health` | Giám sát chi tiết SLA và tình trạng phần cứng. |
+
+---
+
+## [ADM] Tài chính & Cảnh báo (Billing & Alert Settings)
+
+| Phương thức | Endpoint | Mô tả |
+| :--- | :--- | :--- |
+| `GET` | `/admin/billing` | Quản lý hóa đơn và doanh thu từ các gói SaaS. |
+| `GET` | `/admin/alerts/settings` | Cấu hình tham số ngưỡng cho Engine rủi ro. |
+| `GET` | `/admin/alerts/rules` | Quản lý các quy tắc logic mặc định toàn hệ thống. |
+
+---
+
 ## [INT] API Bản đồ Chiến thuật (Internal Map)
 
 | Endpoint | Mô tả | Tham số |
@@ -105,3 +141,16 @@ Yêu cầu Header `X-API-KEY`. Đối với các API Internal, sử dụng tham 
 | :--- | :--- | :--- |
 | `POST` | `/analyze` | Phân tích spectral hình ảnh vệ tinh. |
 | `GET` | `/` | Liveness & Heartbeat của AI Core. |
+
+---
+
+## [SYS] Hạ tầng & Vận hành (Infrastructure)
+
+| Phương thức | Endpoint | Mô tả |
+| :--- | :--- | :--- |
+| `GET` | `/horizon` | Dashboard quản lý hàng đợi và worker. |
+| `GET` | `/up` | Laravel Health Check (V8.3+). |
+| `GET` | `/sanctum/csrf-cookie` | Khởi tạo cookie xác thực cho SPA/Frontend. |
+
+---
+[🏠 Home](Home) | [🏗️ Architecture](Architecture) | [🚀 Algorithms](Algorithms)
