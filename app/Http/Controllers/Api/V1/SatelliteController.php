@@ -43,6 +43,12 @@ class SatelliteController extends Controller
     {
         try {
             $prop = $this->engine->propagate($satellite);
+
+            // Fetch latest environmental data from this specific unit
+            $latestMetric = \App\Models\WeatherMetric::where('source', 'LIKE', "%{$satellite->name}%")
+                ->latest('captured_at')
+                ->first();
+
             return response()->json([
                 'status' => 'success',
                 'data' => [
@@ -56,12 +62,53 @@ class SatelliteController extends Controller
                         'velocity' => $prop['velocity'],
                         'period' => $prop['period'],
                         'timestamp' => $prop['timestamp']
-                    ]
+                    ],
+                    'payload' => $latestMetric ? [
+                        'temperature' => $latestMetric->provenance['temp_derived'] ?? null,
+                        'brightness' => $latestMetric->provenance['mean_brightness'] ?? 180,
+                        'pressure' => $latestMetric->pressure,
+                        'cloud_coverage' => $latestMetric->cloud_coverage,
+                        'wind_speed' => $latestMetric->provenance['wind_speed'] ?? null,
+                        'captured_at' => $latestMetric->captured_at->toIso8601String()
+                    ] : null
                 ]
             ]);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'message' => 'Telemetry link severed'], 500);
+            return response()->json(['status' => 'error', 'message' => 'Telemetry link severed: ' . $e->getMessage()], 500);
         }
+    }
+
+    /**
+     * Get historical imagery for a specific location (Satellite Time Machine).
+     */
+    public function imageryHistory(\Illuminate\Http\Request $request): JsonResponse
+    {
+        $lat = (float) $request->get('lat');
+        $lng = (float) $request->get('lng');
+        $radius = (float) $request->get('radius', 5.0); // degree radius
+
+        $history = \App\Models\WeatherMetric::whereNotNull('provenance->image_id')
+            ->whereBetween('latitude', [$lat - $radius, $lat + $radius])
+            ->whereBetween('longitude', [$lng - $radius, $lng + $radius])
+            ->orderBy('captured_at', 'desc')
+            ->limit(50)
+            ->get()
+            ->map(function ($m) {
+                return [
+                    'id' => $m->id,
+                    'timestamp' => $m->captured_at->toIso8601String(),
+                    'image_url' => asset('storage/weather/' . ($m->provenance['image_id'] ?? 'himawari_latest.png')),
+                    'metrics' => [
+                        'temp' => $m->provenance['temp_derived'] ?? null,
+                        'coverage' => $m->cloud_coverage
+                    ]
+                ];
+            });
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $history
+        ]);
     }
 
     /**
