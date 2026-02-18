@@ -44,3 +44,6 @@ $$C = F(t) \cdot P(n)$$
 - **Mức 4 (Nguy Cấp)**: $R \ge 80$. Kích hoạt quy trình cảnh báo khẩn cấp qua SMS/Email và ghi đè các ưu tiên hệ thống.
 
 ![Bảng điều khiển Phân tích Rủi ro StarWeather](../public/assets/docs/images/dashboard_mockup.png)
+
+---
+[[Về Trang Chủ|Home]] | [[Thuật Toán|Algorithms]] | [[Chiến Lược Mở Rộng|Architecture]]
