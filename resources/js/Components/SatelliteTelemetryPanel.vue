@@ -99,7 +99,7 @@ const formatCoord = (val) => val ? val.toFixed(4) : '0.0000';
             <!-- Action Buttons -->
             <div class="grid grid-cols-2 gap-3 pt-2">
                 <button class="bg-vibrant-blue text-white text-[9px] font-black uppercase tracking-[0.2em] py-3 rounded-lg hover:bg-vibrant-blue/80 transition-all border border-vibrant-blue shadow-[0_0_15px_rgba(0,136,255,0.3)]">Mission_Details</button>
-                <button class="bg-white/5 text-white/60 text-[9px] font-black uppercase tracking-[0.2em] py-3 rounded-lg hover:bg-white/10 transition-all border border-white/10">Telemetry_Logs</button>
+                <button class="bg-white/5 text-white/60 text-[9px] font-black uppercase tracking-[0.2em] py-3 rounded-lg hover:bg-white/10 transition-all border border-white/10" @click="$emit('show-history')">Time_Machine</button>
             </div>
         </div>
 
