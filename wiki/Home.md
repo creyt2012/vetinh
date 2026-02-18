@@ -1,5 +1,7 @@
 # StarWeather Wiki - Table of Contents
 
+![Orbital Command Dashboard](/Users/creytdeveloper/.gemini/antigravity/brain/49cd3ed0-ce2b-49cc-a7bc-a25ea8ff049f/starweather_globe_visualization_1771426474667.png)
+
 This Wiki provides detailed technical insights into the operation, structure, and engineering characteristics of the StarWeather intelligence platform.
 
 ---
