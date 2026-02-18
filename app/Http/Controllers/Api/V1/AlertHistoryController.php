@@ -20,10 +20,8 @@ class AlertHistoryController extends Controller
      */
     public function index(): JsonResponse
     {
-        $tenant = $this->tenantManager->getTenant();
-
-        $logs = $tenant->activityLogs()
-            ->where('action', 'NOTIFICATION_SENT')
+        // Fetch logs for NOTIFICATION_SENT across the system (simplified for current schema)
+        $logs = ActivityLog::where('action', 'NOTIFICATION_SENT')
             ->latest()
             ->limit(100)
             ->get();
