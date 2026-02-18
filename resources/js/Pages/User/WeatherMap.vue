@@ -217,18 +217,33 @@ const currentZonePoints = ref([]);
 const watchZones = ref([]);
 const telemetryData = ref(null);
 
+// Polling Timer for Telemetry
+let telemetryInterval = null;
+
+const fetchLatestTelemetry = async () => {
+    if (!selectedSatellite.value) return;
+    try {
+        const res = await axios.get(`/storage/telemetry/${selectedSatellite.value.norad_id}/latest.json?t=${Date.now()}`);
+        telemetryData.value = res.data;
+    } catch (e) {
+        // Silently fail to keep the loop clean
+    }
+};
+
+// Watcher for selectedSatellite to fetch telemetry
 watch(selectedSatellite, async (newSat) => {
+    if (telemetryInterval) clearInterval(telemetryInterval);
+    
     if (newSat) {
-        try {
-            const res = await axios.get(`/storage/telemetry/${newSat.norad_id}/latest.json?t=${Date.now()}`);
-            telemetryData.value = res.data;
-        } catch (e) {
-            console.warn("No real-time telemetry JSON found for " + newSat.norad_id);
-            telemetryData.value = null;
-        }
+        await fetchLatestTelemetry(); // Instant first fetch
+        telemetryInterval = setInterval(fetchLatestTelemetry, 1000); // 1Hz Polling
     } else {
         telemetryData.value = null;
     }
+});
+
+onUnmounted(() => {
+    if (telemetryInterval) clearInterval(telemetryInterval);
 });
 const auroraData = ref([]);
 const riskHeatmapData = ref([]);
