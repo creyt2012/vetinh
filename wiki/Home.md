@@ -1,28 +1,28 @@
-# StarWeather Wiki - Table of Contents
+# Wiki StarWeather - Mục Lục Kỹ Thuật
 
-![Orbital Command Dashboard](../public/assets/docs/images/globe_visualization.png)
+![Bảng điều khiển Trung tâm Nhiệm vụ StarWeather](../public/assets/docs/images/mission_control_terminal.png)
 
-This Wiki provides detailed technical insights into the operation, structure, and engineering characteristics of the StarWeather intelligence platform.
-
----
-
-## 📘 Chapter 1: Strategic Overview
-- [System Introduction & Vision](Introduction.md)
-- [Enterprise Multi-Tenant SaaS Model](Introduction.md#phân-khúc-khách-hàng)
-
-## 🏗️ Chapter 2: Engineering & Infrastructure
-- [Unified Data Fusion Architecture](Architecture.md)
-- [Real-time Pipeline (ETL & Reverb)](Architecture.md#quy-trình-xử-lý-dữ-liệu-data-pipeline)
-- [Enterprise Scaling Strategy](Architecture.md#chiến-lược-mở-rộng-scaling-strategy)
-
-## 🧮 Chapter 3: Intelligence & Algorithms
-- [Core Mathematical Models (SGP4)](Algorithms.md)
-- [Storm Detection & Path Prediction](Algorithms.md#storm-detection-tracking)
-- [The Risk Assessment Engine](Risk-Engine.md)
-
-## 🔌 Chapter 4: Integration
-- [RESTful API Reference](API-Reference.md)
-- [Authentication & Rate Limiting](API-Reference.md#xác-thực-authentication)
+Wiki này cung cấp các phân tích kỹ thuật chuyên sâu về vận hành, cấu trúc và các đặc tính toán học của nền tảng trí tuệ StarWeather.
 
 ---
-*Documentation is maintained by the StarWeather Core Engineering Team.*
+
+## 📘 Chương 1: Tổng Quan Chiến Lược
+- [Giới thiệu Hệ thống & Tầm nhìn](Introduction.md)
+- [Mô hình SaaS Đa Người dùng Doanh nghiệp](Introduction.md#phân-khúc-khách-hàng)
+
+## 🏗️ Chương 2: Kỹ Thuật Hạ Tầng & Quy Mô
+- [Kiến trúc Hợp nhất Dữ liệu (Unified Architecture)](Architecture.md)
+- [Pipeline Real-time (ETL & Laravel Reverb)](Architecture.md#quy-trình-xử-lý-dữ-liệu-data-pipeline)
+- [Chiến lược Mở rộng Quy mô (Scaling Strategy)](Architecture.md#chiến-lược-mở-rộng-scaling-strategy)
+
+## 🧮 Chương 3: Trí Tuệ Toán Học & Thuật Toán
+- [Mô hình Cơ học Quỹ Đạo (SGP4/Vis-Viva)](Algorithms.md)
+- [Phân Tích Đa Phổ & Nhận Dạng Bão](Algorithms.md#2-xử-lý-phổ-khí-tượng-hợp-nhất-dữ-liệu-data-fusion)
+- [Engine Đánh Giá Rủi Ro Định Lượng](Risk-Engine.md)
+
+## 🔌 Chương 4: Tích Hợp Hệ Thống
+- [Tài liệu API RESTful](API-Reference.md)
+- [Xác thực & Giới hạn Băng thông](API-Reference.md#xác-thực-authentication)
+
+---
+*Tài liệu được duy trì và cập nhật bởi Đội ngũ Kỹ thuật StarWeather Core.*
