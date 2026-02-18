@@ -66,6 +66,7 @@ class ApiExpansionTest extends TestCase
             'name' => 'TEST_ZONE',
             'type' => 'CYCLONE_IMPACT',
             'severity' => 'HIGH',
+            'geometry' => ['type' => 'Polygon', 'coordinates' => [[[106, 10], [107, 10], [107, 11], [106, 11], [106, 10]]]],
             'is_active' => true
         ]);
 
