@@ -15,4 +15,5 @@ Schedule::job(new \App\Jobs\AlertMonitorJob)->everyMinute();
 Schedule::job(new \App\Jobs\RadarIngestJob)->everyMinute();
 Schedule::job(new \App\Jobs\GribIngestionJob)->hourly();
 Schedule::job(new \App\Jobs\GlobalImagerySyncJob)->twiceDaily(0, 12);
+Schedule::job(new \App\Jobs\SatelliteTelemetryJob)->hourly();
 Schedule::job(new \App\Jobs\CelestrakSyncJob)->daily();
