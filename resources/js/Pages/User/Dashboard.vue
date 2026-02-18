@@ -1,9 +1,12 @@
 <script setup>
 import UserLayout from '@/Layouts/UserLayout.vue';
 import { Head, Link } from '@inertiajs/vue3';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue';
 import axios from 'axios';
-import { MapPin } from 'lucide-vue-next';
+import { MapPin, Zap, Thermometer, Radio, Activity } from 'lucide-vue-next';
+import { Chart, registerables } from 'chart.js';
+
+Chart.register(...registerables);
 
 const props = defineProps({
     metrics: Array,
@@ -21,38 +24,98 @@ const weatherData = ref({
 });
 
 const selectedSatellite = ref(null);
+const telemetryData = ref(null);
 const isLoadingSat = ref(false);
+const healthHistory = ref([]);
+const chartRef = ref(null);
+let healthChart = null;
+let pollTimer = null;
 
-const selectSatellite = async (sat) => {
-    selectedSatellite.value = { ...sat, loading: true };
-    isLoadingSat.value = true;
-    
+const fetchSatelliteData = async (noradId) => {
     try {
-        const token = 'vethinh_strategic_internal_token_2026';
-        // We fetch fresh real-time data for this specific satellite
-        const response = await axios.get(`/api/internal-map/satellites?token=${token}`);
-        const fullData = response.data.data.find(s => s.norad_id === sat.norad_id);
-        
-        if (fullData) {
-            selectedSatellite.value = fullData;
-        } else {
-            // Fallback for satellites not in current tracking batch
-            selectedSatellite.value = {
-                ...sat,
-                location: 'SCANNING...',
-                telemetry: { altitude: 550, velocity: 7.6, period: 95 },
-                modules: [
-                    { id: 'MOD-01', name: 'Standard Payload', status: 'ONLINE' }
-                ],
-                specs: { operator: 'Global Network', mass: '850 KG' }
-            };
-        }
+        const res = await axios.get(`/api/user/satellite/${noradId}?t=${Date.now()}`);
+        telemetryData.value = res.data.data;
     } catch (e) {
-        console.error('Failed to fetch satellite intel', e);
-    } finally {
-        isLoadingSat.value = false;
+        console.error('Failed to fetch telemetry', e);
     }
 };
+
+const fetchSatelliteHistory = async (noradId) => {
+    try {
+        const res = await axios.get(`/api/user/satellite/${noradId}/history`);
+        healthHistory.value = res.data.data;
+        initChart();
+    } catch (e) {
+        console.error('Failed to fetch history', e);
+    }
+};
+
+const initChart = () => {
+    if (!chartRef.value || healthHistory.value.length === 0) return;
+    
+    if (healthChart) {
+        healthChart.destroy();
+    }
+
+    const ctx = chartRef.value.getContext('2d');
+    healthChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: healthHistory.value.map(d => d.time),
+            datasets: [
+                {
+                    label: 'Power (%)',
+                    data: healthHistory.value.map(d => d.power),
+                    borderColor: '#0088ff',
+                    backgroundColor: 'rgba(0, 136, 255, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true
+                },
+                {
+                    label: 'Thermal (C)',
+                    data: healthHistory.value.map(d => d.thermal),
+                    borderColor: '#ff3366',
+                    borderWidth: 1,
+                    tension: 0.4,
+                    pointRadius: 0
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { display: false },
+                y: { 
+                    grid: { color: 'rgba(255,255,255,0.05)' },
+                    ticks: { color: 'rgba(255,255,255,0.3)', font: { size: 8 } }
+                }
+            }
+        }
+    });
+};
+
+const selectSatellite = async (sat) => {
+    if (pollTimer) clearInterval(pollTimer);
+    
+    selectedSatellite.value = sat;
+    isLoadingSat.value = true;
+    
+    await fetchSatelliteData(sat.norad_id);
+    await fetchSatelliteHistory(sat.norad_id);
+    
+    isLoadingSat.value = false;
+    
+    // Start 1Hz polling for the selected satellite
+    pollTimer = setInterval(() => fetchSatelliteData(sat.norad_id), 1000);
+};
+
+onUnmounted(() => {
+    if (pollTimer) clearInterval(pollTimer);
+    if (healthChart) healthChart.destroy();
+});
 </script>
 
 <template>
@@ -75,10 +138,8 @@ const selectSatellite = async (sat) => {
 
                 <!-- Main HUD Display -->
                 <div class="aspect-video bg-[#050508] border border-white/5 relative group overflow-hidden">
-                    <!-- Scanner Animation Overlay (Decorative) -->
                     <div class="absolute inset-0 pointer-events-none opacity-20">
                         <div class="w-full h-1 bg-vibrant-blue/20 absolute top-0 animate-[scan_4s_linear_infinite]"></div>
-                        <!-- Background Grid/Map Placeholder -->
                         <div class="absolute inset-0 flex items-center justify-center opacity-10 grayscale scale-150">
                              <div class="w-full h-full bg-[url('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')] bg-cover opacity-30"></div>
                         </div>
@@ -86,11 +147,9 @@ const selectSatellite = async (sat) => {
                     
                     <div class="absolute inset-0 flex items-center justify-center">
                         <div class="text-center relative">
-                            <!-- Tactical Ring Breakdown -->
                             <div class="absolute -inset-12 border border-white/5 rounded-full pointer-events-none"></div>
                             <div class="absolute -inset-20 border border-white/5 rounded-full opacity-30 pointer-events-none"></div>
                             
-                            <!-- Detailed Metrics around the circle -->
                             <div class="absolute -top-16 left-1/2 -translate-x-1/2 whitespace-nowrap">
                                 <p class="text-[7px] font-black text-vibrant-blue tracking-[.3em] uppercase">SYSTEM_INTEGRITY: 100%</p>
                             </div>
@@ -104,7 +163,6 @@ const selectSatellite = async (sat) => {
                             </div>
 
                             <div class="w-40 h-40 rounded-full border border-vibrant-blue/20 flex items-center justify-center relative bg-black/40">
-                                <!-- Pulsing Ring instead of spinning -->
                                 <div class="absolute inset-0 rounded-full border-2 border-vibrant-blue/40 animate-pulse"></div>
                                 <div class="absolute inset-3 rounded-full border border-vibrant-blue/10 border-t-vibrant-blue/60 animate-spin duration-[15000ms]"></div>
                                 
@@ -117,21 +175,10 @@ const selectSatellite = async (sat) => {
                         </div>
                     </div>
 
-                    <!-- Corners UI -->
                     <div class="absolute top-6 left-6 p-4 border-l border-t border-white/10 opacity-40">
                          <p class="text-[10px] font-black tracking-widest uppercase text-vibrant-blue mb-1">INTELLIGENCE_DIAGNOSTICS</p>
                         <p class="text-[8px] font-black tracking-widest uppercase">Sector_Grid: Alpha-09</p>
                         <p class="text-[8px] font-black tracking-widest uppercase">Targeting_Active</p>
-                    </div>
-                    <div class="absolute bottom-6 left-6 p-4 border-l border-b border-white/10 opacity-40">
-                        <p class="text-[7px] font-bold text-vibrant-blue uppercase tracking-widest mb-1">LIVE_DATA_STREAM</p>
-                        <div class="space-y-0.5">
-                            <p class="text-[6px] font-mono text-white/40 italic">REQ_SENT: 18:22:45... OK</p>
-                            <p class="text-[6px] font-mono text-white/40 italic">IMG_INGEST: HIMAWARI_9... LATEST</p>
-                        </div>
-                    </div>
-                    <div class="absolute bottom-6 right-6 p-4 border-r border-b border-vibrant-blue/10">
-                        <p class="text-[8px] font-black text-vibrant-blue tracking-widest uppercase">Encryption_Type: AES-256</p>
                     </div>
                 </div>
 
@@ -164,13 +211,12 @@ const selectSatellite = async (sat) => {
                                     <p class="text-[9px] text-white/20 font-mono tracking-widest">{{ sat.orbit || 'LEO' }} // {{ sat.status?.toUpperCase() || 'ACTIVE' }}</p>
                                 </div>
                                 <div class="text-right">
-                                    <span class="text-[10px] font-black text-vibrant-green font-mono">{{ sat.battery || '98%' }}</span>
+                                    <span class="text-[10px] font-black text-vibrant-green font-mono">98%</span>
                                 </div>
                             </div>
                             
-                            <!-- Battery Bar Visualization -->
                             <div class="h-[2px] w-full bg-white/5 relative z-10">
-                                <div class="h-full bg-vibrant-blue transition-all duration-1000" :style="{ width: sat.battery || '98%' }"></div>
+                                <div class="h-full bg-vibrant-blue transition-all duration-1000" style="width: 98%"></div>
                             </div>
 
                             <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.02] to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
@@ -209,98 +255,107 @@ const selectSatellite = async (sat) => {
             leave-from-class="translate-x-0 opacity-100"
             leave-to-class="translate-x-full opacity-0"
         >
-            <div v-if="selectedSatellite" class="fixed top-24 right-8 bottom-32 w-96 bg-black/90 backdrop-blur-2xl border border-vibrant-blue/50 shadow-[0_0_50px_rgba(0,136,255,0.2)] z-[60] flex flex-col overflow-hidden">
+            <div v-if="selectedSatellite && telemetryData" class="fixed top-24 right-8 bottom-8 w-[450px] bg-black/95 backdrop-blur-2xl border border-vibrant-blue/50 shadow-[0_0_50px_rgba(0,136,255,0.2)] z-[60] flex flex-col overflow-hidden">
                 <!-- Header -->
                 <div class="p-6 border-b border-vibrant-blue/20 bg-vibrant-blue/10 flex justify-between items-center relative overflow-hidden">
                     <div class="relative z-10">
-                        <p class="text-[8px] font-black text-vibrant-blue uppercase tracking-[0.4em] mb-1">Satellite_Intel</p>
-                        <h3 class="text-xl font-black uppercase tracking-tighter italic leading-none">{{ selectedSatellite.name }}</h3>
+                        <p class="text-[8px] font-black text-vibrant-blue uppercase tracking-[0.4em] mb-1">Mission_Asset_Intel</p>
+                        <h3 class="text-xl font-black uppercase tracking-tighter italic leading-none">{{ telemetryData.metadata.name }}</h3>
                     </div>
                     <button @click="selectedSatellite = null" class="relative z-10 text-white/40 hover:text-white transition-colors">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </button>
-                    <!-- Background Decoration -->
-                    <div class="absolute -right-4 -top-4 w-24 h-24 bg-vibrant-blue/5 rounded-full blur-2xl"></div>
                 </div>
 
                 <!-- HUD Content -->
                 <div class="flex-1 overflow-y-auto custom-scrollbar p-8 space-y-8 relative">
-                    <!-- Loading Overlay -->
-                    <div v-if="isLoadingSat" class="absolute inset-0 z-20 bg-black/60 backdrop-blur-md flex flex-col items-center justify-center space-y-4 animate-in fade-in duration-300">
+                    <!-- LOADING OVERLAY -->
+                    <div v-if="isLoadingSat" class="absolute inset-0 z-20 bg-black/80 flex flex-col items-center justify-center space-y-4">
                         <div class="w-12 h-12 border-2 border-vibrant-blue border-t-transparent rounded-full animate-spin"></div>
-                        <p class="text-[9px] font-black text-vibrant-blue uppercase tracking-[0.4em] animate-pulse">ACQUIRING_DATA_LINK...</p>
+                        <p class="text-[9px] font-black text-vibrant-blue uppercase tracking-widest">ESTABLISHING_DATA_LINK</p>
                     </div>
 
-                    <!-- Technical Profile -->
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="p-4 bg-white/[0.03] border border-white/5">
-                            <p class="text-[8px] font-black text-white/20 uppercase mb-1">NORAD_ID</p>
-                            <p class="text-sm font-black text-vibrant-blue font-mono">{{ selectedSatellite.norad_id }}</p>
+                    <!-- ORBITAL VECTOR -->
+                    <div class="grid grid-cols-3 gap-2">
+                        <div class="p-3 bg-white/5 border border-white/10">
+                            <p class="text-[7px] text-white/40 uppercase mb-1">LATITUDE</p>
+                            <p class="text-xs font-mono font-black text-white">{{ telemetryData.orbital.coordinates.lat.toFixed(4) }}°</p>
                         </div>
-                        <div class="p-4 bg-white/[0.03] border border-white/5">
-                            <p class="text-[8px] font-black text-white/20 uppercase mb-1">TX_STATUS</p>
-                            <p class="text-sm font-black text-vibrant-green italic uppercase">{{ selectedSatellite.status || 'ACTIVE' }}</p>
+                        <div class="p-3 bg-white/5 border border-white/10">
+                            <p class="text-[7px] text-white/40 uppercase mb-1">LONGITUDE</p>
+                            <p class="text-xs font-mono font-black text-white">{{ telemetryData.orbital.coordinates.lng.toFixed(4) }}°</p>
+                        </div>
+                        <div class="p-3 bg-white/5 border border-white/10">
+                            <p class="text-[7px] text-white/40 uppercase mb-1">ALTITUDE</p>
+                            <p class="text-xs font-mono font-black text-vibrant-blue">{{ telemetryData.orbital.coordinates.alt.toFixed(0) }}km</p>
                         </div>
                     </div>
 
-                    <!-- Precise Location Vector -->
+                    <!-- MISSION VITALS (HEALTH) -->
                     <div class="space-y-4">
-                        <h4 class="text-[10px] font-black text-white/40 uppercase tracking-widest border-l-2 border-vibrant-blue pl-3">Ground_Impact_Intelligence</h4>
-                        <div class="p-5 bg-vibrant-blue/5 border border-vibrant-blue/20 rounded-xl relative group">
-                            <div class="flex items-center space-x-4 mb-4">
-                                <MapPin class="w-6 h-6 text-vibrant-blue animate-pulse" />
+                        <h4 class="text-[10px] font-black text-vibrant-blue uppercase tracking-widest border-l-2 border-vibrant-blue pl-3">Subsystem_Health_Vector</h4>
+                        <div class="grid grid-cols-2 gap-px bg-white/5 border border-white/10">
+                            <div class="p-4 bg-black flex items-center space-x-3">
+                                <Zap class="w-4 h-4 text-vibrant-yellow" />
                                 <div>
-                                    <p class="text-[8px] font-black text-vibrant-blue uppercase tracking-widest mb-1">Currently_Overflying</p>
-                                    <p class="text-sm font-black text-white uppercase italic">{{ selectedSatellite.location || 'INTELLERNATIONAL_WATERS' }}</p>
+                                    <p class="text-[7px] text-white/20 uppercase">Power_Bus</p>
+                                    <p class="text-sm font-black text-white">{{ telemetryData.subsystems.power_bus }}</p>
                                 </div>
                             </div>
-                            <div class="flex justify-between font-mono text-[10px] font-bold text-white/40 border-t border-white/5 pt-3">
-                                <div class="flex flex-col">
-                                    <span class="text-[8px] opacity-50 mb-0.5">LATITUDE</span>
-                                    <span class="text-white">{{ selectedSatellite.position?.lat?.toFixed(6) || '0.000000' }}</span>
+                            <div class="p-4 bg-black flex items-center space-x-3">
+                                <Thermometer class="w-4 h-4 text-vibrant-red" />
+                                <div>
+                                    <p class="text-[7px] text-white/20 uppercase">Thermal_CPU</p>
+                                    <p class="text-sm font-black text-white">{{ telemetryData.subsystems.thermal }}</p>
                                 </div>
-                                <div class="flex flex-col text-right">
-                                    <span class="text-[8px] opacity-50 mb-0.5">LONGITUDE</span>
-                                    <span class="text-white">{{ selectedSatellite.position?.lng?.toFixed(6) || '0.000000' }}</span>
+                            </div>
+                            <div class="p-4 bg-black flex items-center space-x-3">
+                                <Radio class="w-4 h-4 text-vibrant-blue" />
+                                <div>
+                                    <p class="text-[7px] text-white/20 uppercase">Link_Signal</p>
+                                    <p class="text-sm font-black text-white">{{ telemetryData.subsystems.comm_link }}</p>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-black flex items-center space-x-3">
+                                <Activity class="w-4 h-4 text-vibrant-green" />
+                                <div>
+                                    <p class="text-[7px] text-white/20 uppercase">Orientation</p>
+                                    <p class="text-sm font-black text-white">{{ telemetryData.subsystems.attitude }}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Telemetry -->
-                    <div class="space-y-5">
-                        <h4 class="text-[10px] font-black text-white/40 uppercase tracking-widest border-l-2 border-vibrant-blue pl-3">Live_Telemetry_Stream</h4>
-                        <div class="grid grid-cols-1 gap-1">
-                            <div class="flex justify-between items-center p-4 bg-white/[0.02] border border-white/5">
-                                <span class="text-[9px] text-white/30 font-bold uppercase">Altitude</span>
-                                <span class="text-sm font-black text-white">{{ (selectedSatellite.telemetry?.altitude || 550).toLocaleString() }} <span class="text-[10px] opacity-20 ml-1">KM</span></span>
-                            </div>
-                            <div class="flex justify-between items-center p-4 bg-white/[0.02] border border-white/5">
-                                <span class="text-[9px] text-white/30 font-bold uppercase">Orbital Velocity</span>
-                                <span class="text-sm font-black text-vibrant-green">{{ (selectedSatellite.telemetry?.velocity || 7.6).toFixed(3) }} <span class="text-[10px] opacity-20 ml-1">KM/S</span></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Orbital Modules -->
+                    <!-- SATELLITE HEALTH TREND (CHART) -->
                     <div class="space-y-4">
-                         <h4 class="text-[10px] font-black text-white/40 uppercase tracking-widest border-l-2 border-vibrant-blue pl-3">Orbital_Module_Status</h4>
-                        <div class="space-y-2">
-                            <div v-for="mod in (selectedSatellite.modules || [])" :key="mod.id" 
-                                class="flex items-center justify-between p-4 bg-white/[0.03] border border-white/5 hover:bg-white/[0.05] transition-all">
-                                <div class="flex items-center space-x-4">
-                                    <div class="w-2 h-2 rounded-full shadow-[0_0_10px_currentColor] animate-pulse" :class="mod.status === 'OPERATIONAL' || mod.status === 'ONLINE' ? 'text-vibrant-green bg-vibrant-green' : 'text-red-500 bg-red-500'"></div>
-                                    <span class="text-[10px] font-black text-white/80 uppercase">{{ mod.name }}</span>
-                                </div>
-                                <span class="text-[8px] font-mono text-white/20 uppercase tracking-widest">{{ mod.id }}</span>
+                        <div class="flex justify-between items-center">
+                            <h4 class="text-[10px] font-black text-white/40 uppercase tracking-widest border-l-2 border-white/20 pl-3">24H_Performance_Metrics</h4>
+                            <span class="text-[8px] font-mono text-vibrant-blue">HISTORICAL_LOG</span>
+                        </div>
+                        <div class="h-40 bg-white/[0.02] border border-white/5 p-4 relative">
+                            <canvas ref="chartRef"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- SCIENTIFIC PAYLOAD -->
+                    <div class="space-y-4">
+                        <h4 class="text-[10px] font-black text-white/40 uppercase tracking-widest border-l-2 border-white/20 pl-3">Atmospheric_Observation</h4>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="p-4 border border-white/5 bg-white/[0.01]">
+                                <p class="text-[7px] text-white/30 uppercase mb-1">Local_Temp</p>
+                                <p class="text-lg font-black">{{ telemetryData.scientific.atmosphere.temperature }}°C</p>
+                            </div>
+                            <div class="p-4 border border-white/5 bg-white/[0.01]">
+                                <p class="text-[7px] text-white/30 uppercase mb-1">Pressure</p>
+                                <p class="text-lg font-black">{{ telemetryData.scientific.atmosphere.pressure }}hPa</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Action -->
+                    <!-- ACTION -->
                     <div class="pt-4">
-                        <Link :href="route('weather-map')" class="block w-full py-4 bg-vibrant-blue text-white text-[10px] font-black uppercase tracking-[0.3em] text-center hover:bg-vibrant-blue/80 transition-all shadow-[0_0_30px_rgba(0,136,255,0.2)]">
-                            VIEW_ON_GLOBAL_MAP
+                        <Link :href="route('weather.map')" class="block w-full py-4 bg-vibrant-blue text-white text-[10px] font-black uppercase tracking-[0.3em] text-center hover:bg-vibrant-blue/80 transition-all">
+                            TACTICAL_MAP_REDIRECTION
                         </Link>
                     </div>
                 </div>
