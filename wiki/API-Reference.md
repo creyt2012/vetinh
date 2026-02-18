@@ -2,7 +2,7 @@
 
 Hệ thống StarWeather cung cấp API RESTful toàn diện để truy cập dữ liệu khí tượng, viễn thám và quản lý nhiệm vụ.
 
-## 🔐 Xác thực (Authentication)
+## [AUTH] Xác thực (Authentication)
 
 Tất cả các yêu cầu yêu cầu Header `X-API-KEY`. Bạn có thể quản lý khóa API trong phần Portals của mình.
 
@@ -12,7 +12,7 @@ X-API-KEY: your_api_key_here
 
 ---
 
-## 🛰️ Vệ tinh & Quỹ đạo (Satellites)
+## [SAT] Vệ tinh & Quỹ đạo (Satellites)
 
 | URL | Phương thức | Mô tả |
 | :--- | :--- | :--- |
@@ -23,7 +23,7 @@ X-API-KEY: your_api_key_here
 
 ---
 
-## ⛈️ Khí tượng & Theo dõi Bão (Weather & Storms)
+## [MET] Khí tượng & Theo dõi Bão (Weather & Storms)
 
 | URL | Phương thức | Mô tả |
 | :--- | :--- | :--- |
@@ -38,7 +38,7 @@ X-API-KEY: your_api_key_here
 
 ---
 
-## 🔔 Cảnh báo (Alerting)
+## [ALRT] Cảnh báo (Alerting)
 
 | URL | Phương thức | Mô tả |
 | :--- | :--- | :--- |
@@ -48,7 +48,7 @@ X-API-KEY: your_api_key_here
 
 ---
 
-## 🚢 Hàng hải (Marine Intelligence)
+## [OPS] Hàng hải (Marine Intelligence)
 
 | URL | Phương thức | Mô tả |
 | :--- | :--- | :--- |
@@ -56,7 +56,7 @@ X-API-KEY: your_api_key_here
 
 ---
 
-## 🚀 Quản lý Nhiệm vụ & Báo cáo (Mission Control)
+## [OPS] Quản lý Nhiệm vụ & Báo cáo (Mission Control)
 
 | URL | Phương thức | Mô tả |
 | :--- | :--- | :--- |
@@ -66,7 +66,7 @@ X-API-KEY: your_api_key_here
 
 ---
 
-## ⚙️ Sức khỏe Hệ thống (System Health)
+## [SYS] Sức khỏe Hệ thống (System Health)
 
 | URL | Phương thức | Mô tả |
 | :--- | :--- | :--- |
@@ -75,7 +75,7 @@ X-API-KEY: your_api_key_here
 
 ---
 
-## 💳 Thanh toán (Billing)
+## [FIN] Thanh toán (Billing)
 
 | URL | Phương thức | Mô tả |
 | :--- | :--- | :--- |
