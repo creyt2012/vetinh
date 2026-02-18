@@ -225,6 +225,13 @@ const playbackTime = ref(Date.now());
 const modelMode = ref('ECMWF'); // ECMWF, GFS, COMPARE
 const timeMultiplier = ref(300); // 300x for fast orbital visualization
 
+const imageryConstellations = [
+    { id: '41836', name: 'ASIA_PACIFIC (HIMAWARI)', region: 'ASPAC', norad_id: '41836' },
+    { id: '60133', name: 'AMERICAS (GOES-EAST)', region: 'AMER', norad_id: '60133' },
+    { id: '28912', name: 'EMEA (METEOSAT)', region: 'EMEA', norad_id: '28912' },
+];
+const selectedConstellation = ref(imageryConstellations[0]);
+
 const toggleLayer = (id) => {
     const index = activeLayers.value.indexOf(id);
     if (index === -1) {
