@@ -57,8 +57,10 @@ class HimawariProcessor
         $total = $w * $h;
         $cloudCount = 0;
         $rainIntensitySum = 0;
+        $totalBrightness = 0;
+        $samples = 0;
 
-        for ($x = 0; $x < $w; $x += 5) { // Sub-sampling for speed
+        for ($x = 0; $x < $w; $x += 5) {
             for ($y = 0; $y < $h; $y += 5) {
                 $rgb = imagecolorat($img, $x, $y);
                 $r = ($rgb >> 16) & 0xFF;
@@ -66,6 +68,8 @@ class HimawariProcessor
                 $b = $rgb & 0xFF;
 
                 $brightness = ($r + $g + $b) / 3;
+                $totalBrightness += $brightness;
+                $samples++;
 
                 if ($brightness > 130) {
                     $cloudCount++;
@@ -77,10 +81,11 @@ class HimawariProcessor
             }
         }
 
-        $sampleFactor = (5 * 5); // adjusting for sub-sampling
+        $sampleFactor = (5 * 5);
         return [
             'coverage' => round(($cloudCount * $sampleFactor / $total) * 100, 2),
-            'rain' => round(($rainIntensitySum * $sampleFactor / $total) * 5, 2), // mm/h normalized
+            'rain' => round(($rainIntensitySum * $sampleFactor / $total) * 5, 2),
+            'mean_brightness' => $samples > 0 ? $totalBrightness / $samples : 0,
         ];
     }
 }
