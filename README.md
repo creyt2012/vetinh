@@ -28,6 +28,8 @@
 - **Weighted Scoring Model**: Calculates area-specific risk scores (0-100) based on cloud density, precipitation intensity, and atmospheric pressure volatility.
 - **Data Provenance Consensus**: Each risk assessment is accompanied by a confidence score derived from data freshness and sensor agreement.
 
+![StarWeather Mission Control](/Users/creytdeveloper/.gemini/antigravity/brain/49cd3ed0-ce2b-49cc-a7bc-a25ea8ff049f/starweather_dashboard_final_1771426971917.png)
+
 ---
 
 ## 🛠️ Technology Stack
