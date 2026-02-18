@@ -1122,6 +1122,19 @@ const switchView = (mode) => {
                     <p class="text-[9px] text-white/30 uppercase tracking-[0.3em] mt-1">Global Atmospheric Visualization</p>
                 </div>
 
+                <!-- Imagery Constellation Selector (NEW) -->
+                <div v-if="activeLayers.includes('clouds')" class="space-y-2 pointer-events-auto">
+                    <p class="text-[8px] font-black text-white/40 uppercase tracking-[0.2em] mb-1">IMAGERY_CONSTELLATION</p>
+                    <div class="grid grid-cols-3 gap-1">
+                        <button v-for="sat in imageryConstellations" :key="sat.id"
+                            @click="selectedConstellation = sat; syncGlobeLayers()"
+                            :class="selectedConstellation.id === sat.id ? 'bg-vibrant-blue/30 border-vibrant-blue text-white' : 'bg-black/60 border-white/5 text-white/40'"
+                            class="py-2 border text-[8px] font-black uppercase tracking-tighter hover:bg-white/5 transition-all">
+                            {{ sat.region }}
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Pro Horizontal Controls (NEW LAYOUT) -->
                 <div class="flex flex-row space-x-2 pointer-events-auto">
                     <button @click="toggleRadar"
