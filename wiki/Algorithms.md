@@ -111,6 +111,26 @@ The system implements an automated scanning tool (`StormTrackingService`) to det
 - Gradient Analysis: Calculates the rate of pressure change over time ($dP/dt$).
 - Vector Interpolation Model: Forecasts future satellite positions based on solar and atmospheric perturbation parameters.
 
+---
+
+### [LOGIC] Vortex Identification Logic
+```mermaid
+flowchart TD
+    IMG(("Raw Spectral Image")) --> GRAD["Calculate Brightness Gradient"]
+    GRAD --> THRESH{Threshold Check}
+    
+    THRESH -- "< -75°C (High Altitude)" --> CENTER["Potential Vortex Center"]
+    THRESH -- "> -50°C (Low Altitude)" --> NOISE["Atmospheric Noise"]
+    
+    CENTER --> VECTOR["Wind Vector Field Analysis"]
+    VECTOR --> SPIRAL{Is Rotational?}
+    
+    SPIRAL -- "Yes (Cyclonic)" --> STORM["Classify as Storm/Depression"]
+    SPIRAL -- "No (Linear)" --> FRONT["Classify as Weather Front"]
+    
+    STORM --> PATH["Apply Path Interpolation"]
+```
+
 ![Constellation View](images/constellation.png)
 
 ---
