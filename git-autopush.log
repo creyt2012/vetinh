@@ -6535,3 +6535,9 @@ To https://github.com/creyt2012/vetinh.git
    413a622..e6dda26  main -> main
 [02:43:17.3N] Pushed to GitHub. Contribution secured.
 [02:43:51.3N] Hyper-Sync triggered by database/migrations/2026_02_19_194259_create_modules_table.php
+remote: This repository moved. Please use the new location:        
+remote:   https://github.com/creyt2012/StarWeather.git        
+To https://github.com/creyt2012/vetinh.git
+   e6dda26..10490b4  main -> main
+[02:43:51.3N] Pushed to GitHub. Contribution secured.
+[02:43:53.3N] Hyper-Sync triggered by app/Models/Module.php
