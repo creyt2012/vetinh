@@ -18,8 +18,8 @@
         "laravel/tinker": "^2.9",
         "maatwebsite/excel": "^3.1",
         "tightenco/ziggy": "^2.6",
-        "vortex/aerospace": "*",
-        "vortex/meteo": "*"
+        "creyt2012/vortex-aerospace": "*",
+        "creyt2012/vortex-meteo": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
