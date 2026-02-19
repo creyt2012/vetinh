@@ -17,7 +17,9 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "maatwebsite/excel": "^3.1",
-        "tightenco/ziggy": "^2.6"
+        "tightenco/ziggy": "^2.6",
+        "vortex/aerospace": "*",
+        "vortex/meteo": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -76,6 +78,16 @@
             "php-http/discovery": true
         }
     },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/vortex-aerospace"
+        },
+        {
+            "type": "path",
+            "url": "packages/vortex-meteo"
+        }
+    ],
     "minimum-stability": "stable",
     "prefer-stable": true
 }
