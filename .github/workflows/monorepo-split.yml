@@ -26,7 +26,7 @@ jobs:
 
       # Note: This uses the Symplify Monorepo Split Action
       # It requires a MONOREPO_SPLIT_TOKEN with 'repo' scope
-      - uses: symplify/monorepo-split-github-action@v1.1
+      - uses: symplify/monorepo-split-github-action@main
         with:
           package_directory: 'packages/${{ matrix.package.local_path }}'
           repository_organization: 'creyt2012'
