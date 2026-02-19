@@ -1,6 +1,6 @@
 # Nền tảng Trí tuệ Khí quyển StarWeather
 
-![Mission Control](images/mission_control_terminal.png)
+![Mission Control](images/mission_control.png)
 
 ## Tổng quan Hệ thống
 **StarWeather** là một hệ sinh thái giám sát khí quyển và quỹ đạo cấp cao, kết hợp giữa công nghệ viễn thám vệ tinh (Remote Sensing), trí tuệ nhân tạo (AI Core) và mô hình hóa vật lý thời gian thực. Nền tảng được thiết kế nhằm cung cấp khả năng cảnh báo sớm, phân tích dữ liệu đa phổ và quản lý tài sản không gian cho các tổ chức chuyên nghiệp.

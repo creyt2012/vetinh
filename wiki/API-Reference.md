@@ -12,6 +12,8 @@ X-API-KEY: your_api_key_here
 
 ---
 
+![API Portal](images/api_portal.png)
+
 ## [LIVE] Trạng thái Hệ thống (Live State)
 
 | Phương thức | Endpoint | Mô tả |
@@ -137,6 +139,8 @@ Các đầu cuối dành cho khu vực quản trị, yêu cầu quyền `admin`.
 | `/api/internal-map/point-info` | Thông tin điểm click trên Globe. | `lat`, `lng`, `token` |
 | `/api/internal-map/forecast` | Forecast cho Meteogram dashboard. | `lat`, `lng`, `token` |
 
+![API Documentation](images/api_docs.png)
+
 ---
 
 ## [AI] Microservice AI Core (:8001)
@@ -157,4 +161,4 @@ Các đầu cuối dành cho khu vực quản trị, yêu cầu quyền `admin`.
 | `GET` | `/sanctum/csrf-cookie` | Khởi tạo cookie xác thực cho SPA/Frontend. |
 
 ---
-[Home](Home) | [Architecture](Architecture) | [Algorithms](Algorithms)
+[🏠 Home](Home) | [🏗️ Architecture](Architecture) | [🚀 Algorithms](Algorithms)

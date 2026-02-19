@@ -4,7 +4,7 @@ StarWeather được thiết kế theo kiến trúc **Monolithic-Distributed Hyb
 
 ---
 
-## [SVC] Hệ sinh thái Dịch vụ (Service Ecosystem)
+## [SVC] He sinh thai Dich vu (Service Ecosystem)
 
 Dự án được thiết kế theo mô hình **Hybrid Microservices**:
 
@@ -12,7 +12,9 @@ Dự án được thiết kế theo mô hình **Hybrid Microservices**:
 2.  **AI Core (FastAPI/Python)**: Microservice chuyên biệt xử lý Computer Vision và tính toán vật lý khí quyển từ ảnh vệ tinh.
 3.  **Real-time Engine (WebSockets)**: Phát sóng tọa độ vệ tinh và cảnh báo tức thời.
 
-## [PIPE] Luồng Dữ liệu (Data Pipeline)
+![Mission Control](images/mission_control.png)
+
+## [PIPE] Luong Du lieu (Data Pipeline)
 
 ```mermaid
 graph TD
@@ -49,6 +51,8 @@ Dữ liệu sau khi xử lý được đẩy ra ngoài thông qua hai kênh:
 - RESTful API: Dành cho các bên thứ ba tích hợp dữ liệu.
 - WebSocket (Laravel Reverb): Phát sóng trực tiếp vị trí vệ tinh cho hàng ngàn người dùng đồng thời với độ trễ cực thấp.
 
+![Tactical Map](images/tactical_map.png)
+
 ---
 
 ## Chiến Lược Mở Rộng (Scaling Strategy)
@@ -58,20 +62,6 @@ StarWeather được tối ưu hóa để chạy trên các server vật lý m�
 ### 1. Phân Cấp Bộ Nhớ Đệm (Multi-level Caching)
 - L1 Cache (Redis): Lưu trữ "Hot States" - trạng thái hiện tại của tất cả vệ tinh đang hoạt động để truy xuất tức thì.
 - L2 Cache (Filesystem/CDN): Lưu trữ các tệp tin hình ảnh vệ tinh và radar đã qua xử lý.
-
-## [STOR] Hạ Tầng Lưu Trữ (Storage Infrastructure)
-
-Dữ liệu hình ảnh (Imagery) được tổng hợp từ mạng lưới vệ tinh khí tượng toàn cầu:
-- **Nguồn dữ liệu chính**: Constellation **Himawari-8/9** (JMA) cung cấp ảnh đĩa đầy đủ (Full Disk) phục vụ hiển thị lớp mây thời gian thực.
-- **Trạng thái Mở rộng**: Hệ thống đã sẵn sàng pipeline để tích hợp dữ liệu từ **GOES-R Series** (NOAA) và **Meteosat** (EUMETSAT).
-- **Vị trí lưu trữ vật lý**: `storage/app/public/weather/`
-- **Truy cập công khai**: `public/storage/weather/` (được liên kết qua symbolic link).
-- **Quy tắc đặt tên**:
-    - `himawari_latest.png`: Ảnh vệ tinh mới nhất phục vụ hiển thị thời gian thực trên Globe.
-    - `himawari_YYYYMMDD_HHMMSS.png`: Dữ liệu lịch sử phục vụ tính năng Imagery History.
-
-> [!NOTE]
-> AI Core xử lý dữ liệu hoàn toàn trên RAM để đảm bảo hiệu suất tối đa, không lưu trữ dữ liệu trung gian tại thư mục cục bộ của Microservice.
 
 ### 2. Quản Lý Hàng Đợi (Queue Orchestration)
 Sử dụng **Laravel Horizon** để giám sát và điều phối hàng trăm Worker. Các tác vụ được phân bổ vào các hàng đợi có ưu tiên khác nhau:

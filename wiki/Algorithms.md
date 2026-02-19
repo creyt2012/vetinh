@@ -49,13 +49,17 @@ Dữ liệu từ cảm biến AHI (Advanced Himawari Imager) được xử lý q
 
 Hệ thống triển khai một công cụ quét tự động (`StormTrackingService`) để phát hiện các bất thường khí quyển:
 - Phân tích Gradient: Tính toán tốc độ thay đổi áp suất theo thời gian ($dP/dt$).
-- Mô Hình Nội Suy Vectơ: Dự báo quỹ đạo dựa trên hướng di chuyển lịch sử và các trường dòng chảy khí quyển tầng cao.
+- Mô Hình Nội Suy Vectơ: Dự báo vị trí vệ tinh trong tương lai dựa trên các tham số nhiễu loạn (perturbations) mặt trời và khí quyển.
+
+![Constellation View](images/constellation.png)
 
 ---
 
 ## 4. Mạng Lưới Vệ Tinh Chiến Thuật (Strategic Satellite Network)
 
-Hệ thống StarWeather không chỉ lấy dữ liệu từ một nguồn duy nhất. Chúng tôi phân loại làm hai nhóm chính:
+Hệ thống StarWeather sử dụng các mô hình toán học và vật lý tiên tiến nhất để xử lý dữ liệu viễn thám.
+
+![Spectral Analysis](images/spectral_analysis.png)
 
 ### 4.1. Nhóm Imagery (Cung cấp Hình ảnh)
 Hiện tại, hệ thống sử dụng **Himawari-9** là nguồn cung cấp ảnh đĩa (Full Disk) chính với tần suất cập nhật 10 phút/lần. Đây là vệ tinh có độ phân giải phổ cao nhất khu vực Châu Á - Thái Bình Dương.

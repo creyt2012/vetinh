@@ -1,5 +1,7 @@
 # Tài liệu StarWeather - Tổng quan Hệ thống
 
+![Global View](images/global_view.png)
+
 Chào mừng bạn đến với tài liệu kỹ thuật chính thức của StarWeather. Đây là nền tảng phân tích dữ liệu vệ tinh và dự báo thời tiết chuyên sâu, được thiết kế để phục vụ các yêu cầu khắt khe của doanh nghiệp và tổ chức khí tượng.
 
 ## Tầm nhìn dự án
@@ -12,6 +14,9 @@ Hệ thống được thiết kế theo mô hình SaaS (Software as a Service), 
 
 1. Gói Miễn phí (FREE): Dành cho cá nhân nghiên cứu với các chỉ số cơ bản.
 2. Gói Chuyên nghiệp (PRO): Cung cấp dữ liệu cập nhật nhanh hơn và quyền truy cập API mở rộng.
+
+![Intelligence Dashboard](images/intelligence_dashboard.png)
+
 3. Gói Doanh nghiệp (ENTERPRISE): Toàn bộ tính năng, bao gồm dữ liệu vệ tinh Sentinel-1/2 và hỗ trợ kỹ thuật ưu tiên.
 4. Gói Chính phủ (GOVERNMENT): Tích hợp sâu các radar thời tiết và hệ thống cảnh báo cấp quốc gia.
 
