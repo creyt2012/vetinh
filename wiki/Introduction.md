@@ -20,6 +20,27 @@ The system is designed as a SaaS (Software as a Service) model, supporting multi
 3. Enterprise Plan (ENTERPRISE): All features, including Sentinel-1/2 satellite data and priority technical support.
 4. Government Plan (GOVERNMENT): Deep integration of weather radars and national-level warning systems.
 
+### [PIPELINE] Service Architecture
+```mermaid
+graph TD
+    User((User)) -->|Auth/Access| Portal[SaaS Portal]
+    Portal -->|Tier Check| Dispatcher{Request Dispatcher}
+    
+    Dispatcher -->|Real-time| WS[WebSocket Stream]
+    Dispatcher -->|Historical| DB[(Historical Archive)]
+    Dispatcher -->|Analytics| Insight[AI Insight Engine]
+
+    subgraph Service_Tiers["Access Levels"]
+        FREE[Basic Telemetry]
+        PRO[Extended API + High Frequency]
+        ENT[Sentinel-1/2 + Priority Support]
+    end
+
+    WS -.-> PRO
+    DB -.-> FREE
+    Insight -.-> ENT
+```
+
 ## Main System Components
 
 The system is divided into three primary architectural layers:
