@@ -6342,3 +6342,9 @@ To https://github.com/creyt2012/vetinh.git
    a3406cb..e936cd2  main -> main
 [00:01:21.3N] Pushed to GitHub. Contribution secured.
 [00:02:22.3N] Hyper-Sync triggered by git-autopush.log
+remote: This repository moved. Please use the new location:        
+remote:   https://github.com/creyt2012/StarWeather.git        
+To https://github.com/creyt2012/vetinh.git
+   e936cd2..d8cf6a0  main -> main
+[00:02:22.3N] Pushed to GitHub. Contribution secured.
+[00:02:56.3N] Hyper-Sync triggered by .DS_Store
