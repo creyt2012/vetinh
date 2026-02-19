@@ -1,5 +1,6 @@
 {
     "name": "creyt2012/vortex-meteo",
+    "repository": "https://github.com/creyt2012/vortex-meteo",
     "description": "StarWeather Meteorological Intelligence Engine",
     "type": "library",
     "license": "MIT",
