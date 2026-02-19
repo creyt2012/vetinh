@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\File;
 use App\Models\Module;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Log;
 
 class ModuleServiceProvider extends ServiceProvider
 {
@@ -14,33 +15,8 @@ class ModuleServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        if (!$this->app->runningInConsole() && !Schema::hasTable('modules')) {
-            return;
-        }
-
-        $modulesPath = base_path('Modules');
-
-        if (!File::isDirectory($modulesPath)) {
-            return;
-        }
-
-        $modules = File::directories($modulesPath);
-
-        foreach ($modules as $modulePath) {
-            $moduleName = basename($modulePath);
-
-            // In a real scenario, we check the DB. 
-            // For now, let's load if it's in the DB and active.
-            try {
-                $module = Module::where('name', $moduleName)->first();
-                if ($module && $module->is_active) {
-                    $this->registerModule($moduleName, $modulePath);
-                }
-            } catch (\Exception $e) {
-                // DB might not be ready yet
-                continue;
-            }
-        }
+        // We delay discovery to boot time where DB is ready, 
+        // unless we need to register specific classes early.
     }
 
     /**
@@ -48,18 +24,44 @@ class ModuleServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        if ($this->app->runningInConsole() && !str_contains(request()->fullUrl() ?? '', 'artisan')) {
+            // Avoid issues during some console commands if needed
+        }
+
+        try {
+            if (!Schema::hasTable('modules')) {
+                return;
+            }
+        } catch (\Exception $e) {
+            return;
+        }
+
+        $modulesPath = base_path('Modules');
+        if (!File::isDirectory($modulesPath)) {
+            return;
+        }
+
+        $modules = File::directories($modulesPath);
+        $activeModules = Module::where('is_active', true)->pluck('name')->toArray();
+
+        foreach ($modules as $modulePath) {
+            $moduleName = basename($modulePath);
+
+            if (in_array($moduleName, $activeModules)) {
+                $this->bootModule($moduleName, $modulePath);
+            }
+        }
     }
 
-    protected function registerModule(string $name, string $path): void
+    protected function bootModule(string $name, string $path): void
     {
+        // Register the module's own Service Provider if it exists
         $provider = "Modules\\{$name}\\Providers\\{$name}ServiceProvider";
-
         if (class_exists($provider)) {
             $this->app->register($provider);
         }
 
-        // Auto-load routes if they exist
+        // Auto-load routes
         if (File::exists("{$path}/routes/web.php")) {
             $this->loadRoutesFrom("{$path}/routes/web.php");
         }
@@ -76,6 +78,11 @@ class ModuleServiceProvider extends ServiceProvider
         // Auto-load migrations
         if (File::isDirectory("{$path}/database/migrations")) {
             $this->loadMigrationsFrom("{$path}/database/migrations");
+        }
+
+        // Auto-load translations
+        if (File::isDirectory("{$path}/resources/lang")) {
+            $this->loadTranslationsFrom("{$path}/resources/lang", strtolower($name));
         }
     }
 }
