@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Engines\Geo;
+namespace Vortex\Aerospace;
 
 use App\Models\WeatherMetric;
 use App\Engines\Analytics\RiskEngine;

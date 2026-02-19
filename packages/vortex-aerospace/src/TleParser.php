@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Engines\Satellite;
+namespace Vortex\Aerospace;
 
 class TleParser
 {

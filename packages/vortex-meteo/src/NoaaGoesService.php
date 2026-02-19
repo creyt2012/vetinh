@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Engines\Weather;
+namespace Vortex\Meteo;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;

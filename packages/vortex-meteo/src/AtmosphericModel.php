@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Engines\Weather;
+namespace Vortex\Meteo;
 
 class AtmosphericModel
 {

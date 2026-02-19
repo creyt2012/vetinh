@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Engines\Satellite;
+namespace Vortex\Aerospace;
 
 use App\Models\Satellite;
-use App\Engines\Weather\AtmosphericModel;
+use Vortex\Meteo\AtmosphericModel;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
-use App\Engines\Geo\GeoEngine;
+use Vortex\Aerospace\GeoEngine;
 
 class SatelliteTelemetryManager
 {
