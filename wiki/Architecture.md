@@ -2,6 +2,30 @@
 
 StarWeather is designed with a **Monolithic-Distributed Hybrid** architecture, leveraging Laravel's centralized processing power while distributing heavy tasks through Redis queues and dedicated processing nodes.
 
+### [ORCHESTRATION] Async Pipeline Flow
+```mermaid
+sequenceDiagram
+    participant S as Scheduler
+    participant Q as Redis Queue
+    participant W as Worker Cluster
+    participant D as DB/L1 Cache
+    participant B as WebSocket Broadcast
+
+    S->>Q: Dispatch IngestJob (Himawari)
+    S->>Q: Dispatch SatelliteMonitorJob
+    
+    loop Per Worker
+        W->>Q: Fetch Pending Task
+        activate W
+        W->>W: Process Scientific Calculation
+        W->>D: Persist State (r, v, metrics)
+        W->>B: Trigger Event Update
+        deactivate W
+    end
+    
+    B->>Client: 1Hz UI Sync
+```
+
 ---
 
 ## [SVC] Service Ecosystem
