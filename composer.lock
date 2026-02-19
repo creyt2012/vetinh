@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "faaa3e3c90f658550fffffbcacafb698",
+    "content-hash": "3dfb06325abf9ab78361d4ddf27770e4",
     "packages": [
         {
             "name": "brick/math",
@@ -7782,6 +7782,68 @@
                 }
             ],
             "time": "2024-11-21T01:49:47+00:00"
+        },
+        {
+            "name": "vortex/aerospace",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/vortex-aerospace",
+                "reference": "8aef43139fc52b1f8d012ed2e74a0ee3f4ff5e4e"
+            },
+            "require": {
+                "php": "^8.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Vortex\\Aerospace\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "creyt2012",
+                    "email": "mortarcloud@gmail.com"
+                }
+            ],
+            "description": "StarWeather Aerospace & Orbital Mechanics Engine",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
+            "name": "vortex/meteo",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/vortex-meteo",
+                "reference": "cbf578a866a15c94244804a4e952afd370f2dcde"
+            },
+            "require": {
+                "php": "^8.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Vortex\\Meteo\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "creyt2012",
+                    "email": "mortarcloud@gmail.com"
+                }
+            ],
+            "description": "StarWeather Meteorological Intelligence Engine",
+            "transport-options": {
+                "relative": true
+            }
         }
     ],
     "packages-dev": [
@@ -10159,7 +10221,7 @@
         }
     ],
     "aliases": [],
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
