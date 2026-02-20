@@ -1,14 +1,14 @@
 import ctypes
 import os
 import numpy as np
-from pydantic import BaseModel
 
 # Define the C++ struct in Python
 class SatelliteMetrics(ctypes.Structure):
     _fields_ = [("mean_brightness", ctypes.c_float),
                 ("cloud_coverage_pct", ctypes.c_float),
                 ("estimated_temperature_k", ctypes.c_float),
-                ("pressure_proxy_hpa", ctypes.c_float)]
+                ("pressure_proxy_hpa", ctypes.c_float),
+                ("optical_flow_magnitude", ctypes.c_float)]
 
 class HPCBridge:
     def __init__(self):
@@ -52,7 +52,8 @@ class HPCBridge:
             "mean_brightness": float(metrics.mean_brightness),
             "cloud_coverage_pct": float(metrics.cloud_coverage_pct),
             "temperature_c": round(float(metrics.estimated_temperature_k - 273.15), 1),
-            "pressure_hpa": round(float(metrics.pressure_proxy_hpa), 1)
+            "pressure_hpa": round(float(metrics.pressure_proxy_hpa), 1),
+            "optical_flow_magnitude": float(metrics.optical_flow_magnitude)
         }
 
 # Singleton Instance
@@ -61,3 +62,4 @@ try:
 except Exception as e:
     print("Warning: HPC Bridge failed to load. Falling back to Mock/Python.", e)
     hpc = None
+
