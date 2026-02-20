@@ -30,6 +30,17 @@ sequenceDiagram
 
 ## [SVC] Service Ecosystem
 
+<<<<<<< HEAD
+The project is designed following a **Hybrid Microservices** model:
+
+1.  **Core Backend (Laravel/PHP)**: Manages API, authentication, database, and task orchestration.
+2.  **AI Core (FastAPI/Python)**: Specialized microservice handling Computer Vision and atmospheric physics calculations from satellite imagery.
+3.  **Real-time Engine (WebSockets)**: Broadcasts satellite coordinates and instant warnings.
+
+![Mission Control](images/mission_control.png)
+
+## [PIPE] Data Pipeline
+=======
 The project is designed following a **NASA-Compliant Hybrid Microservices** model:
 
 1.  **Core Backend (Laravel/PHP)**: Manages authentication, database, and telemetry orchestration.
@@ -40,6 +51,7 @@ The project is designed following a **NASA-Compliant Hybrid Microservices** mode
 ![Mission Control](images/mission_control.png)
 
 ## [PIPE] DeepSky Enterprise Data Pipeline
+>>>>>>> 4db7682 (docs: Update Architecture and Algorithms with NASA STAC Microservices paradigm)
 
 ```mermaid
 graph TD
@@ -78,10 +90,17 @@ graph TD
     G3 -->|Insights Payload| H[PostGIS/DB]
 ```
 
+<<<<<<< HEAD
+1.  **Ingestion**: `HimawariIngestJob` downloads satellite images from public sources.
+2.  **Analysis**: AI Core processes pixels to derive temperature, pressure, and wind speed.
+3.  **Propagation**: `SatellitePropagateJob` calculates the next satellite position every second based on TLE.
+4.  **Delivery**: Data is pushed to the frontend via API or WebSockets.
+=======
 1.  **Ingestion**: `SatelliteImageryManager` pulls the latest planetary tile from public S3/HTTP sources.
 2.  **STAC Registration**: Laravel sends the URI to the FastAPI Gateway. The Gateway creates a STAC v1.0.0 Item, pushes it to Redis, and returns a Task ID.
 3.  **Asynchronous Execution**: Idle Celery Worker Nodes pull the task from Redis, download the image directly to their RAM, and execute the 3-Tier Pipeline (L1->L3).
 4.  **Delivery**: Results (Cloud Top Height, Cyclonic Intensity) are stored, ready for the Frontend Tactical Map to display.
+>>>>>>> 4db7682 (docs: Update Architecture and Algorithms with NASA STAC Microservices paradigm)
 
 ## Architectural Layers
 
