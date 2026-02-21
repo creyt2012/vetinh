@@ -206,6 +206,7 @@ const searchQuery = ref('');
 const searchResults = ref([]);
 const isSearching = ref(false);
 const groundStations = ref([]);
+const radarFacilities = ref([]); // NEW: Physical Radar Stations
 const radarTimestamp = ref(null);
 const showRadar = ref(false);
 const isSyncingSatellites = ref(false);
@@ -309,8 +310,14 @@ const syncGlobeLayers = () => {
     if (groundStations.value.length > 0) {
         combinedPoints = [...combinedPoints, ...groundStations.value.map(s => ({ ...s, isStation: true }))];
     }
+    if (showRadar.value && radarFacilities.value.length > 0) {
+        combinedPoints = [...combinedPoints, ...radarFacilities.value.map(s => ({ ...s, isRadar: true, lat: s.latitude, lng: s.longitude }))];
+    }
     
-    world.pointsData(combinedPoints);
+    world.pointsData(combinedPoints)
+         .pointColor(d => d.isStorm ? '#ef4444' : (d.isMarine ? '#00ccff' : (d.isStation ? '#00ffaa' : (d.isLightning ? '#ffffff' : (d.isRadar ? '#facc15' : '#0088ff')))))
+         .pointAltitude(d => d.isRadar ? 0.05 : 0.01)
+         .pointRadius(d => d.isRadar ? 0.6 : 0.5);
 
     // 2. Unified Rings Layer (Storms + Aurora)
     let combinedRings = [];
@@ -825,14 +832,16 @@ onMounted(async () => {
     try {
         const token = 'vethinh_strategic_internal_token_2026';
         
-        // Load storms and stations immediately
-        const [stormRes, stationRes] = await Promise.all([
+        // Load storms, stations, and radar facilities immediately
+        const [stormRes, stationRes, radarFacRes] = await Promise.all([
             axios.get(`/api/internal-map/storms?token=${token}`),
-            axios.get(`/api/internal-map/ground-stations?token=${token}`)
+            axios.get(`/api/internal-map/ground-stations?token=${token}`),
+            axios.get(`/api/internal-map/radar-stations?token=${token}`)
         ]);
         
         activeStorms.value = stormRes.data;
         groundStations.value = stationRes.data.data;
+        radarFacilities.value = radarFacRes.data;
 
         // Fetch Radar metadata
         const radarRes = await axios.get('https://api.rainviewer.com/public/weather-maps.json');
@@ -1036,6 +1045,9 @@ const flyToLocation = (lat, lng, altitude = 2.5) => {
 
 const toggleRadar = () => {
     showRadar.value = !showRadar.value;
+    syncGlobeLayers(); // Refresh Globe points for Radar Facilities
+    syncLeafletMarkers(); // Refresh Leaflet markers
+
     if (!map) return;
     
     if (showRadar.value && map._radarLayer) {
@@ -1043,8 +1055,6 @@ const toggleRadar = () => {
     } else if (map._radarLayer) {
         map.removeLayer(map._radarLayer);
     }
-    
-    // Globe Radar logic (using custom textures is complex, we start with 2D first)
 };
 
 const syncLeafletMarkers = () => {
@@ -1093,7 +1103,21 @@ const syncLeafletMarkers = () => {
                     html: `<div class="station-pulse"></div>`,
                     iconSize: [20, 20]
                 })
-            }).addTo(markers).bindTooltip(`STATION: ${station.name}`);
+            }).addTo(markers).bindTooltip(`EARTH_NODE: ${station.name}`);
+        });
+    }
+
+    // Radar Facilities
+    if (showRadar.value) {
+        radarFacilities.value.forEach(radar => {
+            L.circleMarker([radar.latitude, radar.longitude], {
+                radius: 6,
+                fillColor: '#facc15',
+                color: '#ca8a04',
+                weight: 2,
+                opacity: 0.9,
+                fillOpacity: 0.7
+            }).addTo(markers).bindTooltip(`DOPPLER_RADAR: ${radar.name} [${radar.frequency_band}]<br/>Radius: ${radar.coverage_radius_km}km`);
         });
     }
     
