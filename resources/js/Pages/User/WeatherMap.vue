@@ -1681,7 +1681,36 @@ const switchView = (mode) => {
                             <p class="text-sm font-black italic text-vibrant-blue">{{ selectedPoint.lat.toFixed(4) }}° N, {{ selectedPoint.lng.toFixed(4) }}° E</p>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-4">
+                        <!-- Radar Internal Telemetry Data (If point is Radar) -->
+                        <div v-if="pointData.type === 'radar'" class="space-y-3 p-3 bg-vibrant-blue/5 border border-vibrant-blue/30 rounded-lg">
+                            <h4 class="text-[10px] font-black text-vibrant-blue uppercase tracking-widest border-l-2 border-vibrant-blue pl-2">RADAR_NODE_TELEMETRY</h4>
+                            <div class="space-y-2 mt-2 text-[10px] font-mono">
+                                <div class="flex justify-between border-b border-white/5 pb-1">
+                                    <span class="text-white/40">SYSTEM_ID</span>
+                                    <span class="text-white font-bold">{{ pointData.code }}</span>
+                                </div>
+                                <div class="flex justify-between border-b border-white/5 pb-1">
+                                    <span class="text-white/40">BAND_PROFILE</span>
+                                    <span class="text-white font-bold">{{ pointData.frequency_band }} / {{ pointData.coverage_radius_km }}KM RAD</span>
+                                </div>
+                                <div class="flex justify-between border-b border-white/5 pb-1" v-if="pointData.parameters?.timezone">
+                                    <span class="text-white/40">LOCAL_TIMEZONE</span>
+                                    <span class="text-vibrant-green font-bold">{{ pointData.parameters.timezone }}</span>
+                                </div>
+                                <div class="flex justify-between border-b border-white/5 pb-1" v-if="pointData.parameters?.provider || pointData.parameters?.source">
+                                    <span class="text-white/40">OPERATING_AGENCY</span>
+                                    <span class="text-orange-400 font-bold max-w-[120px] truncate text-right border-b border-dashed border-orange-400/50 pb-0.5" :title="pointData.parameters.provider || pointData.parameters.source">
+                                        {{ pointData.parameters.provider || pointData.parameters.source }}
+                                    </span>
+                                </div>
+                                <div class="flex justify-between border-b border-white/5 pb-1" v-if="pointData.parameters?.data_coverage">
+                                    <span class="text-white/40">SWEEP_COVERAGE</span>
+                                    <span class="text-vibrant-blue font-bold">{{ pointData.parameters.data_coverage }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div v-if="pointData.type !== 'radar'" class="grid grid-cols-2 gap-4">
                             <div class="p-3 bg-white/[0.02] border border-white/5">
                                 <p class="text-[8px] font-black text-white/20 uppercase mb-1">Temperature</p>
                                 <p class="text-xl font-black italic">{{ pointData.temperature.toFixed(1) }}°C</p>
@@ -1700,7 +1729,7 @@ const switchView = (mode) => {
                             </div>
                         </div>
 
-                        <div v-if="pointData.ai_analysis" class="space-y-4 pt-4 border-t border-white/10">
+                        <div v-if="pointData.type !== 'radar' && pointData.ai_analysis" class="space-y-4 pt-4 border-t border-white/10">
                             <h4 class="text-[10px] font-black text-white/40 uppercase tracking-widest border-l-2 border-purple-500 pl-3">AI_Atmospheric_Analysis</h4>
                             <div class="grid grid-cols-1 gap-3">
                                 <div class="p-4 bg-purple-500/5 border border-purple-500/10 rounded-lg">
@@ -1727,7 +1756,7 @@ const switchView = (mode) => {
                             </div>
                         </div>
 
-                        <div class="space-y-2">
+                        <div v-if="pointData.type !== 'radar'" class="space-y-2">
                             <div class="flex justify-between items-center text-[9px] font-black uppercase tracking-widest">
                                 <span class="text-white/40">Cloud_Density</span>
                                 <span class="text-vibrant-blue">{{ pointData.cloud_density.toFixed(0) }}%</span>
@@ -1737,7 +1766,7 @@ const switchView = (mode) => {
                             </div>
                         </div>
 
-                        <div class="pt-4 border-t border-white/5">
+                        <div v-if="pointData.type !== 'radar'" class="pt-4 border-t border-white/5">
                             <button class="w-full py-3 bg-vibrant-blue text-white text-[9px] font-black uppercase tracking-widest hover:scale-[1.02] transition-all">
                                 GENERATE_DETAILED_FORECAST
                             </button>
