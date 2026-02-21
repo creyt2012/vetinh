@@ -54,10 +54,6 @@ class SyncRealRadarStations extends Command
 
             DB::beginTransaction();
 
-            // Clear old mock data if needed (optional, or just rely on unique constraints and updates)
-            // But let's keep it clean since user said they want REAL trạm, not mock.
-            RadarStation::truncate();
-
             foreach ($radars as $radarId => $data) {
                 // Ensure required fields exist
                 if (!isset($data['latitude']) || !isset($data['longitude'])) {
@@ -65,20 +61,15 @@ class SyncRealRadarStations extends Command
                     continue;
                 }
 
-                // Determine name
+                // Determine name (append ID to ensure uniqueness)
                 $name = $data['location'] ?? 'Unknown Location';
                 if (isset($data['country'])) {
                     $name .= ', ' . $data['country'];
                 }
+                $name .= ' (ID: ' . $radarId . ')';
 
-                // Determine code
-                $code = null;
-                if (isset($data['codes'])) {
-                    $code = $data['codes']['wmo'] ?? $data['codes']['icao'] ?? $data['codes']['national'] ?? null;
-                }
-                if (!$code) {
-                    $code = substr($radarId, 0, 10); // Fallback to a truncated ID
-                }
+                // We use the JSON key ($radarId) directly as the unique code to guarantee insertion success
+                $code = mb_substr((string) $radarId, 0, 50);
 
                 $status = (isset($data['status']) && $data['status'] == 1) ? 'operational' : 'offline';
 
@@ -88,22 +79,40 @@ class SyncRealRadarStations extends Command
                     $band = $band . '-band';
                 }
 
-                RadarStation::create([
-                    'name' => mb_substr($name, 0, 255),
-                    'code' => mb_substr($code, 0, 50),
-                    'latitude' => $data['latitude'],
-                    'longitude' => $data['longitude'],
-                    'elevation_m' => $data['station']['height'] ?? $data['antenna']['height'] ?? 0,
-                    'frequency_band' => mb_substr($band, 0, 50),
-                    'coverage_radius_km' => $data['max_range'] ?? 250,
-                    'status' => $status,
-                    'parameters' => [
-                        'radar_id' => $radarId,
-                        'antenna' => $data['antenna'] ?? null,
-                        'wrwp' => $data['wrwp'] ?? null,
-                        'state' => $data['state'] ?? null
-                    ]
-                ]);
+                $parameters = [
+                    'radar_id' => $radarId,
+                    'antenna' => $data['antenna'] ?? null,
+                    'wrwp' => $data['wrwp'] ?? null,
+                    'state' => $data['state'] ?? null
+                ];
+
+                // Upsert to handle unique constraints without failing the whole batch
+                // using the pseudo unique code
+                $existing = RadarStation::where('code', $code)->orWhere('name', $name)->first();
+
+                if ($existing) {
+                    $existing->update([
+                        'latitude' => $data['latitude'],
+                        'longitude' => $data['longitude'],
+                        'elevation_m' => $data['station']['height'] ?? $data['antenna']['height'] ?? 0,
+                        'frequency_band' => mb_substr($band, 0, 50),
+                        'coverage_radius_km' => $data['max_range'] ?? 250,
+                        'status' => $status,
+                        'parameters' => $parameters
+                    ]);
+                } else {
+                    RadarStation::create([
+                        'code' => $code,
+                        'name' => mb_substr($name, 0, 255),
+                        'latitude' => $data['latitude'],
+                        'longitude' => $data['longitude'],
+                        'elevation_m' => $data['station']['height'] ?? $data['antenna']['height'] ?? 0,
+                        'frequency_band' => mb_substr($band, 0, 50),
+                        'coverage_radius_km' => $data['max_range'] ?? 250,
+                        'status' => $status,
+                        'parameters' => $parameters
+                    ]);
+                }
 
                 $bar->advance();
             }
