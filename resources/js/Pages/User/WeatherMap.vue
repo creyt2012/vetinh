@@ -287,6 +287,12 @@ const toggleLayer = (id) => {
         } else if (map._cloudLayer) {
             if (map.hasLayer(map._cloudLayer)) map.removeLayer(map._cloudLayer);
         }
+
+        if (activeLayers.value.includes('wind') && map._windLayer) {
+            if (!map.hasLayer(map._windLayer)) map._windLayer.addTo(map);
+        } else if (map._windLayer) {
+            if (map.hasLayer(map._windLayer)) map.removeLayer(map._windLayer);
+        }
     }
 };
 
@@ -958,6 +964,8 @@ onUnmounted(() => {
 
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import 'leaflet-velocity/dist/leaflet-velocity.css';
+import 'leaflet-velocity';
 
 const initLeaflet = () => {
     if (map) return;
@@ -1050,6 +1058,43 @@ const initLeaflet = () => {
     
     map._radarLayer = radGroup;
     if (showRadar.value) map._radarLayer.addTo(map);
+
+    // Fluid Wind Particles (leaflet-velocity)
+    axios.get('/data/wind-global.json').then(res => {
+        const velocityLayer = L.velocityLayer({
+            displayValues: true,
+            displayOptions: {
+                velocityType: 'Global Wind',
+                displayPosition: 'bottomleft',
+                displayEmptyString: 'No wind data'
+            },
+            data: res.data,
+            maxVelocity: 20,
+            velocityScale: 0.005,
+            particleMultiplier: 1.0,
+            colorScale: [
+                "rgba(36,104, 180, 0.7)",
+                "rgba(60,157, 194, 0.7)",
+                "rgba(128,205,193, 0.7)",
+                "rgba(151,218,168, 0.7)",
+                "rgba(198,231,181, 0.7)",
+                "rgba(238,247,217, 0.7)",
+                "rgba(255,238,159, 1)",
+                "rgba(252,217,125, 1)",
+                "rgba(255,182,100, 1)",
+                "rgba(252,150,75,  1)",
+                "rgba(250,112,52,  1)",
+                "rgba(245,64,32,   1)",
+                "rgba(237,45,28,   1)",
+                "rgba(220,24,32,   1)",
+                "rgba(180,0,35,    1)"
+            ]
+        });
+        map._windLayer = velocityLayer;
+        if (activeLayers.value.includes('wind')) {
+            map._windLayer.addTo(map);
+        }
+    }).catch(err => console.error("Could not load wind flow data", err));
 };
 
 const handleSearch = async () => {
@@ -1192,7 +1237,7 @@ const switchView = (mode) => {
             
             // Switch layers
             map.eachLayer(l => {
-                if (l !== map._markersLayer && l !== map._radarLayer && l !== map._cloudLayer) map.removeLayer(l);
+                if (l !== map._markersLayer && l !== map._radarLayer && l !== map._cloudLayer && l !== map._windLayer) map.removeLayer(l);
             });
             
             if (mode === 'SATELLITE') {
