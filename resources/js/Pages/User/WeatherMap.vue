@@ -279,6 +279,15 @@ const toggleLayer = (id) => {
         if (id === 'wind') world.pathsData(activeLayers.value.includes('satellites') ? activeSatellites.value.map(s => s.path) : []);
     }
     syncGlobeLayers();
+
+    // Sync Leaflet Layers dynamically
+    if (map) {
+        if (activeLayers.value.includes('clouds') && map._cloudLayer) {
+            if (!map.hasLayer(map._cloudLayer)) map._cloudLayer.addTo(map);
+        } else if (map._cloudLayer) {
+            if (map.hasLayer(map._cloudLayer)) map.removeLayer(map._cloudLayer);
+        }
+    }
 };
 
 const syncGlobeLayers = () => {
@@ -998,12 +1007,25 @@ const initLeaflet = () => {
     } else {
         darkLayer.addTo(map);
     }
+    }
+
+    // Global Cloud Layer (OpenWeatherMap)
+    const cloudLayer = L.tileLayer('https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=b1b15e88fa797225412429c1c50c122a1', {
+        maxZoom: 18,
+        opacity: 0.85,
+        zIndex: 95
+    });
 
     // Storage for switching
     map._satelliteLayer = satelliteLayer;
     map._labelLayer = labelLayer;
     map._darkLayer = darkLayer;
     map._tempLayer = tempLayer;
+    map._cloudLayer = cloudLayer;
+
+    if (activeLayers.value.includes('clouds')) {
+        map._cloudLayer.addTo(map);
+    }
 
     // Composite Radar/Precipitation Overlay Group (Leaflet)
     // RainViewer has high-detail ground radar but missing coverage in Asia/Africa
@@ -1166,7 +1188,7 @@ const switchView = (mode) => {
             
             // Switch layers
             map.eachLayer(l => {
-                if (l !== map._markersLayer && l !== map._radarLayer) map.removeLayer(l);
+                if (l !== map._markersLayer && l !== map._radarLayer && l !== map._cloudLayer) map.removeLayer(l);
             });
             
             if (mode === 'SATELLITE') {
