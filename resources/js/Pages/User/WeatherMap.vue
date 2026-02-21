@@ -1011,8 +1011,9 @@ const initLeaflet = () => {
     // Global Cloud Layer (OpenWeatherMap)
     const cloudLayer = L.tileLayer('https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=b1b15e88fa797225412429c1c50c122a1', {
         maxZoom: 18,
-        opacity: 0.85,
-        zIndex: 95
+        opacity: 0.6,
+        zIndex: 95,
+        className: 'contrast-125 saturate-50 mix-blend-screen' // Blend into dark background
     });
 
     // Storage for switching
@@ -1033,15 +1034,17 @@ const initLeaflet = () => {
     
     // 1. Global Precipitation Fallback (OpenWeatherMap)
     const precipLayer = L.tileLayer('https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=b1b15e88fa797225412429c1c50c122a1', {
-        opacity: 0.55,
-        zIndex: 90
+        opacity: 0.65,
+        zIndex: 90,
+        className: 'hue-rotate-15 contrast-125 saturate-150 mix-blend-screen' // Enhance rain colors 
     }).addTo(radGroup);
 
     // 2. High-Res Ground Radar (RainViewer)
     if (radarTimestamp.value) {
         L.tileLayer(`https://tilecache.rainviewer.com/v2/radar/${radarTimestamp.value}/256/{z}/{x}/{y}/2/1_1.png`, {
-            opacity: 0.75,
-            zIndex: 100
+            opacity: 0.85,
+            zIndex: 100,
+            className: 'contrast-150 saturate-200 drop-shadow-lg' // Make radar pop against dark background
         }).addTo(radGroup);
     }
     
