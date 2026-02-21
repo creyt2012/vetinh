@@ -1,5 +1,5 @@
 import numpy as np
-from ...hpc_bridge import hpc
+from hpc_bridge import hpc
 
 class AtmospherePhysicsEngine:
     """
