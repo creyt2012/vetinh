@@ -13,7 +13,7 @@ import {
 
 const globeContainer = ref(null);
 const leafletContainer = ref(null);
-const viewMode = ref('GLOBE'); // GLOBE, SATELLITE, FLAT
+const viewMode = ref('GLOBE'); // GLOBE, SATELLITE, FLAT, TEMPERATURE
 const activeLayers = ref(['clouds', 'satellites']); // Multi-layer selection
 const activeStorms = ref([]);
 const activeSatellites = ref([]);
@@ -699,6 +699,7 @@ const viewOptions = [
     { id: 'GLOBE', name: 'TACTICAL_GLOBE', icon: GlobeIcon },
     { id: 'SATELLITE', name: 'SAT_REALITY', icon: Satellite },
     { id: 'FLAT', name: 'SYNOPTIC_FLAT', icon: MapIcon },
+    { id: 'TEMPERATURE', name: 'THERMAL_MAP', icon: Thermometer },
 ];
 
 import { watch } from 'vue';
@@ -980,9 +981,20 @@ const initLeaflet = () => {
         maxZoom: 20
     });
 
+    // Temperature Overlay (OpenWeatherMap / RainViewer style)
+    // Using a sample thermal/temperature tile from standard weather map providers (stamen/carto dark underlay + thermal layer)
+    const tempLayer = L.tileLayer('https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=93fd7215a772f4e8ebdd3f5a898df5d0', {
+        maxZoom: 18,
+        opacity: 0.6
+    });
+
     // Initial layer based on mode
     if (viewMode.value === 'SATELLITE') {
         satelliteLayer.addTo(map);
+        labelLayer.addTo(map);
+    } else if (viewMode.value === 'TEMPERATURE') {
+        darkLayer.addTo(map);
+        tempLayer.addTo(map);
         labelLayer.addTo(map);
     } else {
         darkLayer.addTo(map);
@@ -992,6 +1004,7 @@ const initLeaflet = () => {
     map._satelliteLayer = satelliteLayer;
     map._labelLayer = labelLayer;
     map._darkLayer = darkLayer;
+    map._tempLayer = tempLayer;
 
     // Radar Overlay (Leaflet)
     if (radarTimestamp.value) {
@@ -1136,11 +1149,15 @@ const switchView = (mode) => {
             
             // Switch layers
             map.eachLayer(l => {
-                if (l !== map._markersLayer) map.removeLayer(l);
+                if (l !== map._markersLayer && l !== map._radarLayer) map.removeLayer(l);
             });
             
             if (mode === 'SATELLITE') {
                 map._satelliteLayer.addTo(map);
+                map._labelLayer.addTo(map);
+            } else if (mode === 'TEMPERATURE') {
+                map._darkLayer.addTo(map);
+                map._tempLayer.addTo(map);
                 map._labelLayer.addTo(map);
             } else {
                 map._darkLayer.addTo(map);
