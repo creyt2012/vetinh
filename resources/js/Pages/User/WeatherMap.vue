@@ -259,6 +259,23 @@ onMounted(() => {
                     };
                 }
             }
+        })
+        .listen('.batch.updated', (e) => {
+            // Bulk update for high performance
+            e.satellites.forEach(data => {
+                const index = activeSatellites.value.findIndex(s => s.norad_id === data.norad_id);
+                if (index !== -1) {
+                    activeSatellites.value[index].position = {
+                        lat: data.lat || data.latitude,
+                        lng: data.lng || data.longitude,
+                        alt: data.alt || data.altitude
+                    };
+                }
+            });
+            // Trigger globe update if active
+            if (activeLayers.value.includes('satellites') && world) {
+                world.customLayerData([...activeSatellites.value.map(s => ({...s}))]);
+            }
         });
 });
 
