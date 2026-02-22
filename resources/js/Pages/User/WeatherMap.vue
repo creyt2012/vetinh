@@ -14,26 +14,20 @@ import {
 const globeContainer = ref(null);
 const leafletContainer = ref(null);
 const viewMode = ref('GLOBE'); // GLOBE, SATELLITE, FLAT, TEMPERATURE
-const activeLayers = ref(['clouds', 'satellites']); // Multi-layer selection
-const activeStorms = ref([]);
-const activeSatellites = ref([]);
-const selectedPoint = ref(null);
-const selectedSatellite = ref(null);
-const pointData = ref(null);
-const isLoadingPoint = ref(false);
+const playbackSpeed = ref(1);
+const showAtmosphere = ref(true);
+const currentZonePoints = ref([]);
+const showGroundStations = ref(true);
+const showSensorPayload = ref(false);
 const showBottomForecast = ref(false);
-const forecastData = ref([]);
-const isLoadingForecast = ref(false);
-const orbitTick = ref(0);
-const lastFetchTime = ref(Date.now());
-const isPOVMode = ref(false);
-const isLive = ref(true);
 const playbackTime = ref(Date.now());
+const isLive = ref(true);
 const timeMultiplier = ref(1);
+
 const isSyncingSatellites = ref(false);
 const isDrawingZone = ref(false);
 const watchZones = ref([]);
-const showLightning = ref(true);
+const showLightning = ref(false);
 const lightningData = ref([]);
 const showRadar = ref(true);
 const radarFacilities = ref([]);
@@ -42,7 +36,6 @@ const marineData = ref([]);
 const windParticles = ref([]);
 const rafId = ref(null);
 const intervalId = ref(null);
-const playbackSpeed = ref(1);
 const showAtmosphere = ref(true);
 
 const togglePOV = () => {
@@ -216,19 +209,7 @@ const handleGlobeClick = async (arg1, arg2, arg3) => {
 const searchQuery = ref('');
 const searchResults = ref([]);
 const isSearching = ref(false);
-const groundStations = ref([]);
-const radarFacilities = ref([]); // NEW: Physical Radar Stations
-const radarTimestamp = ref(null);
-const showRadar = ref(true);
-const isSyncingSatellites = ref(false);
-const showGroundStations = ref(true);
-const showLightning = ref(false);
-const lightningData = ref([]);
-const isDrawingZone = ref(false);
-const currentZonePoints = ref([]);
-const watchZones = ref([]);
 const telemetryData = ref(null);
-const showSensorPayload = ref(false);
 
 const toggleSensorPayload = () => {
     showSensorPayload.value = !showSensorPayload.value;
@@ -878,11 +859,11 @@ onMounted(async () => {
                 const pos = d.position || { 
                     lat: d.latitude || d.lat || 0, 
                     lng: d.longitude || d.lng || 0, 
-                    alt: d.altitude || d.alt || 0.1 
+                    alt: d.altitude || d.alt || 0 
                 };
                 const { lat, lng, alt } = pos;
-                const scaledAlt = Math.min(alt, 1.0) * 0.15; 
-                const coords = world.getCoords(lat, lng, scaledAlt + 0.05);
+                const scaledAlt = (alt || 0) * 0.00005 + 0.05; 
+                const coords = world.getCoords(lat, lng, scaledAlt);
                 obj.position.set(coords.x, coords.y, coords.z);
                 obj.lookAt(0, 0, 0); 
             })
@@ -897,7 +878,7 @@ onMounted(async () => {
             .pathDashLength(0) 
             .pathPointLat(p => p[0])
             .pathPointLng(p => p[1])
-            .pathPointAlt(p => (p[2] || 0) * 0.15 + 0.08) // Even higher to be sure
+            .pathPointAlt(p => (p[2] || 0) * 0.00005 + 0.05)
             .onGlobeClick(handleGlobeClick)
             .onPolygonClick(handleGlobeClick)
             .onPointClick(handleGlobeClick)
