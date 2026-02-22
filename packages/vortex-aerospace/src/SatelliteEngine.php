@@ -36,7 +36,7 @@ class SatelliteEngine
 
                 $pos = $this->propagate($satellite, $time);
                 // [lat, lng, alt] format for globe.gl
-                $path[] = [$pos['latitude'], $pos['longitude'], $pos['altitude'] * 0.15]; // Scaled for visualization
+                $path[] = [$pos['latitude'], $pos['longitude'], $pos['altitude']];
             }
 
             return $path;
