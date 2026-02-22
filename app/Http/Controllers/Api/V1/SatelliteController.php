@@ -139,11 +139,19 @@ class SatelliteController extends Controller
                     ->latest('tracked_at')
                     ->first();
 
+                $trackData = app(\Vortex\Aerospace\SatelliteEngine::class)->propagate($sat);
+                $path = app(\Vortex\Aerospace\SatelliteEngine::class)->getOrbitPath($sat);
+
                 return [
                     'id' => $sat->id,
                     'name' => $sat->name,
                     'norad_id' => $sat->norad_id,
                     'type' => $sat->type,
+                    'path' => $path,
+                    'telemetry' => [
+                        'period' => $trackData['period'] ?? 0,
+                        'velocity' => $trackData['velocity'] ?? 0,
+                    ],
                     'last_track' => $latestTrack ? [
                         'latitude' => $latestTrack->latitude,
                         'longitude' => $latestTrack->longitude,
@@ -151,7 +159,14 @@ class SatelliteController extends Controller
                         'velocity' => $latestTrack->velocity,
                         'timestamp' => $latestTrack->tracked_at,
                         'source' => $latestTrack->source ?? 'Authentic Telemetry'
-                    ] : null
+                    ] : [
+                        'latitude' => $trackData['latitude'],
+                        'longitude' => $trackData['longitude'],
+                        'altitude' => $trackData['altitude'],
+                        'velocity' => $trackData['velocity'],
+                        'timestamp' => $trackData['timestamp'],
+                        'source' => 'Calculated Baseline'
+                    ]
                 ];
             });
 
