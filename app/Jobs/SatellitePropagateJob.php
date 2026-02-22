@@ -31,6 +31,7 @@ class SatellitePropagateJob implements ShouldQueue
                 $stateData = array_merge([
                     'id' => $satellite->id,
                     'name' => $satellite->name,
+                    'norad_id' => $satellite->norad_id,
                     'type' => $satellite->type,
                     'velocity' => $trackData['velocity'] ?? 0,
                     'altitude' => $trackData['altitude'] ?? 0,
