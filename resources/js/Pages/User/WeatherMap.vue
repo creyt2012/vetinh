@@ -27,6 +27,23 @@ const isLoadingForecast = ref(false);
 const orbitTick = ref(0);
 const lastFetchTime = ref(Date.now());
 const isPOVMode = ref(false);
+const isLive = ref(true);
+const playbackTime = ref(Date.now());
+const timeMultiplier = ref(1);
+const isSyncingSatellites = ref(false);
+const isDrawingZone = ref(false);
+const watchZones = ref([]);
+const showLightning = ref(true);
+const lightningData = ref([]);
+const showRadar = ref(true);
+const radarFacilities = ref([]);
+const radarTimestamp = ref(null);
+const marineData = ref([]);
+const windParticles = ref([]);
+const rafId = ref(null);
+const intervalId = ref(null);
+const playbackSpeed = ref(1);
+const showAtmosphere = ref(true);
 
 const togglePOV = () => {
     isPOVMode.value = !isPOVMode.value;
@@ -858,8 +875,12 @@ onMounted(async () => {
                 return group;
             })
             .customThreeObjectUpdate((obj, d) => {
-                if (!d.position || !world) return;
-                const { lat, lng, alt } = d.position;
+                const pos = d.position || { 
+                    lat: d.latitude || d.lat || 0, 
+                    lng: d.longitude || d.lng || 0, 
+                    alt: d.altitude || d.alt || 0.1 
+                };
+                const { lat, lng, alt } = pos;
                 const scaledAlt = Math.min(alt, 1.0) * 0.15; 
                 const coords = world.getCoords(lat, lng, scaledAlt + 0.05);
                 obj.position.set(coords.x, coords.y, coords.z);
