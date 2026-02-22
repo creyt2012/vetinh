@@ -14,19 +14,26 @@ import {
 const globeContainer = ref(null);
 const leafletContainer = ref(null);
 const viewMode = ref('GLOBE'); // GLOBE, SATELLITE, FLAT, TEMPERATURE
-const playbackSpeed = ref(1);
-const showAtmosphere = ref(true);
-const currentZonePoints = ref([]);
-const showGroundStations = ref(true);
-const showSensorPayload = ref(false);
+const activeLayers = ref(['clouds', 'satellites']); // Multi-layer selection
+const activeStorms = ref([]);
+const activeSatellites = ref([]);
+const selectedPoint = ref(null);
+const selectedSatellite = ref(null);
+const pointData = ref(null);
+const isLoadingPoint = ref(false);
 const showBottomForecast = ref(false);
-const playbackTime = ref(Date.now());
+const forecastData = ref([]);
+const isLoadingForecast = ref(false);
+const orbitTick = ref(0);
+const lastFetchTime = ref(Date.now());
+const isPOVMode = ref(false);
 const isLive = ref(true);
-const timeMultiplier = ref(1);
-
+const playbackTime = ref(Date.now());
+const timeMultiplier = ref(300); // Fast forward for visualization
 const isSyncingSatellites = ref(false);
 const isDrawingZone = ref(false);
 const watchZones = ref([]);
+const currentZonePoints = ref([]);
 const showLightning = ref(false);
 const lightningData = ref([]);
 const showRadar = ref(true);
@@ -36,7 +43,16 @@ const marineData = ref([]);
 const windParticles = ref([]);
 const rafId = ref(null);
 const intervalId = ref(null);
+const playbackSpeed = ref(1);
 const showAtmosphere = ref(true);
+const groundStations = ref([]);
+const auroraData = ref([]);
+const riskHeatmapData = ref([]);
+const ndviData = ref([]);
+const showGroundStations = ref(true);
+const showSensorPayload = ref(false);
+const telemetryData = ref(null);
+const modelMode = ref('ECMWF');
 
 const togglePOV = () => {
     isPOVMode.value = !isPOVMode.value;
@@ -111,7 +127,7 @@ const refreshTacticalData = async () => {
             headers: { 'X-API-KEY': 'vetinh_dev_key_123' }
         });
         activeSatellites.value = res.data.data;
-        lastFetchTime.value = Date.now();
+        lastFetchTime.value = isLive.value ? Date.now() : playbackTime.value;
         
         if (world) {
             world.customLayerData(activeSatellites.value);
@@ -205,16 +221,6 @@ const handleGlobeClick = async (arg1, arg2, arg3) => {
     }
 };
 
-// Pro Upgrade State
-const searchQuery = ref('');
-const searchResults = ref([]);
-const isSearching = ref(false);
-const telemetryData = ref(null);
-
-const toggleSensorPayload = () => {
-    showSensorPayload.value = !showSensorPayload.value;
-};
-
 // Polling Timer for Telemetry
 let telemetryInterval = null;
 
@@ -281,15 +287,6 @@ onUnmounted(() => {
     window.Echo.leave('satellites.live');
     if (telemetryInterval) clearInterval(telemetryInterval);
 });
-const auroraData = ref([]);
-const riskHeatmapData = ref([]);
-const windParticles = ref([]);
-const marineData = ref([]);
-const ndviData = ref([]);
-const isLive = ref(true);
-const playbackTime = ref(Date.now());
-const modelMode = ref('ECMWF'); // ECMWF, GFS, COMPARE
-const timeMultiplier = ref(300); // 300x for fast orbital visualization
 
 const imageryConstellations = [
     { id: '41836', name: 'ASIA_PACIFIC (HIMAWARI)', region: 'ASPAC', norad_id: '41836' },
@@ -309,21 +306,6 @@ const toggleLayer = (id) => {
         if (id === 'wind') world.pathsData(activeLayers.value.includes('satellites') ? activeSatellites.value.map(s => s.path) : []);
     }
     syncGlobeLayers();
-
-    // Sync Leaflet Layers dynamically
-    if (map) {
-        if (activeLayers.value.includes('clouds') && map._cloudLayer) {
-            if (!map.hasLayer(map._cloudLayer)) map._cloudLayer.addTo(map);
-        } else if (map._cloudLayer) {
-            if (map.hasLayer(map._cloudLayer)) map.removeLayer(map._cloudLayer);
-        }
-
-        if (activeLayers.value.includes('wind') && map._windLayer) {
-            if (!map.hasLayer(map._windLayer)) map._windLayer.addTo(map);
-        } else if (map._windLayer) {
-            if (map.hasLayer(map._windLayer)) map.removeLayer(map._windLayer);
-        }
-    }
 };
 
 const syncGlobeLayers = () => {
