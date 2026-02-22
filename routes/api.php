@@ -38,6 +38,7 @@ Route::middleware(['auth.api_key', \App\Http\Middleware\CheckApiKeyLimits::class
     Route::get('/weather/storms/{storm}', [\App\Http\Controllers\Api\V1\StormController::class, 'show']);
     Route::get('/weather/storms/{storm}/vortex', [\App\Http\Controllers\Api\V1\StormController::class, 'vortex']);
     Route::get('/weather/risk-areas', [\App\Http\Controllers\Api\V1\RiskAreaController::class, 'index']);
+    Route::get('/weather/radar-stations', [\App\Http\Controllers\Api\V1\RadarStationController::class, 'index']);
 
     Route::get('/weather/trends', function () {
         return \App\Models\DailyWeatherSummary::latest()->limit(30)->get();
