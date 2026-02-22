@@ -898,41 +898,50 @@ onMounted(async () => {
     }
 
     // Initial Fetch (vitals first for fast render)
-    try {
-        const headers = { 'X-API-KEY': 'vetinh_dev_key_123' };
-        
-        // Load storms, stations, and radar facilities immediately
-        const [stormRes, stationRes, radarFacRes] = await Promise.all([
-            axios.get('/api/v1/weather/storms', { headers }),
-            axios.get('/api/v1/weather/ground-stations', { headers }),
-            axios.get('/api/v1/weather/radar-stations', { headers })
-        ]);
-        
-        activeStorms.value = stormRes.data;
-        groundStations.value = stationRes.data.data;
-        radarFacilities.value = radarFacRes.data;
+    const headers = { 'X-API-KEY': 'vetinh_dev_key_123' };
+    
+    const fetchStorms = async () => {
+        try {
+            const res = await axios.get('/api/v1/weather/storms', { headers });
+            activeStorms.value = res.data;
+        } catch (e) { console.error("Storm fetch failed", e); }
+    };
 
-        // Fetch Radar metadata
-        const radarRes = await axios.get('https://api.rainviewer.com/public/weather-maps.json');
-        radarTimestamp.value = radarRes.data.radar.past[radarRes.data.radar.past.length - 1].time;
-        
+    const fetchStations = async () => {
+        try {
+            const res = await axios.get('/api/v1/weather/ground-stations', { headers });
+            groundStations.value = res.data.data;
+        } catch (e) { console.error("Station fetch failed", e); }
+    };
+
+    const fetchRadarStations = async () => {
+        try {
+            const res = await axios.get('/api/v1/weather/radar-stations', { headers });
+            radarFacilities.value = res.data;
+        } catch (e) { console.error("Radar Station fetch failed", e); }
+    };
+
+    const fetchRadarMetadata = async () => {
+        try {
+            const res = await axios.get('https://api.rainviewer.com/public/weather-maps.json');
+            radarTimestamp.value = res.data.radar.past[res.data.radar.past.length - 1].time;
+        } catch (e) { console.error("Radar metadata failure", e); }
+    };
+
+    await Promise.all([fetchStorms(), fetchStations(), fetchRadarStations(), fetchRadarMetadata()]);
+    syncGlobeLayers();
+
+    // DECOUPLED: Fetch Satellites in background
+    isSyncingSatellites.value = true;
+    axios.get('/api/v1/satellites/live', { headers }).then(satRes => {
+        activeSatellites.value = satRes.data.data || [];
         syncGlobeLayers();
-
-        // DECOUPLED: Fetch Satellites in background
-        isSyncingSatellites.value = true;
-        axios.get('/api/v1/satellites/live', { headers }).then(satRes => {
-            activeSatellites.value = satRes.data.data;
-            syncGlobeLayers();
-            isSyncingSatellites.value = false;
-            console.log("SATELLITE_HYDRATION_COMPLETE");
-        }).catch(err => {
-            console.error("Satellite hydration failed", err);
-            isSyncingSatellites.value = false;
-        });
-
-    } catch (e) {
-        console.error('Failed to fetch initial tactical data', e);
-    }
+        isSyncingSatellites.value = false;
+        console.log("SATELLITE_HYDRATION_COMPLETE");
+    }).catch(err => {
+        console.error("Satellite hydration failed", err);
+        isSyncingSatellites.value = false;
+    });
 
 const syncCommsLinks = () => {
     if (!world || activeSatellites.value.length === 0 || groundStations.value.length === 0) return;
