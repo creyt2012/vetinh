@@ -110,7 +110,10 @@ onMounted(() => {
                 <div v-for="(val, label) in stats" :key="label" 
                     class="bg-[#08080C] border border-white/5 p-6 relative overflow-hidden group hover:border-vibrant-blue/30 transition-all duration-500">
                     <p class="text-[8px] font-black text-white/20 uppercase tracking-[0.4em] mb-1 italic">{{ label.replace(/_/g, '.') }}</p>
-                    <h3 class="text-3xl font-black font-outfit text-white tabular-nums group-hover:text-vibrant-blue transition-colors">{{ val }}</h3>
+                    <h3 class="text-3xl font-black font-outfit text-white tabular-nums group-hover:text-vibrant-blue transition-colors">
+                        <template v-if="label === 'monthly_usage'">{{ (val / 1000).toFixed(1) }}k</template>
+                        <template v-else>{{ val }}</template>
+                    </h3>
                     <div class="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-vibrant-blue/20 to-transparent"></div>
                 </div>
             </div>

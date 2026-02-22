@@ -79,6 +79,22 @@ Route::get('/api-docs', function () {
 Route::get('/reports', [\App\Http\Controllers\User\ReportController::class, 'index'])->name('user.reports.index');
 Route::get('/reports/{file}/download', [\App\Http\Controllers\User\ReportController::class, 'download'])->name('user.reports.download');
 
+Route::get('/marine/tracking', function () {
+    return Inertia::render('User/MarineTracking');
+})->name('user.marine.index');
+
+Route::get('/orbital/safety', function () {
+    return Inertia::render('User/OrbitalSafety');
+})->name('user.orbital.safety');
+
+Route::get('/system/health', function () {
+    return Inertia::render('User/SystemHealth');
+})->name('user.health.index');
+
+Route::get('/stac/discovery', function () {
+    return Inertia::render('User/StacDiscovery');
+})->name('stac.discovery');
+
 // Satellite Intelligence APIs
 Route::prefix('api/user/satellite')->group(function () {
     Route::get('/{norad_id}', [\App\Http\Controllers\User\SatelliteIntelController::class, 'show']);
@@ -146,8 +162,15 @@ Route::prefix('admin')->group(function () {
     Route::put('/users/{user}', [\App\Http\Controllers\Admin\UserManagementController::class, 'update'])->name('admin.users.update');
     Route::delete('/users/{user}', [\App\Http\Controllers\Admin\UserManagementController::class, 'destroy'])->name('admin.users.destroy');
 
-    // System Health (SLA) (NEW)
-    Route::get('/system/health', [\App\Http\Controllers\Admin\SystemHealthController::class, 'index'])->name('admin.system.health');
+    // Surveillance Management
+    Route::get('/vessels', [\App\Http\Controllers\Admin\VesselManagementController::class, 'index'])->name('admin.vessels.index');
+    Route::patch('/vessels/{vessel}', [\App\Http\Controllers\Admin\VesselManagementController::class, 'update'])->name('admin.vessels.update');
+    Route::delete('/vessels/{vessel}', [\App\Http\Controllers\Admin\VesselManagementController::class, 'destroy'])->name('admin.vessels.destroy');
+
+    Route::get('/orbital-safety', [\App\Http\Controllers\Admin\OrbitalSafetyController::class, 'index'])->name('admin.orbital.index');
+    Route::patch('/orbital-safety/{conjunction}', [\App\Http\Controllers\Admin\OrbitalSafetyController::class, 'update'])->name('admin.orbital.update');
+
+    Route::get('/health', [\App\Http\Controllers\Admin\SystemHealthController::class, 'index'])->name('admin.health.index');
 
     // System Infrastructure Settings
     Route::get('/settings', [\App\Http\Controllers\Admin\SystemSettingController::class, 'index'])->name('admin.settings.index');

@@ -183,6 +183,27 @@ const handleSurfaceClick = async (data) => {
         console.error('Failed to fetch forecast:', e);
     }
 };
+const transmitIntel = async () => {
+    if (!selectedLocation.value) return;
+    
+    try {
+        const response = await fetch('/api/v1/internal/transmit', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-API-KEY': 'vetinh_dev_key_123'
+            },
+            body: JSON.stringify(selectedLocation.value)
+        });
+        const json = await response.json();
+        
+        if (json.status === 'success') {
+            alert(`SUCCESS: ${json.message}\nTXID: ${json.transmission_id}`);
+        }
+    } catch (e) {
+        console.error('Transmission failed:', e);
+    }
+};
 </script>
 
 <template>
@@ -290,9 +311,9 @@ const handleSurfaceClick = async (data) => {
                                     <span class="text-4xl font-black">{{ selectedLocation.temp }}</span>
                                     <span class="text-sm font-bold text-white/20">°C</span>
                                 </div>
-                                <!-- Sparkline -->
+                                <!-- Sparkline (Mocked with random for visual but should be API) -->
                                 <div class="h-8 mt-4 flex items-end space-x-1 outline outline-1 outline-white/5 p-1 rounded">
-                                    <div v-for="i in 15" :key="i" :style="{ height: (30 + Math.random() * 70) + '%' }" class="flex-1 bg-vibrant-blue/20 rounded-t-[1px]"></div>
+                                    <div v-for="i in 15" :key="i" :style="{ height: (50 + Math.sin(i + Math.random()) * 20) + '%' }" class="flex-1 bg-vibrant-blue/20 rounded-t-[1px]"></div>
                                 </div>
                             </div>
 

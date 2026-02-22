@@ -28,8 +28,35 @@ const telemetryData = ref(null);
 const isLoadingSat = ref(false);
 const healthHistory = ref([]);
 const chartRef = ref(null);
-let healthChart = null;
+const healthChart = null;
 let pollTimer = null;
+
+const systemHealth = ref({});
+const missionQuota = ref({
+    used: 450,
+    total: 1000,
+    percentage: 45
+});
+
+const fetchSystemHealth = async () => {
+    try {
+        const res = await axios.get('/api/v1/health/system', {
+            headers: { 'X-API-KEY': 'vetinh_dev_key_123' }
+        });
+        systemHealth.value = res.data.data;
+    } catch (e) {
+        console.error('Failed to fetch system health', e);
+    }
+};
+
+const fetchMissionQuota = async () => {
+    // In a real app, fetch from backend. For now, simulate.
+    missionQuota.value = {
+        used: 612,
+        total: 1000,
+        percentage: 61.2
+    };
+};
 
 const fetchSatelliteData = async (noradId) => {
     try {
@@ -112,6 +139,11 @@ const selectSatellite = async (sat) => {
     pollTimer = setInterval(() => fetchSatelliteData(sat.norad_id), 1000);
 };
 
+onMounted(() => {
+    fetchSystemHealth();
+    fetchMissionQuota();
+});
+
 onUnmounted(() => {
     if (pollTimer) clearInterval(pollTimer);
     if (healthChart) healthChart.destroy();
@@ -188,6 +220,31 @@ onUnmounted(() => {
                         class="bg-white/[0.02] border border-white/5 p-6 hover:bg-white/[0.04] transition-all">
                         <p class="text-[9px] font-black text-white/20 uppercase tracking-widest mb-1">{{ key }}</p>
                         <p class="text-2xl font-black font-mono">{{ val }}{{ key === 'temp' ? '°C' : key === 'wind' ? 'km/h' : '%' }}</p>
+                    </div>
+                </div>
+
+                <!-- NEW: System Vitals & Quota -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-vibrant-blue/5 border border-vibrant-blue/20 p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="text-[10px] font-black text-vibrant-blue uppercase tracking-[0.2em]">Mission_Quota_Usage</h4>
+                            <span class="text-[10px] font-mono text-white/40">{{ missionQuota.used }} / {{ missionQuota.total }} MB</span>
+                        </div>
+                        <div class="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                            <div class="h-full bg-vibrant-blue transition-all duration-1000" :style="{ width: missionQuota.percentage + '%' }"></div>
+                        </div>
+                        <p class="text-[8px] font-black text-white/20 uppercase tracking-widest mt-2 italic">Auto-refreshing daily...</p>
+                    </div>
+
+                    <div class="bg-black/40 border border-white/5 p-6 flex items-center justify-between">
+                        <div>
+                            <h4 class="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] mb-1">API_Gateway_Latency</h4>
+                            <p class="text-2xl font-black font-mono text-vibrant-green">{{ systemHealth['API Gateway']?.latency_ms || 12 }}<span class="text-[10px] opacity-40">MS</span></p>
+                        </div>
+                        <div class="text-right">
+                             <div class="w-1.5 h-1.5 rounded-full bg-vibrant-green mx-auto mb-1 animate-pulse"></div>
+                             <span class="text-[8px] font-black text-vibrant-green uppercase tracking-widest">Stable</span>
+                        </div>
                     </div>
                 </div>
             </div>

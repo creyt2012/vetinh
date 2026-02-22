@@ -16,8 +16,35 @@ class SatelliteEngine
     private const WGS84_E2 = 0.00669437999014; // eccentricity squared
 
     /**
-     * Propagate satellite position to a specific time.
+     * Generate an array of coordinates representing one full orbital revolution.
+     * Calculated as a ground track relative to the requested start time.
      */
+    public function getOrbitPath(object $satellite, int $points = 120): array
+    {
+        try {
+            $baseState = $this->propagate($satellite);
+            $period = $baseState['period'];
+            $stepMinutes = $period / $points;
+
+            $path = [];
+            $startTime = new DateTime('now', new DateTimeZone('UTC'));
+
+            for ($i = 0; $i < $points; $i++) {
+                $time = clone $startTime;
+                $offset = (int) ($i * $stepMinutes);
+                $time->modify("+{$offset} minutes");
+
+                $pos = $this->propagate($satellite, $time);
+                // [lat, lng, alt] format for globe.gl
+                $path[] = [$pos['latitude'], $pos['longitude'], $pos['altitude'] * 0.15]; // Scaled for visualization
+            }
+
+            return $path;
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+
     public function propagate(object $satellite, ?DateTime $time = null): array
     {
         $time = $time ?: new DateTime('now', new DateTimeZone('UTC'));

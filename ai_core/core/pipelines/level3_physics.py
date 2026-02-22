@@ -24,19 +24,26 @@ class AtmospherePhysicsEngine:
         cth_km = np.maximum(0, (surface_temp - cloud_tb) / self.lapse_rate)
         avg_cth_km = float(np.mean(cth_km))
 
-        # 2. Wind Vectors from C++ HPC (Lucas-Kanade dense optical flow proxy)
-        # HPC gives us a magnitude proxy, we scale it
-        wind_magnitude_mps = hpc_data.get("optical_flow_magnitude", 0.0) * 1.5
-        wind_kmh = wind_magnitude_mps * 3.6
+        # 2. Wind Vectors from C++ HPC or AI Estimation
+        # We blend HPC optical flow with AI-based cyclone intensity if active
+        hpc_wind_mps = hpc_data.get("optical_flow_magnitude", 0.0) * 1.5
+        ai_wind_knots = l2_data.get("estimated_max_wind_knots", 0.0)
+        
+        # Convert knots to m/s (1 knot = 0.514444 m/s)
+        ai_wind_mps = ai_wind_knots * 0.514444
+        
+        # Weighted blend: if AI is confident in a cyclone, it takes precedence
+        cyclone_prob = l2_data.get("cyclone_probability_pct", 0) / 100.0
+        final_wind_mps = (ai_wind_mps * cyclone_prob) + (hpc_wind_mps * (1.0 - cyclone_prob))
+        final_wind_kmh = final_wind_mps * 3.6
 
-        # 3. Cyclone Risk Assessment Combinations
-        prob = l2_data["cyclone_probability_pct"]
-        is_cyclone = prob > 60.0
+        # 3. Cyclone Risk Assessment
+        is_cyclone = cyclone_prob > 0.6
         
         category = "None"
         if is_cyclone:
-            wind = l2_data["estimated_max_wind_knots"]
-            if wind > 137: category = "Cat 5"
+            wind = ai_wind_knots
+            if wind > 137: category = "Cat 5 / Super Typhoon"
             elif wind > 113: category = "Cat 4"
             elif wind > 96: category = "Cat 3"
             elif wind > 83: category = "Cat 2"
@@ -45,14 +52,18 @@ class AtmospherePhysicsEngine:
 
         return {
             "mean_cloud_top_height_km": round(avg_cth_km, 2),
-            "wind_speed_kmh": round(wind_kmh, 1),
+            "wind_speed_kmh": round(final_wind_kmh, 1),
             "cyclone_detection": {
                 "active": is_cyclone,
-                "confidence": round(prob, 2),
+                "confidence": round(cyclone_prob * 100, 2),
                 "category_prediction": category,
-                "max_sustained_wind_knots": round(l2_data["estimated_max_wind_knots"], 1)
+                "max_sustained_wind_knots": round(ai_wind_knots, 1)
             },
-            "atmospheric_pressure_hpa": round(hpc_data.get("pressure_hpa", 1013.25), 1)
+            "atmospheric_pressure_hpa": round(hpc_data.get("pressure_hpa", 1013.25), 1),
+            "processing_metadata": {
+                "l2_status": l2_data.get("model_status", "UNKNOWN"),
+                "hpc_status": "ACTIVE" if hpc_data.get("optical_flow_magnitude") is not None else "INACTIVE"
+            }
         }
 
 def run_level3_physics(l1: dict, l2: dict, hpc: dict) -> dict:

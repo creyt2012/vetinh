@@ -12,23 +12,19 @@ class MarineController extends Controller
      */
     public function index(): JsonResponse
     {
-        // Simulate AIS tracking data
-        $vessels = [];
-        $types = ['CONTAINER_SHIP', 'OIL_TANKER', 'CARGO_VESSEL', 'RESEARCH_UNIT'];
-
-        for ($i = 0; $i < 50; $i++) {
-            $vessels[] = [
-                'mmsi' => '244' . rand(100000, 999999),
-                'name' => 'STAR_UNIT_' . ($i + 100),
-                'type' => $types[rand(0, 3)],
-                'latitude' => (rand(-600, 600) / 10),
-                'longitude' => (rand(-1800, 1800) / 10),
-                'speed_knots' => rand(10, 25),
-                'course' => rand(0, 360),
-                'destination' => 'COASTAL_SECTOR_' . chr(rand(65, 90)),
-                'eta' => now()->addDays(rand(1, 5))->toIso8601String()
+        $vessels = \App\Models\Vessel::all()->map(function ($vessel) {
+            return [
+                'mmsi' => $vessel->mmsi,
+                'name' => $vessel->name,
+                'type' => $vessel->type,
+                'latitude' => (float) $vessel->latitude,
+                'longitude' => (float) $vessel->longitude,
+                'speed_knots' => (float) $vessel->speed,
+                'course' => (float) $vessel->heading,
+                'status' => $vessel->status,
+                'metadata' => $vessel->metadata
             ];
-        }
+        });
 
         return response()->json([
             'status' => 'success',

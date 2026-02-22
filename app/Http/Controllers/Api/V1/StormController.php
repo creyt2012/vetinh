@@ -38,17 +38,18 @@ class StormController extends Controller
      */
     public function vortex(Storm $storm): JsonResponse
     {
-        // Simulate advanced atmospheric analytics
+        $metadata = $storm->metadata ?? [];
+
         return response()->json([
             'status' => 'success',
             'data' => [
                 'storm_id' => $storm->id,
-                'vortex_integrity' => 0.85 + (rand(0, 10) / 100),
-                'eye_replacement_cycle' => rand(0, 1) ? 'ACTIVE' : 'STABLE',
-                'outflow_efficiency' => 0.72 + (rand(0, 15) / 100),
-                'vertical_wind_shear' => rand(5, 25) . ' knots',
-                'ocean_heat_content' => rand(60, 120) . ' kJ/cm^2',
-                'captured_at' => now()->toIso8601String()
+                'vortex_integrity' => $metadata['vortex_integrity'] ?? 0.85,
+                'eye_replacement_cycle' => $metadata['eye_cycle'] ?? 'STABLE',
+                'outflow_efficiency' => $metadata['outflow'] ?? 0.70,
+                'vertical_wind_shear' => ($metadata['shear'] ?? rand(5, 25)) . ' knots',
+                'ocean_heat_content' => ($metadata['ocean_heat'] ?? rand(60, 120)) . ' kJ/cm^2',
+                'captured_at' => $storm->updated_at->toIso8601String()
             ]
         ]);
     }

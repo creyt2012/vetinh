@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import { Head, useForm } from '@inertiajs/vue3';
-import DashboardLayout from '@/Layouts/DashboardLayout.vue';
+import AdminLayout from '@/Layouts/AdminLayout.vue';
 import { Save, Server, Database, Globe, Zap } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -57,10 +57,9 @@ const formatGroupName = (name) => {
 <template>
     <Head title="System Configuration" />
 
-    <DashboardLayout>
+    <AdminLayout>
         <template #header>
-            <h2 class="font-semibold text-xl text-emerald-400 leading-tight">System Infrastructure Configuration</h2>
-            <p class="text-slate-400 text-sm mt-1">Manage core engines, telemetry polling loops, and database retention.</p>
+            System Configuration
         </template>
 
         <div class="py-6 sm:py-8 h-full overflow-y-auto">
@@ -136,5 +135,5 @@ const formatGroupName = (name) => {
 
             </div>
         </div>
-    </DashboardLayout>
+    </AdminLayout>
 </template>

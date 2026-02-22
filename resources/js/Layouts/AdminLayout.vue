@@ -10,6 +10,8 @@ const navigation = [
         items: [
             { name: 'Global_Dashboard', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', route: 'admin.dashboard' },
             { name: 'Orbital_Assets', icon: 'M12 19l9 2-9-18-9 18 9-2zm0 0v-8', route: 'admin.satellites.index' },
+            { name: 'Marine_Surveillance', icon: 'M13 10V3L4 14h7v7l9-11h-7z', route: 'admin.vessels.index' },
+            { name: 'Orbital_Safety', icon: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z', route: 'admin.orbital.index' },
             { name: 'Ground_Stations', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4', route: 'admin.ground-stations.index' },
             { name: 'Radar_Facilities', icon: 'M5.636 18.364a9 9 0 010-12.728m12.728 0a9 9 0 010 12.728m-9.9-2.829a5 5 0 010-7.07m7.072 0a5 5 0 010 7.07M12 12h.01', route: 'admin.radar-stations.index' },
         ]

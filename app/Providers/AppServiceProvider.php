@@ -17,6 +17,12 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(\App\Services\TenantManager::class, function ($app) {
             return new \App\Services\TenantManager();
         });
+        $this->app->singleton(\App\Services\Intelligence\IntelligenceService::class, function ($app) {
+            return new \App\Services\Intelligence\IntelligenceService();
+        });
+        $this->app->singleton(\App\Services\Orbital\OrbitalService::class, function ($app) {
+            return new \App\Services\Orbital\OrbitalService($app->make(\Vortex\Aerospace\SatelliteEngine::class));
+        });
     }
 
     /**

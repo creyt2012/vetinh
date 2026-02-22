@@ -7,6 +7,7 @@ use App\Models\WeatherMetric;
 use App\Engines\Analytics\RiskEngine;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http; // Added for Http client
 
 class WeatherController extends Controller
 {
@@ -247,13 +248,54 @@ class WeatherController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data' => $data,
+            'data' => [
+                'lat' => $lat,
+                'lng' => $lng,
+                'province' => $location['province'] ?? 'MARITIME_ZONE',
+                'district' => $location['district'] ?? null,
+                'commune' => $location['commune'] ?? null,
+                'temp' => $data['temperature'],
+                'windSpeed' => $data['wind_speed'],
+                'windGusts' => round($data['wind_speed'] * 1.2, 1),
+                'pressure' => $data['pressure'],
+                'humidity' => $data['humidity'],
+                'visibility' => $data['visibility'],
+                'clouds' => $data['cloud_density'],
+                'dewPoint' => round($data['temperature'] - ((100 - $data['humidity']) / 5), 1),
+                'uvIndex' => 5 + rand(-2, 2),
+                'ai_analysis' => $aiAnalysis ?? [
+                    'cloud_depth' => 0,
+                    'cyclone_genesis' => 0,
+                    'anomaly_detected' => false,
+                    'hpc_engine' => 'FALLBACK'
+                ]
+            ],
             'meta' => [
                 'lat' => $lat,
                 'lng' => $lng,
                 'location' => $location,
                 'timestamp' => now()->toIso8601String()
             ]
+        ]);
+    }
+
+    /**
+     * Transmit intelligence to command center.
+     */
+    public function transmit(Request $request): JsonResponse
+    {
+        $data = $request->all();
+
+        \Illuminate\Support\Facades\Log::info("INTEL_TRANSMISSION_INITIATED", [
+            'key' => $request->header('X-API-KEY'),
+            'payload' => $data
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Intelligence packet transmitted to Command Center.',
+            'transmission_id' => 'TX-' . strtoupper(bin2hex(random_bytes(4))),
+            'timestamp' => now()->toIso8601String()
         ]);
     }
 

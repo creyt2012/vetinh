@@ -56,4 +56,11 @@ Route::middleware(['auth.api_key', \App\Http\Middleware\CheckApiKeyLimits::class
     Route::get('/mission-control/files/{missionFile}', [MissionControlController::class, 'show']);
     Route::get('/reports', [\App\Http\Controllers\Api\V1\ReportController::class, 'index']);
     Route::get('/reports/{file}/download', [\App\Http\Controllers\Api\V1\ReportController::class, 'download']);
+
+    Route::post('/internal/transmit', [WeatherController::class, 'transmit']);
+
+    // STAC API Foundation
+    Route::get('/stac', [\App\Http\Controllers\Api\V1\StacController::class, 'index']);
+    Route::get('/stac/collections', [\App\Http\Controllers\Api\V1\StacController::class, 'collections']);
+    Route::get('/stac/search', [\App\Http\Controllers\Api\V1\StacController::class, 'search']);
 });

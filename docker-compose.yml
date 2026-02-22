@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: starweather-mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-vetinh}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-root}
+      MYSQL_USER: ${DB_USERNAME:-sail}
+    ports:
+      - "${FORWARD_DB_PORT:-3306}:3306"
+    volumes:
+      - starweather-mysql:/var/lib/mysql
+    networks:
+      - starweather
+
+  redis:
+    image: redis:7.0-alpine
+    container_name: starweather-redis
+    restart: always
+    ports:
+      - "${FORWARD_REDIS_PORT:-6379}:6379"
+    volumes:
+      - starweather-redis:/data
+    networks:
+      - starweather
+
+  reverb:
+    image: php:8.3-cli-alpine
+    container_name: starweather-reverb
+    restart: always
+    depends_on:
+      - redis
+    ports:
+      - "${VITE_REVERB_PORT:-8080}:8080"
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+    command: >
+      sh -c "docker-php-ext-install pcntl bcmath &&
+             php artisan reverb:start --host=0.0.0.0 --port=8080"
+    networks:
+      - starweather
+
+networks:
+  starweather:
+    driver: bridge
+
+volumes:
+  starweather-mysql:
+    driver: local
+  starweather-redis:
+    driver: local

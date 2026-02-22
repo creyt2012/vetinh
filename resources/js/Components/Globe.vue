@@ -27,9 +27,13 @@ const emit = defineEmits(['select', 'hover', 'surface-click', 'surface-hover', '
 let scene, camera, renderer, globe, clouds, controls, starfield;
 let satelliteMarkers = new Map();
 let groundStationMarkers = new Map();
+let vesselMarkers = new Map();
+let conjunctionMarkers = new Map();
 let orbitPaths = new Map();
 let selectedSatellite = ref(null);
 let hoveredSatellite = ref(null);
+let hoveredVessel = ref(null);
+let hoveredConjunction = ref(null);
 let toolTipPos = ref({ x: 0, y: 0 });
 let hoveredSurface = ref(null); // Restore for tooltips
 let selectedLocation = ref(null); // { lat, lng, x, y, province, district, commune }
@@ -49,6 +53,8 @@ const CATEGORY_COLORS = {
     'STATION': 0xffffff,       // White (ISS)
     'WEATHER': 0x10b981,       // Green
     'METEOROLOGICAL': 0x10b981, // Map to Weather Green
+    'MARINE': 0xfde047,        // Yellow (Vessels)
+    'CONJUNCTION': 0xff3366,   // Red/Pink (Collision Risk)
     'DEFAULT': 0xcccccc
 };
 
@@ -56,6 +62,7 @@ onMounted(() => {
     initScene();
     animate();
     fetchHeatmap();
+    fetchSurveillanceData();
     setupEchoListeners();
 });
 
@@ -82,6 +89,70 @@ watch(() => props.activeLayers, (layers) => {
 watch(() => props.groundStations, (newStations) => {
     updateGroundStationMarkers(newStations);
 }, { deep: true });
+
+const fetchSurveillanceData = async () => {
+    try {
+        const [vesselRes, conjRes] = await Promise.all([
+            fetch('/api/v1/marine/vessels', { headers: { 'X-API-KEY': 'vetinh_dev_key_123' } }),
+            fetch('/api/v1/satellites/conjunctions', { headers: { 'X-API-KEY': 'vetinh_dev_key_123' } })
+        ]);
+        
+        const vessels = await vesselRes.json();
+        const conjs = await conjRes.json();
+        
+        if (vessels.status === 'success') updateVesselMarkers(vessels.data);
+        if (conjs.status === 'success') updateConjunctionMarkers(conjs.data);
+    } catch (e) {
+        console.error("Surveillance fetch failed", e);
+    }
+};
+
+const updateVesselMarkers = (vessels) => {
+    vesselMarkers.forEach(m => { scene.remove(m); });
+    vesselMarkers.clear();
+    
+    if (!props.activeLayers.includes('MARINE')) return;
+
+    vessels.forEach(v => {
+        const pos = calcPosFromLatLng(v.latitude, v.longitude, 1.002);
+        const geometry = new THREE.ConeGeometry(0.008, 0.02, 3);
+        const material = new THREE.MeshBasicMaterial({ color: CATEGORY_COLORS.MARINE });
+        const marker = new THREE.Mesh(geometry, material);
+        marker.position.copy(pos);
+        marker.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), pos.clone().normalize());
+        marker.rotateX(Math.PI / 2);
+        marker.rotateY(v.course * Math.PI / 180);
+        marker.userData = { type: 'vessel', data: v };
+        scene.add(marker);
+        vesselMarkers.set(v.mmsi, marker);
+    });
+};
+
+const updateConjunctionMarkers = (conjs) => {
+    conjunctionMarkers.forEach(m => { scene.remove(m); });
+    conjunctionMarkers.clear();
+
+    if (!props.activeLayers.includes('ORBITAL_SAFETY')) return;
+
+    conjs.forEach(c => {
+        if (!c.satellite_a || !c.satellite_b) return;
+        const sat = (c.satellite_a || c.satellite_b);
+        const pos = calcPosFromLatLng(sat.latitude, sat.longitude, 1 + (sat.altitude / 6371));
+        
+        const spriteMat = new THREE.SpriteMaterial({
+            map: createGlowTexture(CATEGORY_COLORS.CONJUNCTION),
+            color: CATEGORY_COLORS.CONJUNCTION,
+            transparent: true,
+            blending: THREE.AdditiveBlending
+        });
+        const sprite = new THREE.Sprite(spriteMat);
+        sprite.scale.set(0.3, 0.3, 1);
+        sprite.position.copy(pos);
+        sprite.userData = { type: 'conjunction', data: c };
+        scene.add(sprite);
+        conjunctionMarkers.set(c.id, sprite);
+    });
+};
 
 const initScene = () => {
     scene = new THREE.Scene();

@@ -24,6 +24,7 @@ class SatelliteHighFreqMonitor extends Command
             $startTime = microtime(true);
             $aggregateState = [];
 
+            /** @var Satellite $satellite */
             foreach ($satellites as $satellite) {
                 try {
                     // Capture volatile state (No historical disk write per second)
@@ -31,6 +32,16 @@ class SatelliteHighFreqMonitor extends Command
 
                     // Update the individual 'latest.json' (Fast IO)
                     $this->updateLatestJson($satellite, $telemetry);
+
+                    // BROADCAST: Send real-time update via Reverb
+                    event(new \App\Events\SatelliteUpdated($satellite, [
+                        'lat' => $telemetry['orbital']['coordinates']['lat'],
+                        'lng' => $telemetry['orbital']['coordinates']['lng'],
+                        'alt' => $telemetry['orbital']['coordinates']['alt'],
+                        'v' => $telemetry['orbital']['physics']['velocity_kms'],
+                        'h' => $telemetry['intel']['heading_deg'],
+                        'gs' => $telemetry['intel']['link_specs']['is_visible_to_hanoi']
+                    ]));
 
                     // Add to aggregate for frontend optimization
                     $aggregateState[$satellite->norad_id] = [

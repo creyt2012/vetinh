@@ -21,16 +21,21 @@ class AdminDashboardController extends Controller
                 'active_keys' => ApiKey::where('is_active', true)->count(),
                 'total_users' => User::count(),
                 'monthly_usage' => ApiKey::sum('usage_count'),
+                'total_vessels' => \App\Models\Vessel::count(),
+                'active_conjunction_risks' => \App\Models\Conjunction::where('status', 'ACTIVE')->count(),
+                'stac_collections' => 2, // Hardcoded for now as defined in StacController
             ],
             'satellite_distribution' => [
                 'by_type' => Satellite::selectRaw('type, count(*) as total')->groupBy('type')->pluck('total', 'type'),
                 'by_status' => Satellite::selectRaw('status, count(*) as total')->groupBy('status')->pluck('total', 'status'),
                 'by_priority' => Satellite::selectRaw('priority, count(*) as total')->groupBy('priority')->pluck('total', 'priority'),
             ],
-            // Simulated usage trend for the area chart
             'usage_trend' => [
-                'labels' => ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '23:59'],
-                'data' => [12, 45, 67, 89, 76, 54, 32]
+                'labels' => collect(range(6, 0))->map(fn($i) => now()->subHours($i * 4)->format('H:i')),
+                'data' => collect(range(6, 0))->map(
+                    fn($i) =>
+                    ActivityLog::whereBetween('created_at', [now()->subHours(($i + 1) * 4), now()->subHours($i * 4)])->count()
+                )
             ],
             'recent_keys' => ApiKey::latest()->take(5)->get(),
             'recent_logs' => ActivityLog::with('user')->latest()->take(10)->get(),

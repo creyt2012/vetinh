@@ -97,8 +97,9 @@ const propagateSatellites = () => {
 
 const refreshTacticalData = async () => {
     try {
-        const token = 'vethinh_strategic_internal_token_2026';
-        const res = await axios.get(`/api/internal-map/satellites?token=${token}`);
+        const res = await axios.get('/api/v1/satellites/live', {
+            headers: { 'X-API-KEY': 'vetinh_dev_key_123' }
+        });
         activeSatellites.value = res.data.data;
         lastFetchTime.value = Date.now();
         
@@ -116,9 +117,9 @@ const fetchForecast = async (lat, lng) => {
     isLoadingForecast.value = true;
     showBottomForecast.value = true;
     try {
-        const token = 'vethinh_strategic_internal_token_2026';
-        const response = await axios.get('/api/internal-map/forecast', {
-            params: { lat, lng, token }
+        const response = await axios.get('/api/v1/weather/forecast', {
+            params: { lat, lng },
+            headers: { 'X-API-KEY': 'vetinh_dev_key_123' }
         });
         forecastData.value = response.data.data;
     } catch (e) {
@@ -180,20 +181,13 @@ const handleGlobeClick = async (arg1, arg2, arg3) => {
     fetchForecast(lat, lng);
 
     try {
-        const token = 'vethinh_strategic_internal_token_2026';
-        const response = await axios.get('/api/internal-map/point-info', {
-            params: { lat, lng, token }
+        const response = await axios.get('/api/v1/weather/point-info', {
+            params: { lat, lng },
+            headers: { 'X-API-KEY': 'vetinh_dev_key_123' }
         });
         
-        // Inject AI Analysis metrics
-        pointData.value = {
-            ...response.data.data,
-            ai_analysis: {
-                cloud_depth: 15 + Math.random() * 45, // Simulating volumetric in KM
-                cyclone_genesis: Math.abs(lat) < 20 ? (10 + Math.random() * 20) : (Math.random() * 5),
-                anomaly_detected: Math.random() > 0.8
-            }
-        };
+        // Use verified intelligence from backend
+        pointData.value = response.data.data;
         isLoadingPoint.value = false;
     } catch (e) {
         console.error('Failed to fetch point intelligence', e);
@@ -236,19 +230,40 @@ const fetchLatestTelemetry = async () => {
     }
 };
 
-// Watcher for selectedSatellite to fetch telemetry
-watch(selectedSatellite, async (newSat) => {
-    if (telemetryInterval) clearInterval(telemetryInterval);
-    
-    if (newSat) {
-        await fetchLatestTelemetry(); // Instant first fetch
-        telemetryInterval = setInterval(fetchLatestTelemetry, 1000); // 1Hz Polling
-    } else {
-        telemetryData.value = null;
-    }
+// Real-time Broadcasting for Telemetry (Laravel Echo)
+onMounted(() => {
+    window.Echo.channel('satellites.live')
+        .listen('.satellite.updated', (e) => {
+            // Update state in active constellation
+            const index = activeSatellites.value.findIndex(s => s.norad_id === e.data.norad_id);
+            if (index !== -1) {
+                // Smoothly update position (Globe.gl will handle interpolation if props change)
+                activeSatellites.value[index].position = {
+                    lat: e.data.lat,
+                    lng: e.data.lng,
+                    alt: e.data.alt
+                };
+                
+                // If this is the selected satellite, update its telemetry HUD data
+                if (selectedSatellite.value && selectedSatellite.value.norad_id === e.data.norad_id) {
+                    telemetryData.value = {
+                        orbital: {
+                            coordinates: { lat: e.data.lat, lng: e.data.lng, alt: e.data.alt },
+                            physics: { velocity_kms: e.data.v }
+                        },
+                        intel: {
+                            heading_deg: e.data.h,
+                            link_specs: { is_visible_to_hanoi: e.data.gs }
+                        },
+                        timestamp: new Date().toISOString()
+                    };
+                }
+            }
+        });
 });
 
 onUnmounted(() => {
+    window.Echo.leave('satellites.live');
     if (telemetryInterval) clearInterval(telemetryInterval);
 });
 const auroraData = ref([]);
@@ -316,7 +331,7 @@ const syncGlobeLayers = () => {
         combinedPoints = [...combinedPoints, ...activeStorms.value.map(s => ({ ...s, isStorm: true }))];
     }
     if (activeLayers.value.includes('marine')) {
-        if (marineData.value.length === 0) generateMarineData();
+        if (marineData.value.length === 0) renderMarineLayer();
         combinedPoints = [...combinedPoints, ...marineData.value.map(v => ({ ...v, isMarine: true }))];
     }
     if (activeLayers.value.includes('lightning') && showLightning.value) {
@@ -340,19 +355,14 @@ const syncGlobeLayers = () => {
         combinedRings = [...combinedRings, ...activeStorms.value];
     }
     if (activeLayers.value.includes('aurora')) {
-        if (auroraData.value.length === 0) generateAuroraData();
-        combinedRings = [...combinedRings, ...auroraData.value];
+        // Aurora simulation (Optional/Legacy block removed for stability)
     }
     world.ringsData(combinedRings);
 
     // 3. Unified Heatmaps (Risk + SST)
     let combinedHeatmaps = [];
     if (activeLayers.value.includes('risk')) {
-        combinedHeatmaps.push({
-            data: riskHeatmapData.value.length ? riskHeatmapData.value : generateRiskData(),
-            lat: d => d.lat, lng: d => d.lng, weight: d => d.weight,
-            radius: 15, opacity: 0.4, colorInterpolator: t => `rgba(255, 0, 0, ${t})`
-        });
+        // Handled by renderRiskLayer (Polygons)
     }
     if (activeLayers.value.includes('sst')) {
         combinedHeatmaps.push({
@@ -368,10 +378,11 @@ const syncGlobeLayers = () => {
     else world.hexBinPointsData([]);
 
     // 5. Polygons (NDVI + Watch Zones)
-    if (activeLayers.value.includes('ndvi')) renderNDVILayer();
-    else {
-        // Keep watch zones visible if not in NDVI mode
-        world.polygonsData(watchZones.value);
+    if (activeLayers.value.includes('risk')) {
+        renderRiskLayer();
+    } else {
+        // Clear polygons if not in drawing mode or risk mode
+        if (!isDrawingZone.value) world.polygonsData(watchZones.value);
     }
 
     // 6. Paths (Wind + Orbits)
@@ -410,6 +421,7 @@ const syncGlobeLayers = () => {
 
     // 7. Custom Layers (Satellites)
     if (activeLayers.value.includes('satellites')) {
+        // Map satellites to custom objects for the procedural renderer
         world.customLayerData([...activeSatellites.value]);
     } else {
         world.customLayerData([]);
@@ -592,43 +604,43 @@ const toggleWindLayer = (active) => {
     }
 };
 
-const renderMarineLayer = () => {
-    // Simulating global shipping traffic
-    const vessels = Array.from({ length: 500 }, () => ({
-        lat: (Math.random() - 0.5) * 120,
-        lng: (Math.random() - 0.5) * 360,
-        name: `VESSEL_${Math.floor(Math.random() * 9000 + 1000)}`,
-        type: ['CONTAINER', 'TANKER', 'CARGO'][Math.floor(Math.random() * 3)],
-        speed: (Math.random() * 25).toFixed(1) + ' kn'
-    }));
-    
-    marineData.value = vessels;
-    if (world) {
-        world.pointsData(marineData.value)
-             .pointColor(() => '#00ccff')
-             .pointRadius(0.4)
-             .pointAltitude(0.02)
-             .pointLabel(d => `VESSEL: ${d.name}\nTYPE: ${d.type}\nSPEED: ${d.speed}`);
+const renderMarineLayer = async () => {
+    try {
+        const res = await axios.get('/api/v1/marine/vessels', {
+            headers: { 'X-API-KEY': 'vetinh_dev_key_123' }
+        });
+        marineData.value = res.data.data;
+        if (world) {
+            world.pointsData(marineData.value)
+                 .pointColor(() => '#00ccff')
+                 .pointRadius(0.4)
+                 .pointAltitude(0.02)
+                 .pointLabel(d => `VESSEL: ${d.name}\nTYPE: ${d.type}\nSPEED: ${d.speed_knots} kn`);
+        }
+    } catch (e) {
+        console.error("Marine sync failed", e);
     }
 };
 
-const renderNDVILayer = () => {
-    // NDVI is represented by coloring countries or regions based on vegetation health
-    // We use the already loaded countries data for this
-    fetch('https://raw.githubusercontent.com/vasturiano/globe.gl/master/example/datasets/ne_110m_admin_0_countries.geojson')
-        .then(res => res.json())
-        .then(countries => {
-            if (world) {
-                world.polygonsData(countries.features)
-                     .polygonCapColor(() => {
-                         const values = ['#fde047', '#a3e635', '#4ade80', '#22c55e', '#16a34a', '#15803d'];
-                         return values[Math.floor(Math.random() * values.length)];
-                     })
-                     .polygonSideColor(() => 'rgba(255, 255, 255, 0.05)')
-                     .polygonStrokeColor(() => 'rgba(255, 255, 255, 0.2)')
-                     .polygonLabel(d => `<b>${d.properties.NAME}</b><br/>NDVI_HEALTH_INDEX: ${(0.4 + Math.random() * 0.5).toFixed(2)} [GOOD]`);
-            }
+const renderRiskLayer = async () => {
+    try {
+        const res = await axios.get('/api/v1/weather/risk-areas', {
+            headers: { 'X-API-KEY': 'vetinh_dev_key_123' }
         });
+        const riskAreas = res.data.data;
+        if (world) {
+            world.polygonsData(riskAreas)
+                 .polygonCapColor(d => {
+                     const colors = { 'LOW': 'rgba(0, 255, 0, 0.2)', 'MEDIUM': 'rgba(255, 255, 0, 0.2)', 'HIGH': 'rgba(255, 0, 0, 0.2)' };
+                     return colors[d.severity] || 'rgba(255, 255, 255, 0.1)';
+                 })
+                 .polygonSideColor(() => 'rgba(255, 255, 255, 0.05)')
+                 .polygonStrokeColor(() => 'rgba(255, 255, 255, 0.2)')
+                 .polygonLabel(d => `<b>RISK_ZONE: ${d.name}</b><br/>TYPE: ${d.type}<br/>SEVERITY: ${d.severity}`);
+        }
+    } catch (e) {
+        console.error("Risk sync failed", e);
+    }
 };
 
 const notifyDrawingStart = () => {
@@ -794,14 +806,38 @@ onMounted(async () => {
             .customLayerData([]) 
             .customThreeObject(d => {
                 const isStrategic = d.norad_id === '41836' || d.norad_id === '40267' || d.norad_id === '25544'; 
-                const size = isStrategic ? 1.5 : 0.8; 
+                const size = isStrategic ? 1.2 : 0.6; 
                 const color = isStrategic ? '#00ffff' : '#0088ff';
                 const group = new THREE.Group();
-                const mesh = new THREE.Mesh(
-                    new THREE.BoxGeometry(size, size, size),
-                    new THREE.MeshPhongMaterial({ color, emissive: color, emissiveIntensity: 0.8, transparent: true, opacity: 0.9 })
+                
+                // Main Satellite Body (Bus)
+                const busMesh = new THREE.Mesh(
+                    new THREE.BoxGeometry(size, size, size * 1.5),
+                    new THREE.MeshPhongMaterial({ color, emissive: color, emissiveIntensity: 0.5 })
                 );
-                group.add(mesh);
+                group.add(busMesh);
+
+                // Solar Panels
+                const panelWidth = size * 3;
+                const panelHeight = size * 0.8;
+                const panelDepth = 0.05;
+                const panelGeometry = new THREE.BoxGeometry(panelWidth, panelHeight, panelDepth);
+                const panelMaterial = new THREE.MeshPhongMaterial({ 
+                    color: '#1a1a1a', 
+                    emissive: color, 
+                    emissiveIntensity: 0.2,
+                    specular: color,
+                    shininess: 100
+                });
+
+                const panelL = new THREE.Mesh(panelGeometry, panelMaterial);
+                panelL.position.x = -panelWidth / 2 - size / 2;
+                group.add(panelL);
+
+                const panelR = new THREE.Mesh(panelGeometry, panelMaterial);
+                panelR.position.x = panelWidth / 2 + size / 2;
+                group.add(panelR);
+
                 return group;
             })
             .customThreeObjectUpdate((obj, d) => {
@@ -846,13 +882,13 @@ onMounted(async () => {
 
     // Initial Fetch (vitals first for fast render)
     try {
-        const token = 'vethinh_strategic_internal_token_2026';
+        const headers = { 'X-API-KEY': 'vetinh_dev_key_123' };
         
         // Load storms, stations, and radar facilities immediately
         const [stormRes, stationRes, radarFacRes] = await Promise.all([
-            axios.get(`/api/internal-map/storms?token=${token}`),
-            axios.get(`/api/internal-map/ground-stations?token=${token}`),
-            axios.get(`/api/internal-map/radar-stations?token=${token}`)
+            axios.get('/api/v1/weather/storms', { headers }),
+            axios.get('/api/v1/weather/ground-stations', { headers }),
+            axios.get('/api/v1/weather/radar-stations', { headers })
         ]);
         
         activeStorms.value = stormRes.data;
@@ -867,7 +903,7 @@ onMounted(async () => {
 
         // DECOUPLED: Fetch Satellites in background
         isSyncingSatellites.value = true;
-        axios.get(`/api/internal-map/satellites?token=${token}`).then(satRes => {
+        axios.get('/api/v1/satellites/live', { headers }).then(satRes => {
             activeSatellites.value = satRes.data.data;
             syncGlobeLayers();
             isSyncingSatellites.value = false;
