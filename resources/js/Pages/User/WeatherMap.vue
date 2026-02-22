@@ -41,8 +41,8 @@ const radarFacilities = ref([]);
 const radarTimestamp = ref(null);
 const marineData = ref([]);
 const windParticles = ref([]);
-const rafId = ref(null);
-const intervalId = ref(null);
+let rafId = null;
+let intervalId = null;
 const playbackSpeed = ref(1);
 const showAtmosphere = ref(true);
 const groundStations = ref([]);
@@ -701,8 +701,6 @@ const stopLightningSimulation = () => {
 
 let world = null; // Globe.gl instance
 let map = null;   // Leaflet instance
-let rafId = null;
-let intervalId = null;
 
 const layers = [
     { id: 'satellites', name: 'ORBITAL_INTEL', color: 'vibrant-blue', icon: Satellite },
@@ -998,7 +996,7 @@ const handleResize = () => {
     
     // Auto-sync data every 60 seconds
     intervalId = setInterval(refreshTacticalData, 60000);
-    lastFetchTime.value = Date.now();
+    lastFetchTime.value = isLive.value ? Date.now() : playbackTime.value;
 });
 
 import { onUnmounted } from 'vue';
