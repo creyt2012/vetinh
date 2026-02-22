@@ -26,6 +26,8 @@ class SatellitePropagateJob implements ShouldQueue
         foreach ($satellites as $satellite) {
             try {
                 $trackData = $engine->propagate($satellite);
+                $path = $engine->getOrbitPath($satellite);
+
                 $stateData = array_merge([
                     'id' => $satellite->id,
                     'name' => $satellite->name,
@@ -33,6 +35,11 @@ class SatellitePropagateJob implements ShouldQueue
                     'velocity' => $trackData['velocity'] ?? 0,
                     'altitude' => $trackData['altitude'] ?? 0,
                     'period' => $trackData['period'] ?? 0,
+                    'path' => $path,
+                    'telemetry' => [
+                        'period' => $trackData['period'] ?? 0,
+                        'velocity' => $trackData['velocity'] ?? 0,
+                    ]
                 ], $trackData);
 
                 // 1. Update L1 Cache
